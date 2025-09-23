@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useChat } from '@/contexts/ChatContext';
+import { Badge } from '@/components/ui/badge';
 import {
   LayoutDashboard,
   Package,
@@ -23,7 +25,8 @@ import {
   Menu,
   X,
   Home,
-  ChevronRight
+  ChevronRight,
+  MessageCircle
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -34,6 +37,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
   const { t, dir } = useLanguage();
+  const { unreadCount } = useChat();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -43,6 +47,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { name: 'سفارشات', href: '/admin/orders', icon: ShoppingCart, roles: ['admin', 'manager', 'sales'] },
     { name: 'مشتریان', href: '/admin/customers', icon: Users, roles: ['admin', 'manager', 'sales'] },
     { name: 'گزارش‌ها', href: '/admin/reports', icon: BarChart3, roles: ['admin', 'manager'] },
+    { name: 'مدیریت چت', href: '/admin/chat', icon: MessageCircle, roles: ['admin', 'manager', 'sales'] },
     { name: 'ادغام خارجی', href: '/admin/integrations', icon: Zap, roles: ['admin', 'manager'] },
   ];
 
@@ -110,7 +115,14 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                <item.icon className="w-4 h-4" />
+                <div className="relative">
+                  <item.icon className="w-4 h-4" />
+                  {item.icon === MessageCircle && unreadCount > 0 && (
+                    <Badge className="absolute -top-2 -right-2 w-5 h-5 rounded-full p-0 flex items-center justify-center bg-red-500 text-white text-xs">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </Badge>
+                  )}
+                </div>
                 {item.name}
                 {isActive(item.href) && (
                   <ChevronRight className={`w-4 h-4 mr-auto ${dir === 'rtl' ? 'rotate-180' : ''}`} />

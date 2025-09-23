@@ -31,6 +31,7 @@ interface ChatContextType {
   sessions: ChatSession[];
   activeSession: ChatSession | null;
   isTyping: boolean;
+  unreadCount: number;
   sendMessage: (message: string, sessionId: string) => Promise<void>;
   createSession: (visitorInfo: { name: string; email?: string; phone?: string }) => string;
   closeSession: (sessionId: string) => void;
@@ -175,6 +176,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [sessions, setSessions] = useState<ChatSession[]>(initialSessions);
   const [activeSession, setActiveSession] = useState<ChatSession | null>(null);
   const [isTyping, setIsTyping] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { user } = useAuth();
 
   // Load sessions from localStorage on mount
@@ -183,12 +185,38 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (savedSessions) {
       setSessions(JSON.parse(savedSessions));
     }
+
+    // Calculate initial unread count
+    const totalUnread = initialSessions.reduce((sum, session) => sum + session.unreadCount, 0);
+    setUnreadCount(totalUnread);
   }, []);
 
   // Save sessions to localStorage whenever sessions change
   useEffect(() => {
     localStorage.setItem('chatSessions', JSON.stringify(sessions));
+
+    // Update unread count
+    const totalUnread = sessions.reduce((sum, session) => sum + session.unreadCount, 0);
+    setUnreadCount(totalUnread);
   }, [sessions]);
+
+  // Show notification for new messages
+  useEffect(() => {
+    const handleNewMessage = (event: CustomEvent) => {
+      if (event.detail && event.detail.sessionId) {
+        // Show browser notification if permission granted
+        if (Notification.permission === 'granted') {
+          new Notification('پیام جدید', {
+            body: `پیام جدید از ${event.detail.visitorName}`,
+            icon: '/favicon.ico'
+          });
+        }
+      }
+    };
+
+    window.addEventListener('newChatMessage' as any, handleNewMessage);
+    return () => window.removeEventListener('newChatMessage' as any, handleNewMessage);
+  }, []);
 
   const createSession = (visitorInfo: { name: string; email?: string; phone?: string }) => {
     const newSession: ChatSession = {
@@ -306,6 +334,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sessions,
       activeSession,
       isTyping,
+      unreadCount,
       sendMessage,
       createSession,
       closeSession,
