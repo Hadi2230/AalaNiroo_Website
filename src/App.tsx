@@ -19,6 +19,7 @@ import AdminProducts from './pages/AdminProducts';
 import AdminOrders from './pages/AdminOrders';
 import AdminCustomers from './pages/AdminCustomers';
 import AdminReports from './pages/AdminReports';
+import AdminIntegrations from './pages/AdminIntegrations';
 
 const queryClient = new QueryClient();
 
@@ -78,6 +79,14 @@ const App = () => (
                 element={
                   <ProtectedRoute requiredRoles={['admin', 'manager']}>
                     <AdminReports />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/integrations"
+                element={
+                  <ProtectedRoute requiredRoles={['admin', 'manager']}>
+                    <AdminIntegrations />
                   </ProtectedRoute>
                 }
               />

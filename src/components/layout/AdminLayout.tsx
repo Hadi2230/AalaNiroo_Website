@@ -43,6 +43,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { name: 'سفارشات', href: '/admin/orders', icon: ShoppingCart, roles: ['admin', 'manager', 'sales'] },
     { name: 'مشتریان', href: '/admin/customers', icon: Users, roles: ['admin', 'manager', 'sales'] },
     { name: 'گزارش‌ها', href: '/admin/reports', icon: BarChart3, roles: ['admin', 'manager'] },
+    { name: 'ادغام خارجی', href: '/admin/integrations', icon: Zap, roles: ['admin', 'manager'] },
   ];
 
   const filteredNavigation = navigation.filter(item =>
