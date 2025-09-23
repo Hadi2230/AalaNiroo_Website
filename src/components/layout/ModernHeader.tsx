@@ -100,6 +100,11 @@ const ModernHeader = () => {
 
             {/* CTA Buttons */}
             <div className="hidden lg:flex items-center gap-4">
+              <Link to="/admin/login">
+                <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
+                  پنل فروش
+                </Button>
+              </Link>
               <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
                 {t('hero.cta.quote')}
               </Button>
@@ -137,10 +142,15 @@ const ModernHeader = () => {
                   </Link>
                 ))}
                 <div className="flex flex-col gap-2 mt-4">
-                  <Button variant="outline" className="border-blue-600 text-blue-600">
+                  <Link to="/admin/login">
+                    <Button variant="outline" className="border-blue-600 text-blue-600 w-full">
+                      پنل فروش
+                    </Button>
+                  </Link>
+                  <Button variant="outline" className="border-blue-600 text-blue-600 w-full">
                     {t('hero.cta.quote')}
                   </Button>
-                  <Button className="bg-blue-600 hover:bg-blue-700">
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">
                     <Phone className="w-4 h-4 mr-2" />
                     {t('hero.cta.call')}
                   </Button>
