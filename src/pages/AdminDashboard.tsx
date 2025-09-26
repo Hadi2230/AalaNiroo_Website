@@ -45,7 +45,13 @@ import {
   CheckCircle,
   ArrowUp,
   ArrowDown,
-  Zap
+  Zap,
+  FileText,
+  Image,
+  LayoutDashboard,
+  MessageCircle,
+  Settings,
+  LogIn
 } from 'lucide-react';
 
 // Advanced Dashboard Data
@@ -476,46 +482,149 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
-        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold flex items-center gap-3">
-              <Zap className="w-6 h-6 text-yellow-600" />
-              دسترسی سریع
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Link to="/admin/products" className="group">
-                <Button className="w-full h-20 flex flex-col gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transition-all group-hover:-translate-y-1">
-                  <Package className="w-6 h-6" />
-                  <span className="text-sm">مدیریت محصولات</span>
-                </Button>
-              </Link>
+        {/* All Admin Panels Grid */}
+        <div className="space-y-6">
+          <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold flex items-center gap-3">
+                <Zap className="w-8 h-8 text-yellow-600" />
+                پنل‌های مدیریتی
+              </CardTitle>
+              <CardDescription className="text-lg">
+                دسترسی سریع به تمام 11 پنل مدیریتی سیستم
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* Row 1 - Primary Panels */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">پنل‌های اصلی</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  <Link to="/admin/dashboard" className="group">
+                    <Button className="w-full h-24 flex flex-col gap-3 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 shadow-lg hover:shadow-xl transition-all group-hover:-translate-y-2 group-hover:scale-105">
+                      <Activity className="w-8 h-8" />
+                      <span className="font-semibold">داشبورد اصلی</span>
+                      <span className="text-xs opacity-90">آمار لحظه‌ای</span>
+                    </Button>
+                  </Link>
 
-              <Link to="/admin/orders" className="group">
-                <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-2 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all group-hover:-translate-y-1">
-                  <ShoppingCart className="w-6 h-6" />
-                  <span className="text-sm">سفارشات جدید</span>
-                </Button>
-              </Link>
+                  <Link to="/admin/products" className="group">
+                    <Button className="w-full h-24 flex flex-col gap-3 bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 shadow-lg hover:shadow-xl transition-all group-hover:-translate-y-2 group-hover:scale-105">
+                      <Package className="w-8 h-8" />
+                      <span className="font-semibold">محصولات</span>
+                      <span className="text-xs opacity-90">مدیریت موجودی</span>
+                    </Button>
+                  </Link>
 
-              <Link to="/admin/customers" className="group">
-                <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-2 hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-950 transition-all group-hover:-translate-y-1">
-                  <Users className="w-6 h-6" />
-                  <span className="text-sm">مشتریان</span>
-                </Button>
-              </Link>
+                  <Link to="/admin/orders" className="group">
+                    <Button className="w-full h-24 flex flex-col gap-3 bg-gradient-to-r from-purple-600 to-violet-700 hover:from-purple-700 hover:to-violet-800 shadow-lg hover:shadow-xl transition-all group-hover:-translate-y-2 group-hover:scale-105">
+                      <ShoppingCart className="w-8 h-8" />
+                      <span className="font-semibold">سفارشات</span>
+                      <span className="text-xs opacity-90">پیگیری سفارشات</span>
+                    </Button>
+                  </Link>
 
-              <Link to="/admin/reports" className="group">
-                <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-2 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-950 transition-all group-hover:-translate-y-1">
-                  <BarChart3 className="w-6 h-6" />
-                  <span className="text-sm">گزارش‌ها</span>
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+                  <Link to="/admin/customers" className="group">
+                    <Button className="w-full h-24 flex flex-col gap-3 bg-gradient-to-r from-pink-600 to-rose-700 hover:from-pink-700 hover:to-rose-800 shadow-lg hover:shadow-xl transition-all group-hover:-translate-y-2 group-hover:scale-105">
+                      <Users className="w-8 h-8" />
+                      <span className="font-semibold">مشتریان</span>
+                      <span className="text-xs opacity-90">پایگاه مشتریان</span>
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Row 2 - CMS Panels */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">مدیریت محتوا (CMS)</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <Link to="/admin/content" className="group">
+                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-2 hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950 transition-all group-hover:-translate-y-1 group-hover:shadow-lg">
+                      <FileText className="w-6 h-6 text-orange-600" />
+                      <span className="font-medium">مدیریت محتوا</span>
+                      <span className="text-xs">ویرایش متن‌ها</span>
+                    </Button>
+                  </Link>
+
+                  <Link to="/admin/media" className="group">
+                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-2 hover:border-cyan-500 hover:bg-cyan-50 dark:hover:bg-cyan-950 transition-all group-hover:-translate-y-1 group-hover:shadow-lg">
+                      <Image className="w-6 h-6 text-cyan-600" />
+                      <span className="font-medium">مدیریت رسانه</span>
+                      <span className="text-xs">تصاویر و فایل‌ها</span>
+                    </Button>
+                  </Link>
+
+                  <Link to="/admin/pages" className="group">
+                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-2 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-950 transition-all group-hover:-translate-y-1 group-hover:shadow-lg">
+                      <LayoutDashboard className="w-6 h-6 text-indigo-600" />
+                      <span className="font-medium">مدیریت صفحات</span>
+                      <span className="text-xs">ایجاد صفحات</span>
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Row 3 - Advanced Panels */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">پنل‌های پیشرفته</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Link to="/admin/reports" className="group">
+                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-2 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-950 transition-all group-hover:-translate-y-1 group-hover:shadow-lg">
+                      <BarChart3 className="w-6 h-6 text-purple-600" />
+                      <span className="font-medium">گزارش‌ها</span>
+                      <span className="text-xs">تحلیل و آمار</span>
+                    </Button>
+                  </Link>
+
+                  <Link to="/admin/chat" className="group">
+                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-2 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950 transition-all group-hover:-translate-y-1 group-hover:shadow-lg">
+                      <MessageCircle className="w-6 h-6 text-emerald-600" />
+                      <span className="font-medium">چت آنلاین</span>
+                      <span className="text-xs">پیام‌های زنده</span>
+                    </Button>
+                  </Link>
+
+                  <Link to="/admin/integrations" className="group">
+                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-2 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950 transition-all group-hover:-translate-y-1 group-hover:shadow-lg">
+                      <Settings className="w-6 h-6 text-amber-600" />
+                      <span className="font-medium">ادغام خارجی</span>
+                      <span className="text-xs">ERP/CRM/ایمیل</span>
+                    </Button>
+                  </Link>
+
+                  <Link to="/admin/login" className="group">
+                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-2 hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-all group-hover:-translate-y-1 group-hover:shadow-lg">
+                      <LogIn className="w-6 h-6 text-red-600" />
+                      <span className="font-medium">ورود مدیریت</span>
+                      <span className="text-xs">احراز هویت</span>
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Statistics */}
+              <div className="mt-8 p-6 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-blue-900 rounded-xl">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                  <div>
+                    <div className="text-3xl font-bold text-blue-600">11</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">پنل مدیریتی</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-green-600">4</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">دسته‌بندی</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-purple-600">100%</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">دسترسی سریع</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-orange-600">24/7</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">فعال</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </AdminLayout>
   );
