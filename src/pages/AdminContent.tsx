@@ -1,12 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-import { Save, Edit, FileText, Image, Settings, Globe } from 'lucide-react';
+import {
+  Save,
+  Edit,
+  FileText,
+  Image,
+  Settings,
+  Globe,
+  Search,
+  Eye,
+  History,
+  Download,
+  Upload,
+  Trash2,
+  Plus,
+  Copy,
+  Palette,
+  Code,
+  Bold,
+  Italic,
+  List,
+  Link,
+  ImageIcon,
+  Video,
+  Table,
+  Quote,
+  Undo,
+  Redo,
+  Type,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Maximize2,
+  Minimize2,
+  CheckCircle,
+  AlertCircle,
+  Clock,
+  Users,
+  Tag,
+  ExternalLink,
+  RefreshCw
+} from 'lucide-react';
 import { companyInfo } from '@/data/companyData';
 
 export default function AdminContent() {
