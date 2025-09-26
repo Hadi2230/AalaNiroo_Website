@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { products, services, projects, companyInfo } from '@/data/companyData';
+import { useCompany } from '@/contexts/CompanyContext';
+import { products, services, projects } from '@/data/companyData';
 import { 
   ArrowRight, 
   CheckCircle, 
@@ -29,10 +30,23 @@ import {
 
 export default function ModernIndex() {
   const { language, t, dir } = useLanguage();
+  const { companyData, isLoading } = useCompany();
   const currentProducts = products[language];
   const currentServices = services[language];
   const currentProjects = projects[language];
-  const company = companyInfo[language];
+  const company = companyData[language];
+
+  // Show loading state while company data is loading
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">بارگذاری اطلاعات شرکت...</p>
+        </div>
+      </div>
+    );
+  }
 
   const stats = [
     { icon: Building, value: '500+', label: language === 'fa' ? 'پروژه موفق' : 'Successful Projects' },

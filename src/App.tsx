@@ -7,6 +7,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ChatProvider } from '@/contexts/ChatContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { CompanyProvider } from '@/contexts/CompanyContext';
 
 // ---------- ProtectedRoute ----------
 const RequireAuth = ({
@@ -83,7 +84,8 @@ const App = () => (
     <AuthProvider>
       <ChatProvider>
         <LanguageProvider>
-          <TooltipProvider>
+          <CompanyProvider>
+            <TooltipProvider>
             <Toaster position="top-right" richColors expand={true} />
 
             <ErrorBoundary>
@@ -185,7 +187,8 @@ const App = () => (
                 </Routes>
               </BrowserRouter>
             </ErrorBoundary>
-          </TooltipProvider>
+            </TooltipProvider>
+          </CompanyProvider>
         </LanguageProvider>
       </ChatProvider>
     </AuthProvider>

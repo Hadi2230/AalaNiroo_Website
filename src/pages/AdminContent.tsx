@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCompany } from '@/contexts/CompanyContext';
 import {
   Save,
   Edit,
@@ -55,9 +56,9 @@ import { companyInfo } from '@/data/companyData';
 
 export default function AdminContent() {
   const { user } = useAuth();
+  const { companyData, updateCompanyData, saveCompanyData, resetToDefault, lastModified, modifiedBy } = useCompany();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('fa');
-  const [content, setContent] = useState(companyInfo);
   const [searchTerm, setSearchTerm] = useState('');
   const [showPreview, setShowPreview] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -66,9 +67,9 @@ export default function AdminContent() {
   const [selectedSection, setSelectedSection] = useState('company');
   const [editorMode, setEditorMode] = useState<'wysiwyg' | 'html' | 'text'>('wysiwyg');
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Advanced content management
-  const [contentHistory, setContentHistory] = useState<any[]>([]);
   const [seoData, setSeoData] = useState({
     metaTitle: '',
     metaDescription: '',
@@ -106,44 +107,25 @@ export default function AdminContent() {
       }, 30000); // Auto-save every 30 seconds
       return () => clearTimeout(timer);
     }
-  }, [content, autoSave, isEditing]);
+  }, [companyData, autoSave, isEditing]);
 
-  // Save to localStorage for persistence
   const handleSave = async () => {
+    setIsSaving(true);
     try {
-      const contentToSave = {
-        ...content,
-        lastModified: new Date().toISOString(),
-        modifiedBy: user?.name || 'Unknown'
-      };
-
-      // Save to localStorage (in real app, save to backend)
-      localStorage.setItem('companyContent', JSON.stringify(contentToSave));
-      localStorage.setItem('seoData', JSON.stringify(seoData));
-      localStorage.setItem('menuStructure', JSON.stringify(menuStructure));
-
-      // Add to history
-      setContentHistory(prev => [...prev.slice(-9), {
-        content: contentToSave,
-        timestamp: new Date().toISOString(),
-        user: user?.name
-      }]);
-
-      console.log('Content saved successfully');
-      // Show success notification
+      const success = await saveCompanyData();
+      if (success) {
+        console.log('Content saved successfully');
+        // Show success notification
+      }
     } catch (error) {
       console.error('Save failed:', error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleContentChange = (lang: 'fa' | 'en', field: string, value: string) => {
-    setContent(prev => ({
-      ...prev,
-      [lang]: {
-        ...prev[lang],
-        [field]: value
-      }
-    }));
+    updateCompanyData(lang, field, value);
   };
 
   const handleSEOSave = () => {
@@ -161,7 +143,7 @@ export default function AdminContent() {
 
   const exportContent = () => {
     const data = {
-      content,
+      content: companyData,
       seoData,
       menuStructure,
       exportDate: new Date().toISOString()
@@ -206,12 +188,18 @@ export default function AdminContent() {
                 </Badge>
                 <Badge variant="outline" className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  آخرین ذخیره: {new Date().toLocaleTimeString('fa-IR')}
+                  آخرین ذخیره: {lastModified ? new Date(lastModified).toLocaleTimeString('fa-IR') : 'هرگز'}
                 </Badge>
                 {autoSave && (
                   <Badge variant="default" className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" />
                     ذخیره خودکار فعال
+                  </Badge>
+                )}
+                {isSaving && (
+                  <Badge variant="outline" className="flex items-center gap-2">
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    در حال ذخیره...
                   </Badge>
                 )}
               </div>
@@ -258,6 +246,11 @@ export default function AdminContent() {
               <Button onClick={exportContent} variant="outline" size="lg">
                 <Download className="w-5 h-5 mr-2" />
                 پشتیبان‌گیری
+              </Button>
+
+              <Button onClick={resetToDefault} variant="outline" size="lg" className="text-red-600 hover:text-red-700">
+                <RefreshCw className="w-5 h-5 mr-2" />
+                بازنشانی
               </Button>
 
               <Button
@@ -374,13 +367,13 @@ export default function AdminContent() {
                             <Label className="text-sm font-medium">نام شرکت</Label>
                             {isEditing ? (
                               <Input
-                                value={content[lang].name}
+                                value={companyData[lang].name}
                                 onChange={(e) => handleContentChange(lang, 'name', e.target.value)}
                                 className="text-lg font-semibold"
                               />
                             ) : (
                               <p className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-lg font-semibold">
-                                {content[lang].name}
+                                {companyData[lang].name}
                               </p>
                             )}
                           </div>
@@ -388,12 +381,12 @@ export default function AdminContent() {
                             <Label className="text-sm font-medium">شعار شرکت</Label>
                             {isEditing ? (
                               <Input
-                                value={content[lang].tagline}
+                                value={companyData[lang].tagline}
                                 onChange={(e) => handleContentChange(lang, 'tagline', e.target.value)}
                               />
                             ) : (
                               <p className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                {content[lang].tagline}
+                                {companyData[lang].tagline}
                               </p>
                             )}
                           </div>
@@ -403,14 +396,14 @@ export default function AdminContent() {
                           <Label className="text-sm font-medium">توضیحات شرکت</Label>
                           {isEditing ? (
                             <Textarea
-                              value={content[lang].description}
+                              value={companyData[lang].description}
                               onChange={(e) => handleContentChange(lang, 'description', e.target.value)}
                               rows={4}
                               className="resize-none"
                             />
                           ) : (
                             <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg min-h-[100px]">
-                              {content[lang].description}
+                              {companyData[lang].description}
                             </div>
                           )}
                         </div>
@@ -420,12 +413,12 @@ export default function AdminContent() {
                             <Label className="text-sm font-medium">تلفن</Label>
                             {isEditing ? (
                               <Input
-                                value={content[lang].phone}
+                                value={companyData[lang].phone}
                                 onChange={(e) => handleContentChange(lang, 'phone', e.target.value)}
                               />
                             ) : (
                               <p className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                {content[lang].phone}
+                                {companyData[lang].phone}
                               </p>
                             )}
                           </div>
@@ -433,12 +426,12 @@ export default function AdminContent() {
                             <Label className="text-sm font-medium">ایمیل</Label>
                             {isEditing ? (
                               <Input
-                                value={content[lang].email}
+                                value={companyData[lang].email}
                                 onChange={(e) => handleContentChange(lang, 'email', e.target.value)}
                               />
                             ) : (
                               <p className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                {content[lang].email}
+                                {companyData[lang].email}
                               </p>
                             )}
                           </div>
@@ -446,12 +439,12 @@ export default function AdminContent() {
                             <Label className="text-sm font-medium">آدرس</Label>
                             {isEditing ? (
                               <Input
-                                value={content[lang].address}
+                                value={companyData[lang].address}
                                 onChange={(e) => handleContentChange(lang, 'address', e.target.value)}
                               />
                             ) : (
                               <p className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                {content[lang].address}
+                                {companyData[lang].address}
                               </p>
                             )}
                           </div>
@@ -586,17 +579,17 @@ export default function AdminContent() {
               </DialogDescription>
             </DialogHeader>
             <div className="mt-4">
-              <h2 className="text-2xl font-bold mb-4">{content[activeTab].name}</h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">{content[activeTab].description}</p>
+              <h2 className="text-2xl font-bold mb-4">{companyData[activeTab].name}</h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">{companyData[activeTab].description}</p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <strong>تلفن:</strong> {content[activeTab].phone}
+                  <strong>تلفن:</strong> {companyData[activeTab].phone}
                 </div>
                 <div>
-                  <strong>ایمیل:</strong> {content[activeTab].email}
+                  <strong>ایمیل:</strong> {companyData[activeTab].email}
                 </div>
                 <div>
-                  <strong>آدرس:</strong> {content[activeTab].address}
+                  <strong>آدرس:</strong> {companyData[activeTab].address}
                 </div>
               </div>
             </div>
@@ -636,9 +629,23 @@ export default function AdminContent() {
         {/* Save Button */}
         {isEditing && (
           <div className="fixed bottom-6 left-6">
-            <Button onClick={handleSave} size="lg" className="shadow-2xl bg-green-600 hover:bg-green-700">
-              <Save className="w-5 h-5 mr-2" />
-              ذخیره همه تغییرات
+            <Button
+              onClick={handleSave}
+              size="lg"
+              className="shadow-2xl bg-green-600 hover:bg-green-700"
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                  در حال ذخیره...
+                </>
+              ) : (
+                <>
+                  <Save className="w-5 h-5 mr-2" />
+                  ذخیره همه تغییرات
+                </>
+              )}
             </Button>
           </div>
         )}
