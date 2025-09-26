@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdminLayout from '@/components/layout/AdminLayout';
@@ -7,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import {
   AreaChart,
   Area,
@@ -38,7 +40,12 @@ import {
   RefreshCw,
   Calendar,
   Target,
-  BarChart3
+  BarChart3,
+  Package,
+  CheckCircle,
+  ArrowUp,
+  ArrowDown,
+  Zap
 } from 'lucide-react';
 
 // Advanced Dashboard Data
