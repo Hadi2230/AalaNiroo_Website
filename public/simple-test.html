@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست ساده</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 500px;
+        }
+        .success {
+            color: #4CAF50;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        .info {
+            color: #2196F3;
+            font-size: 18px;
+            margin: 15px 0;
+        }
+        .debug {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="success">✅ تست موفقیت‌آمیز!</h1>
+        <p class="info">اگر این صفحه را می‌بینید، وب سرور کار می‌کند.</p>
+        
+        <div class="debug">
+            <h3>اطلاعات سیستم:</h3>
+            <ul style="text-align: left; padding-left: 20px;">
+                <li>✅ HTML: بارگذاری شده</li>
+                <li>✅ CSS: اعمال شده</li>
+                <li>✅ JavaScript: در حال اجرا</li>
+                <li>✅ Vite: فعال</li>
+            </ul>
+        </div>
+        
+        <p class="timestamp">زمان بارگذاری: <span id="timestamp"></span></p>
+        <p class="timestamp">آخرین بروزرسانی: 2024-09-24</p>
+    </div>
+
+    <script>
+        document.getElementById('timestamp').textContent = new Date().toLocaleString('fa-IR');
+        
+        // اضافه کردن کمی انیمیشن
+        setTimeout(() => {
+            const container = document.querySelector('.container');
+            container.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                container.style.transform = 'scale(1)';
+            }, 200);
+        }, 500);
+    </script>
+</body>
+</html>

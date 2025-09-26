@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>تست ساده JavaScript</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1 class="success">✅ تست JavaScript ساده</h1>
+    <p id="test-result">در حال تست...</p>
+    <button onclick="testJS()">تست JavaScript</button>
+    
+    <script>
+        function testJS() {
+            document.getElementById('test-result').innerHTML = 
+                '<span class="success">✅ JavaScript کار می‌کند! زمان: ' + new Date().toLocaleString('fa-IR') + '</span>';
+        }
+        
+        // تست خودکار
+        document.addEventListener('DOMContentLoaded', function() {
+            testJS();
+        });
+    </script>
+</body>
+</html>

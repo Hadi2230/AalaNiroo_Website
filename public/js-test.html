@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>تست مستقیم JavaScript</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
+        .test { color: green; font-size: 18px; }
+        .info { background: white; padding: 15px; border-radius: 8px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1 class="test">✅ تست مستقیم JavaScript</h1>
+        <p id="test1">در حال تست...</p>
+        <p id="test2">در حال تست...</p>
+        <button onclick="runTests()">اجرای تست‌ها</button>
+    </div>
+
+    <script>
+        function runTests() {
+            document.getElementById('test1').innerHTML = 
+                '✅ JavaScript کار می‌کند! زمان: ' + new Date().toLocaleString('fa-IR');
+            
+            document.getElementById('test2').innerHTML = 
+                '✅ Event Listener ها کار می‌کنند! کاربر کلیک کرد.';
+        }
+
+        // اجرای خودکار
+        window.addEventListener('load', function() {
+            runTests();
+        });
+    </script>
+</body>
+</html>
