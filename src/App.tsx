@@ -21,6 +21,7 @@ import AdminOrders from './pages/AdminOrders';
 import AdminCustomers from './pages/AdminCustomers';
 import AdminReports from './pages/AdminReports';
 import AdminIntegrations from './pages/AdminIntegrations';
+import AdminChat from './pages/AdminChat';
 
 const queryClient = new QueryClient();
 
