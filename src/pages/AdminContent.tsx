@@ -56,7 +56,16 @@ import { companyInfo } from '@/data/companyData';
 
 export default function AdminContent() {
   const { user } = useAuth();
-  const { companyData, updateCompanyData, saveCompanyData, resetToDefault, lastModified, modifiedBy } = useCompany();
+  const {
+    companyData,
+    updateCompanyData,
+    saveCompanyData,
+    resetToDefault,
+    lastModified,
+    modifiedBy,
+    contentHistory,
+    setContentHistory
+  } = useCompany();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('fa');
   const [searchTerm, setSearchTerm] = useState('');
@@ -114,6 +123,13 @@ export default function AdminContent() {
     try {
       const success = await saveCompanyData();
       if (success) {
+        // Add to history
+        setContentHistory(prev => [...prev.slice(-9), {
+          content: companyData,
+          timestamp: new Date().toISOString(),
+          user: user?.name || 'Unknown'
+        }]);
+
         console.log('Content saved successfully');
         // Show success notification
       }

@@ -28,6 +28,8 @@ interface CompanyContextType {
   isLoading: boolean;
   lastModified: string | null;
   modifiedBy: string | null;
+  contentHistory: any[];
+  setContentHistory: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
 const CompanyContext = createContext<CompanyContextType | undefined>(undefined);
@@ -49,6 +51,7 @@ export const CompanyProvider: React.FC<CompanyProviderProps> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true);
   const [lastModified, setLastModified] = useState<string | null>(null);
   const [modifiedBy, setModifiedBy] = useState<string | null>(null);
+  const [contentHistory, setContentHistory] = useState<any[]>([]);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -60,6 +63,12 @@ export const CompanyProvider: React.FC<CompanyProviderProps> = ({ children }) =>
           setCompanyData(parsedData);
           setLastModified(parsedData.lastModified || null);
           setModifiedBy(parsedData.modifiedBy || null);
+        }
+
+        // Load content history
+        const savedHistory = localStorage.getItem('contentHistory');
+        if (savedHistory) {
+          setContentHistory(JSON.parse(savedHistory));
         }
       } catch (error) {
         console.error('Error loading company data from localStorage:', error);
@@ -92,6 +101,7 @@ export const CompanyProvider: React.FC<CompanyProviderProps> = ({ children }) =>
       };
 
       localStorage.setItem('companyContent', JSON.stringify(dataToSave));
+      localStorage.setItem('contentHistory', JSON.stringify(contentHistory));
       setLastModified(dataToSave.lastModified);
       setModifiedBy(dataToSave.modifiedBy);
 
@@ -107,7 +117,9 @@ export const CompanyProvider: React.FC<CompanyProviderProps> = ({ children }) =>
     setCompanyData(defaultCompanyInfo);
     setLastModified(null);
     setModifiedBy(null);
+    setContentHistory([]);
     localStorage.removeItem('companyContent');
+    localStorage.removeItem('contentHistory');
     console.log('Company data reset to default');
   };
 
@@ -118,7 +130,9 @@ export const CompanyProvider: React.FC<CompanyProviderProps> = ({ children }) =>
     resetToDefault,
     isLoading,
     lastModified,
-    modifiedBy
+    modifiedBy,
+    contentHistory,
+    setContentHistory
   };
 
   return (
