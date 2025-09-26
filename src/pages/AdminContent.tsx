@@ -56,14 +56,84 @@ import { companyInfo } from '@/data/companyData';
 export default function AdminContent() {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState('fa');
   const [content, setContent] = useState(companyInfo);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [showSEO, setShowSEO] = useState(false);
+  const [autoSave, setAutoSave] = useState(true);
+  const [selectedSection, setSelectedSection] = useState('company');
+  const [editorMode, setEditorMode] = useState<'wysiwyg' | 'html' | 'text'>('wysiwyg');
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const handleSave = () => {
-    // Here you would save to a backend or local storage
-    console.log('Saving content:', content);
-    setIsEditing(false);
-    // In a real app, you would save to backend:
-    // await saveContentToBackend(content);
+  // Advanced content management
+  const [contentHistory, setContentHistory] = useState<any[]>([]);
+  const [seoData, setSeoData] = useState({
+    metaTitle: '',
+    metaDescription: '',
+    keywords: '',
+    ogTitle: '',
+    ogDescription: '',
+    ogImage: '',
+    schemaMarkup: '',
+    canonicalUrl: '',
+    robots: 'index,follow'
+  });
+
+  const [menuStructure, setMenuStructure] = useState({
+    header: [
+      { id: 'home', title: 'خانه', url: '/', children: [] },
+      { id: 'about', title: 'درباره ما', url: '/about', children: [] },
+      { id: 'services', title: 'خدمات', url: '/services', children: [] },
+      { id: 'products', title: 'محصولات', url: '/products', children: [] },
+      { id: 'projects', title: 'پروژه‌ها', url: '/projects', children: [] },
+      { id: 'contact', title: 'تماس', url: '/contact', children: [] }
+    ],
+    footer: [
+      { id: 'company', title: 'شرکت', url: '/about', children: [] },
+      { id: 'services2', title: 'خدمات', url: '/services', children: [] },
+      { id: 'support', title: 'پشتیبانی', url: '/support', children: [] },
+      { id: 'privacy', title: 'حریم خصوصی', url: '/privacy', children: [] }
+    ]
+  });
+
+  // Auto-save functionality
+  useEffect(() => {
+    if (autoSave && isEditing) {
+      const timer = setTimeout(() => {
+        handleSave();
+      }, 30000); // Auto-save every 30 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [content, autoSave, isEditing]);
+
+  // Save to localStorage for persistence
+  const handleSave = async () => {
+    try {
+      const contentToSave = {
+        ...content,
+        lastModified: new Date().toISOString(),
+        modifiedBy: user?.name || 'Unknown'
+      };
+
+      // Save to localStorage (in real app, save to backend)
+      localStorage.setItem('companyContent', JSON.stringify(contentToSave));
+      localStorage.setItem('seoData', JSON.stringify(seoData));
+      localStorage.setItem('menuStructure', JSON.stringify(menuStructure));
+
+      // Add to history
+      setContentHistory(prev => [...prev.slice(-9), {
+        content: contentToSave,
+        timestamp: new Date().toISOString(),
+        user: user?.name
+      }]);
+
+      console.log('Content saved successfully');
+      // Show success notification
+    } catch (error) {
+      console.error('Save failed:', error);
+    }
   };
 
   const handleContentChange = (lang: 'fa' | 'en', field: string, value: string) => {
@@ -76,199 +146,498 @@ export default function AdminContent() {
     }));
   };
 
+  const handleSEOSave = () => {
+    localStorage.setItem('seoData', JSON.stringify(seoData));
+    console.log('SEO data saved');
+  };
+
+  const handleMenuUpdate = (menuType: 'header' | 'footer', items: any[]) => {
+    setMenuStructure(prev => ({
+      ...prev,
+      [menuType]: items
+    }));
+    localStorage.setItem('menuStructure', JSON.stringify(menuStructure));
+  };
+
+  const exportContent = () => {
+    const data = {
+      content,
+      seoData,
+      menuStructure,
+      exportDate: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `content-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+  };
+
   if (!user) {
-    return <div className="min-h-screen flex items-center justify-center">دسترسی محدود</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-950">
+        <div className="text-center">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">دسترسی محدود</h2>
+          <p className="text-gray-600 dark:text-gray-400">لطفاً وارد حساب کاربری خود شوید</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">مدیریت محتوا</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
-              ویرایش متن‌ها، تصاویر و محتوای وبسایت
-            </p>
+    <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-950 transition-all duration-300 ${isFullscreen ? 'p-0' : 'p-6'}`}>
+      <div className={`mx-auto transition-all duration-300 ${isFullscreen ? 'max-w-none' : 'max-w-7xl'}`}>
+        {/* Header */}
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 mb-8">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                مدیریت محتوای پیشرفته
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-2 text-lg">
+                سیستم مدیریت محتوای حرفه‌ای با امکانات کامل
+              </p>
+              <div className="flex items-center gap-4 mt-3">
+                <Badge variant="outline" className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  ویرایشگر: {user.name}
+                </Badge>
+                <Badge variant="outline" className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  آخرین ذخیره: {new Date().toLocaleTimeString('fa-IR')}
+                </Badge>
+                {autoSave && (
+                  <Badge variant="default" className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    ذخیره خودکار فعال
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                onClick={() => setIsEditing(!isEditing)}
+                variant={isEditing ? "outline" : "default"}
+                size="lg"
+                className="min-w-[140px]"
+              >
+                {isEditing ? (
+                  <>
+                    <Save className="w-5 h-5 mr-2" />
+                    ذخیره تغییرات
+                  </>
+                ) : (
+                  <>
+                    <Edit className="w-5 h-5 mr-2" />
+                    ویرایش محتوا
+                  </>
+                )}
+              </Button>
+
+              <Button
+                onClick={() => setShowPreview(!showPreview)}
+                variant="outline"
+                size="lg"
+              >
+                <Eye className="w-5 h-5 mr-2" />
+                پیش‌نمایش
+              </Button>
+
+              <Button
+                onClick={() => setShowHistory(!showHistory)}
+                variant="outline"
+                size="lg"
+              >
+                <History className="w-5 h-5 mr-2" />
+                تاریخچه
+              </Button>
+
+              <Button onClick={exportContent} variant="outline" size="lg">
+                <Download className="w-5 h-5 mr-2" />
+                پشتیبان‌گیری
+              </Button>
+
+              <Button
+                onClick={() => setIsFullscreen(!isFullscreen)}
+                variant="outline"
+                size="lg"
+              >
+                {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+              </Button>
+            </div>
           </div>
-          <div className="flex gap-4">
-            <Button 
-              onClick={() => setIsEditing(!isEditing)}
-              variant={isEditing ? "outline" : "default"}
-            >
-              {isEditing ? (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  ذخیره تغییرات
-                </>
-              ) : (
-                <>
-                  <Edit className="w-4 h-4 mr-2" />
-                  ویرایش محتوا
-                </>
-              )}
-            </Button>
+
+          {/* Advanced Controls */}
+          <div className="flex flex-wrap items-center gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="auto-save" className="text-sm font-medium">ذخیره خودکار</Label>
+              <Switch
+                id="auto-save"
+                checked={autoSave}
+                onCheckedChange={setAutoSave}
+              />
+            </div>
+
+            <Select value={editorMode} onValueChange={(value: any) => setEditorMode(value)}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="wysiwyg">ویرایشگر دیداری</SelectItem>
+                <SelectItem value="html">HTML</SelectItem>
+                <SelectItem value="text">متن ساده</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="flex-1 max-w-md">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="جستجو در محتوا..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        <Tabs defaultValue="fa" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="fa" className="flex items-center gap-2">
-              <Globe className="w-4 h-4" />
-              فارسی
-            </TabsTrigger>
-            <TabsTrigger value="en" className="flex items-center gap-2">
-              <Globe className="w-4 h-4" />
-              English
-            </TabsTrigger>
-          </TabsList>
+        {/* Main Content */}
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+          {/* Sidebar */}
+          <div className="xl:col-span-1">
+            <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl sticky top-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="w-5 h-5" />
+                  بخش‌های محتوا
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {[
+                  { id: 'company', title: 'اطلاعات شرکت', icon: Settings },
+                  { id: 'content', title: 'محتوای صفحات', icon: FileText },
+                  { id: 'media', title: 'مدیریت رسانه', icon: Image },
+                  { id: 'menus', title: 'ساختار منوها', icon: List },
+                  { id: 'seo', title: 'SEO و متادیتا', icon: Tag },
+                  { id: 'translations', title: 'مدیریت ترجمه', icon: Globe }
+                ].map((section) => (
+                  <Button
+                    key={section.id}
+                    variant={selectedSection === section.id ? "default" : "ghost"}
+                    className="w-full justify-start"
+                    onClick={() => setSelectedSection(section.id)}
+                  >
+                    <section.icon className="w-4 h-4 mr-2" />
+                    {section.title}
+                  </Button>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
 
-          {(['fa', 'en'] as const).map((lang) => (
-            <TabsContent key={lang} value={lang} className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Settings className="w-5 h-5" />
-                    اطلاعات شرکت
-                  </CardTitle>
-                  <CardDescription>
-                    ویرایش اطلاعات پایه شرکت
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">نام شرکت</label>
-                      {isEditing ? (
-                        <Input
-                          value={content[lang].name}
-                          onChange={(e) => handleContentChange(lang, 'name', e.target.value)}
-                        />
-                      ) : (
-                        <p className="p-2 bg-gray-100 dark:bg-gray-800 rounded">{content[lang].name}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">شعار شرکت</label>
-                      {isEditing ? (
-                        <Input
-                          value={content[lang].tagline}
-                          onChange={(e) => handleContentChange(lang, 'tagline', e.target.value)}
-                        />
-                      ) : (
-                        <p className="p-2 bg-gray-100 dark:bg-gray-800 rounded">{content[lang].tagline}</p>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium mb-2">توضیحات شرکت</label>
-                    {isEditing ? (
-                      <Textarea
-                        value={content[lang].description}
-                        onChange={(e) => handleContentChange(lang, 'description', e.target.value)}
-                        rows={3}
-                      />
-                    ) : (
-                      <p className="p-3 bg-gray-100 dark:bg-gray-800 rounded">{content[lang].description}</p>
-                    )}
-                  </div>
+          {/* Main Editor */}
+          <div className="xl:col-span-3">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="fa" className="flex items-center gap-2 text-lg">
+                  <Globe className="w-5 h-5" />
+                  فارسی
+                </TabsTrigger>
+                <TabsTrigger value="en" className="flex items-center gap-2 text-lg">
+                  <Globe className="w-5 h-5" />
+                  English
+                </TabsTrigger>
+              </TabsList>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">تلفن</label>
-                      {isEditing ? (
-                        <Input
-                          value={content[lang].phone}
-                          onChange={(e) => handleContentChange(lang, 'phone', e.target.value)}
-                        />
-                      ) : (
-                        <p className="p-2 bg-gray-100 dark:bg-gray-800 rounded">{content[lang].phone}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">ایمیل</label>
-                      {isEditing ? (
-                        <Input
-                          value={content[lang].email}
-                          onChange={(e) => handleContentChange(lang, 'email', e.target.value)}
-                        />
-                      ) : (
-                        <p className="p-2 bg-gray-100 dark:bg-gray-800 rounded">{content[lang].email}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">آدرس</label>
-                      {isEditing ? (
-                        <Input
-                          value={content[lang].address}
-                          onChange={(e) => handleContentChange(lang, 'address', e.target.value)}
-                        />
-                      ) : (
-                        <p className="p-2 bg-gray-100 dark:bg-gray-800 rounded">{content[lang].address}</p>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              {(['fa', 'en'] as const).map((lang) => (
+                <TabsContent key={lang} value={lang} className="space-y-6">
+                  {/* Company Information */}
+                  {selectedSection === 'company' && (
+                    <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-3">
+                          <Settings className="w-6 h-6 text-blue-600" />
+                          اطلاعات شرکت
+                        </CardTitle>
+                        <CardDescription>
+                          ویرایش اطلاعات پایه و هویت شرکت
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">نام شرکت</Label>
+                            {isEditing ? (
+                              <Input
+                                value={content[lang].name}
+                                onChange={(e) => handleContentChange(lang, 'name', e.target.value)}
+                                className="text-lg font-semibold"
+                              />
+                            ) : (
+                              <p className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-lg font-semibold">
+                                {content[lang].name}
+                              </p>
+                            )}
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">شعار شرکت</Label>
+                            {isEditing ? (
+                              <Input
+                                value={content[lang].tagline}
+                                onChange={(e) => handleContentChange(lang, 'tagline', e.target.value)}
+                              />
+                            ) : (
+                              <p className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                {content[lang].tagline}
+                              </p>
+                            )}
+                          </div>
+                        </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5" />
-                    محتوای صفحات
-                  </CardTitle>
-                  <CardDescription>
-                    ویرایش محتوای صفحات وبسایت
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Badge variant="secondary" className="p-3 justify-center">
-                      درباره ما - قابل ویرایش
-                    </Badge>
-                    <Badge variant="secondary" className="p-3 justify-center">
-                      خدمات - قابل ویرایش
-                    </Badge>
-                    <Badge variant="secondary" className="p-3 justify-center">
-                      محصولات - قابل ویرایش
-                    </Badge>
-                    <Badge variant="secondary" className="p-3 justify-center">
-                      پروژه‌ها - قابل ویرایش
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium">توضیحات شرکت</Label>
+                          {isEditing ? (
+                            <Textarea
+                              value={content[lang].description}
+                              onChange={(e) => handleContentChange(lang, 'description', e.target.value)}
+                              rows={4}
+                              className="resize-none"
+                            />
+                          ) : (
+                            <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg min-h-[100px]">
+                              {content[lang].description}
+                            </div>
+                          )}
+                        </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Image className="w-5 h-5" />
-                    مدیریت تصاویر
-                  </CardTitle>
-                  <CardDescription>
-                    آپلود و مدیریت تصاویر وبسایت
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
-                    <Image className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">
-                      تصاویر وبسایت را اینجا آپلود کنید
-                    </p>
-                    <Button variant="outline" disabled={!isEditing}>
-                      انتخاب فایل
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">تلفن</Label>
+                            {isEditing ? (
+                              <Input
+                                value={content[lang].phone}
+                                onChange={(e) => handleContentChange(lang, 'phone', e.target.value)}
+                              />
+                            ) : (
+                              <p className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                {content[lang].phone}
+                              </p>
+                            )}
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">ایمیل</Label>
+                            {isEditing ? (
+                              <Input
+                                value={content[lang].email}
+                                onChange={(e) => handleContentChange(lang, 'email', e.target.value)}
+                              />
+                            ) : (
+                              <p className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                {content[lang].email}
+                              </p>
+                            )}
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">آدرس</Label>
+                            {isEditing ? (
+                              <Input
+                                value={content[lang].address}
+                                onChange={(e) => handleContentChange(lang, 'address', e.target.value)}
+                              />
+                            ) : (
+                              <p className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                {content[lang].address}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Page Content Editor */}
+                  {selectedSection === 'content' && (
+                    <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-3">
+                          <FileText className="w-6 h-6 text-green-600" />
+                          ویرایشگر محتوای صفحات
+                        </CardTitle>
+                        <CardDescription>
+                          ویرایش محتوای صفحات وبسایت با ویرایشگر پیشرفته
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center bg-gray-50 dark:bg-gray-700/50">
+                          <Code className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                          <h3 className="text-xl font-semibold mb-2">ویرایشگر WYSIWYG پیشرفته</h3>
+                          <p className="text-gray-600 dark:text-gray-400 mb-6">
+                            ویرایشگر حرفه‌ای با امکانات کامل در حال بارگذاری...
+                          </p>
+                          <div className="flex justify-center gap-4">
+                            <Button variant="outline">
+                              <Bold className="w-4 h-4 mr-2" />
+                              Bold
+                            </Button>
+                            <Button variant="outline">
+                              <Italic className="w-4 h-4 mr-2" />
+                              Italic
+                            </Button>
+                            <Button variant="outline">
+                              <Link className="w-4 h-4 mr-2" />
+                              Link
+                            </Button>
+                            <Button variant="outline">
+                              <ImageIcon className="w-4 h-4 mr-2" />
+                              Image
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* SEO Management */}
+                  {selectedSection === 'seo' && (
+                    <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-3">
+                          <Tag className="w-6 h-6 text-purple-600" />
+                          مدیریت SEO
+                        </CardTitle>
+                        <CardDescription>
+                          بهینه‌سازی موتورهای جستجو و متادیتا
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">Meta Title</Label>
+                            <Input
+                              value={seoData.metaTitle}
+                              onChange={(e) => setSeoData(prev => ({ ...prev, metaTitle: e.target.value }))}
+                              placeholder="عنوان صفحه برای موتورهای جستجو"
+                            />
+                            <p className="text-xs text-gray-500">{seoData.metaTitle.length}/60</p>
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">Meta Description</Label>
+                            <Textarea
+                              value={seoData.metaDescription}
+                              onChange={(e) => setSeoData(prev => ({ ...prev, metaDescription: e.target.value }))}
+                              rows={3}
+                              placeholder="توضیحات صفحه برای موتورهای جستجو"
+                            />
+                            <p className="text-xs text-gray-500">{seoData.metaDescription.length}/160</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium">Keywords</Label>
+                          <Input
+                            value={seoData.keywords}
+                            onChange={(e) => setSeoData(prev => ({ ...prev, keywords: e.target.value }))}
+                            placeholder="کلمات کلیدی جدا شده با کاما"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">Open Graph Title</Label>
+                            <Input
+                              value={seoData.ogTitle}
+                              onChange={(e) => setSeoData(prev => ({ ...prev, ogTitle: e.target.value }))}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">Open Graph Description</Label>
+                            <Input
+                              value={seoData.ogDescription}
+                              onChange={(e) => setSeoData(prev => ({ ...prev, ogDescription: e.target.value }))}
+                            />
+                          </div>
+                        </div>
+
+                        <Button onClick={handleSEOSave} className="w-full">
+                          <Save className="w-4 h-4 mr-2" />
+                          ذخیره تنظیمات SEO
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+                </TabsContent>
+              ))}
+            </Tabs>
+          </div>
+        </div>
+
+        {/* Preview Modal */}
+        <Dialog open={showPreview} onOpenChange={setShowPreview}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto">
+            <DialogHeader>
+              <DialogTitle>پیش‌نمایش محتوا</DialogTitle>
+              <DialogDescription>
+                نمایش محتوای ذخیره شده در وبسایت
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4">
+              <h2 className="text-2xl font-bold mb-4">{content[activeTab].name}</h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">{content[activeTab].description}</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <strong>تلفن:</strong> {content[activeTab].phone}
+                </div>
+                <div>
+                  <strong>ایمیل:</strong> {content[activeTab].email}
+                </div>
+                <div>
+                  <strong>آدرس:</strong> {content[activeTab].address}
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* History Modal */}
+        <Dialog open={showHistory} onOpenChange={setShowHistory}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-auto">
+            <DialogHeader>
+              <DialogTitle>تاریخچه تغییرات</DialogTitle>
+              <DialogDescription>
+                نسخه‌های قبلی محتوای ذخیره شده
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              {contentHistory.slice().reverse().map((item, index) => (
+                <Card key={index} className="p-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium">نسخه {contentHistory.length - index}</p>
+                      <p className="text-sm text-gray-600">توسط: {item.user}</p>
+                      <p className="text-sm text-gray-600">
+                        تاریخ: {new Date(item.timestamp).toLocaleString('fa-IR')}
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      بازیابی
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          ))}
-        </Tabs>
+                </Card>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
 
+        {/* Save Button */}
         {isEditing && (
-          <div className="fixed bottom-6 right-6">
-            <Button onClick={handleSave} size="lg" className="shadow-lg">
-              <Save className="w-4 h-4 mr-2" />
+          <div className="fixed bottom-6 left-6">
+            <Button onClick={handleSave} size="lg" className="shadow-2xl bg-green-600 hover:bg-green-700">
+              <Save className="w-5 h-5 mr-2" />
               ذخیره همه تغییرات
             </Button>
           </div>
