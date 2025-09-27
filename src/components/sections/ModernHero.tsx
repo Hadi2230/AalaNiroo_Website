@@ -1,11 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Phone, FileText, Calendar, Play, Award, Users, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { companyInfo } from '@/data/companyData';
+import { useCompany } from '@/contexts/CompanyContext';
 
 const ModernHero = () => {
   const { language, t, dir } = useLanguage();
-  const company = companyInfo[language];
+  const { companyData } = useCompany();
+  const company = companyData[language];
 
   return (
     <section className="relative min-h-screen flex items-center bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800 text-white overflow-hidden">

@@ -3,13 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Menu, X, Phone, Mail, Globe, ChevronDown } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { companyInfo } from '@/data/companyData';
+import { useCompany } from '@/contexts/CompanyContext';
 
 const ModernHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const { language, setLanguage, t, dir } = useLanguage();
+  const { companyData } = useCompany();
 
   const navigation = [
     { name: t('nav.home'), href: '/' },
@@ -30,7 +31,7 @@ const ModernHeader = () => {
   }, []);
 
   const isActive = (path: string) => location.pathname === path;
-  const company = companyInfo[language];
+  const company = companyData[language];
 
   return (
     <>

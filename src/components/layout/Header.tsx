@@ -2,10 +2,15 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Phone, Mail } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useCompany } from '@/contexts/CompanyContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { language } = useLanguage();
+  const { companyData } = useCompany();
+  const company = companyData[language];
 
   const navigation = [
     { name: 'خانه', href: '/' },
@@ -27,11 +32,11 @@ const Header = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Phone className="w-4 h-4" />
-              <span>021-88776655</span>
+              <span>{company.phone}</span>
             </div>
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
-              <span>info@energyco.ir</span>
+              <span>{company.email}</span>
             </div>
           </div>
           <div className="hidden md:block">
@@ -47,11 +52,11 @@ const Header = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">E</span>
+                <span className="text-white font-bold text-xl">A</span>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">انرژی پاک</h1>
-                <p className="text-sm text-gray-600">راهکارهای انرژی پایدار</p>
+                <h1 className="text-xl font-bold text-gray-900">{company.name}</h1>
+                <p className="text-sm text-gray-600">{company.tagline}</p>
               </div>
             </Link>
 

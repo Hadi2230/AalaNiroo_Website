@@ -13,6 +13,13 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompany } from '@/contexts/CompanyContext';
 import { toast } from 'sonner';
+
+// Extend window type for autoSaveTimer
+declare global {
+  interface Window {
+    autoSaveTimer: NodeJS.Timeout;
+  }
+}
 import {
   Save,
   Edit,
@@ -52,7 +59,8 @@ import {
   Users,
   Tag,
   ExternalLink,
-  RefreshCw
+  RefreshCw,
+  Zap
 } from 'lucide-react';
 import { companyInfo } from '@/data/companyData';
 
@@ -133,9 +141,16 @@ export default function AdminContent() {
         }]);
 
         toast.success('محتوا با موفقیت ذخیره شد', {
-          description: 'تغییرات در وبسایت اعمال خواهد شد'
+          description: 'تغییرات فوراً در وبسایت اعمال شد'
         });
         setIsEditing(false);
+        
+        // Force update all components by triggering a re-render
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('companyDataUpdated', {
+            detail: companyData
+          }));
+        }, 100);
       }
     } catch (error) {
       console.error('Save failed:', error);
@@ -149,6 +164,14 @@ export default function AdminContent() {
 
   const handleContentChange = (lang: 'fa' | 'en', field: string, value: string) => {
     updateCompanyData(lang, field, value);
+    
+    // Auto-save after 2 seconds of no typing (debounce)
+    if (autoSave) {
+      clearTimeout(window.autoSaveTimer);
+      window.autoSaveTimer = setTimeout(() => {
+        handleSave();
+      }, 2000);
+    }
   };
 
   const handleSEOSave = () => {
@@ -276,6 +299,32 @@ export default function AdminContent() {
               <Button onClick={resetToDefault} variant="outline" size="lg" className="text-red-600 hover:text-red-700">
                 <RefreshCw className="w-5 h-5 mr-2" />
                 بازنشانی
+              </Button>
+
+              <Button 
+                onClick={() => window.open('/', '_blank')} 
+                variant="outline" 
+                size="lg"
+                className="text-green-600 hover:text-green-700"
+              >
+                <ExternalLink className="w-5 h-5 mr-2" />
+                مشاهده سایت
+              </Button>
+
+              <Button 
+                onClick={() => {
+                  // Test sync by updating a field
+                  updateCompanyData('fa', 'name', 'شرکت اعلا نیرو - تست ' + Date.now());
+                  toast.success('تست sync انجام شد!', {
+                    description: 'صفحه اصلی را چک کنید'
+                  });
+                }} 
+                variant="outline" 
+                size="lg"
+                className="text-purple-600 hover:text-purple-700"
+              >
+                <Zap className="w-5 h-5 mr-2" />
+                تست فوری
               </Button>
 
               <Button

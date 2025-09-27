@@ -91,25 +91,55 @@ export const CompanyProvider: React.FC<CompanyProviderProps> = ({ children }) =>
     const handleCompanyDataUpdate = (event: CustomEvent) => {
       if (event.detail) {
         setCompanyData(event.detail);
-        setLastModified(event.detail.lastModified);
-        setModifiedBy(event.detail.modifiedBy);
+        setLastModified(event.detail.lastModified || new Date().toISOString());
+        setModifiedBy(event.detail.modifiedBy || 'Admin User');
+      }
+    };
+
+    // Listen for storage changes from other tabs/windows
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'companyContent' && event.newValue) {
+        try {
+          const parsedData = JSON.parse(event.newValue);
+          setCompanyData(parsedData);
+          setLastModified(parsedData.lastModified);
+          setModifiedBy(parsedData.modifiedBy);
+        } catch (error) {
+          console.error('Error parsing storage data:', error);
+        }
       }
     };
 
     window.addEventListener('companyDataUpdated', handleCompanyDataUpdate as EventListener);
+    window.addEventListener('storage', handleStorageChange);
     
     return () => {
       window.removeEventListener('companyDataUpdated', handleCompanyDataUpdate as EventListener);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
 
   const updateCompanyData = (lang: 'fa' | 'en', field: string, value: string) => {
-    setCompanyData(prev => ({
-      ...prev,
+    const newData = {
+      ...companyData,
       [lang]: {
-        ...prev[lang],
+        ...companyData[lang],
         [field]: value
       }
+    };
+    
+    setCompanyData(newData);
+    
+    // Immediately save to localStorage for instant sync
+    localStorage.setItem('companyContent', JSON.stringify({
+      ...newData,
+      lastModified: new Date().toISOString(),
+      modifiedBy: 'Admin User'
+    }));
+    
+    // Trigger event for other components
+    window.dispatchEvent(new CustomEvent('companyDataUpdated', {
+      detail: newData
     }));
   };
 
