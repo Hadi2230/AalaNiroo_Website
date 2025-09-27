@@ -338,7 +338,7 @@ const defaultProducts: Product[] = [
 ];
 
 export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [products, setProducts] = useState<Product[]>(defaultProducts);
+  const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>(defaultCategories);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -364,10 +364,17 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     if (savedProducts) {
       try {
-        setProducts(JSON.parse(savedProducts));
+        const loadedProducts = JSON.parse(savedProducts);
+        console.log('📂 Loading products from localStorage:', loadedProducts.length);
+        setProducts(loadedProducts);
       } catch (error) {
         console.error('Error loading products:', error);
+        // Fallback to default products
+        setProducts(defaultProducts);
       }
+    } else {
+      console.log('📦 No saved products, using defaults');
+      setProducts(defaultProducts);
     }
     
     if (savedCategories) {
@@ -377,11 +384,45 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         console.error('Error loading categories:', error);
       }
     }
+
+    // Listen for products updates from other components/tabs
+    const handleProductsUpdate = (event: CustomEvent) => {
+      if (event.detail && Array.isArray(event.detail)) {
+        console.log('🔄 Products updated via event:', event.detail.length);
+        setProducts(event.detail);
+      }
+    };
+
+    // Listen for storage changes from other tabs
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'products' && event.newValue) {
+        try {
+          const newProducts = JSON.parse(event.newValue);
+          console.log('💾 Products updated via storage:', newProducts.length);
+          setProducts(newProducts);
+        } catch (error) {
+          console.error('Error parsing storage products:', error);
+        }
+      }
+    };
+
+    window.addEventListener('productsUpdated', handleProductsUpdate as EventListener);
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('productsUpdated', handleProductsUpdate as EventListener);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
-  // Save to localStorage
+  // Save to localStorage and trigger sync event
   useEffect(() => {
     localStorage.setItem('products', JSON.stringify(products));
+    
+    // Trigger custom event for real-time sync
+    window.dispatchEvent(new CustomEvent('productsUpdated', {
+      detail: products
+    }));
   }, [products]);
 
   useEffect(() => {
@@ -451,8 +492,22 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         updatedBy: 'admin'
       };
 
-      setProducts(prev => [newProduct, ...prev]);
-      toast.success('محصول جدید با موفقیت ایجاد شد');
+      setProducts(prev => {
+        const updatedProducts = [newProduct, ...prev];
+        
+        // Force immediate sync
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('productsUpdated', {
+            detail: updatedProducts
+          }));
+        }, 100);
+        
+        return updatedProducts;
+      });
+      
+      toast.success('محصول جدید با موفقیت ایجاد شد', {
+        description: 'محصول در صفحه عمومی نمایش داده خواهد شد'
+      });
       
       return newProduct;
     } catch (error) {

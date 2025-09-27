@@ -42,7 +42,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Info,
-  Settings
+  Settings,
+  RefreshCw
 } from 'lucide-react';
 
 export default function Products() {
@@ -69,7 +70,26 @@ export default function Products() {
     console.log('🔍 Products in /products page:', products);
     console.log('📊 Total products:', products.length);
     console.log('🔍 Public products:', products.filter(p => p.status === 'active' && p.visibility === 'public'));
+    console.log('💾 localStorage products:', localStorage.getItem('products'));
   }, [products]);
+
+  // Force refresh products from localStorage
+  const forceRefresh = useCallback(() => {
+    const savedProducts = localStorage.getItem('products');
+    if (savedProducts) {
+      try {
+        const parsedProducts = JSON.parse(savedProducts);
+        console.log('🔄 Force refreshing products:', parsedProducts.length);
+        window.dispatchEvent(new CustomEvent('productsUpdated', {
+          detail: parsedProducts
+        }));
+        toast.success('محصولات به‌روزرسانی شدند');
+      } catch (error) {
+        console.error('Error force refreshing:', error);
+        toast.error('خطا در به‌روزرسانی');
+      }
+    }
+  }, []);
 
   // Filter only active and public products for frontend
   const publicProducts = products.filter(product => 
@@ -186,24 +206,36 @@ export default function Products() {
             </Select>
 
             {/* View Mode */}
-            <div className="flex bg-gray-100 rounded-lg p-1">
+            <div className="flex items-center gap-2">
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <Button
+                  size="sm"
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  onClick={() => setViewMode('grid')}
+                  className="px-4"
+                >
+                  <Grid className="w-4 h-4 mr-2" />
+                  {language === 'fa' ? 'شبکه' : 'Grid'}
+                </Button>
+                <Button
+                  size="sm"
+                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  onClick={() => setViewMode('list')}
+                  className="px-4"
+                >
+                  <List className="w-4 h-4 mr-2" />
+                  {language === 'fa' ? 'لیست' : 'List'}
+                </Button>
+              </div>
+              
               <Button
+                variant="outline"
                 size="sm"
-                variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                onClick={() => setViewMode('grid')}
-                className="px-4"
+                onClick={forceRefresh}
+                className="text-blue-600 hover:text-blue-700"
               >
-                <Grid className="w-4 h-4 mr-2" />
-                {language === 'fa' ? 'شبکه' : 'Grid'}
-              </Button>
-              <Button
-                size="sm"
-                variant={viewMode === 'list' ? 'default' : 'ghost'}
-                onClick={() => setViewMode('list')}
-                className="px-4"
-              >
-                <List className="w-4 h-4 mr-2" />
-                {language === 'fa' ? 'لیست' : 'List'}
+                <RefreshCw className="w-4 h-4 mr-2" />
+                به‌روزرسانی
               </Button>
             </div>
           </div>
