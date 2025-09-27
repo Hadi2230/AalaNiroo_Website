@@ -144,7 +144,7 @@ const ChatWidget = () => {
     }
   }, []);
 
-  const handleStartChat = useCallback(() => {
+  const handleStartChat = useCallback(async () => {
     if (!visitorInfo.name.trim()) {
       toast.error('لطفاً نام خود را وارد کنید');
       return;
@@ -153,7 +153,7 @@ const ChatWidget = () => {
     try {
       setConnectionStatus('connecting');
       
-      const newSessionId = createSession({
+      const newSessionId = await createSession({
         name: visitorInfo.name,
         email: visitorInfo.email || undefined,
         phone: visitorInfo.phone || undefined,
@@ -309,56 +309,83 @@ const ChatWidget = () => {
 
   return (
     <>
-      {/* Chat Button */}
+      {/* Professional Chat Button */}
       <div className="fixed bottom-6 left-6 z-50">
-        <div className="relative">
+        <div className="relative group">
+          {/* Main Chat Button */}
           <Button
             onClick={() => setIsOpen(!isOpen)}
-            className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 group"
+            className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 hover:from-blue-600 hover:via-blue-700 hover:to-purple-700 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-110 group relative overflow-hidden"
           >
-            {isOpen ? (
-              <X className="w-6 h-6 group-hover:rotate-90 transition-transform" />
-            ) : (
-              <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
-            )}
+            {/* Animated Background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            
+            {/* Icon with Animation */}
+            <div className="relative z-10">
+              {isOpen ? (
+                <X className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300 text-white" />
+              ) : (
+                <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform duration-300 text-white" />
+              )}
+            </div>
+            
+            {/* Shine Effect */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
           </Button>
           
-          {/* Unread Badge */}
+          {/* Professional Unread Badge */}
           {unreadMessages > 0 && !isOpen && (
-            <Badge className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0 flex items-center justify-center bg-red-500 text-white text-xs animate-bounce">
+            <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold flex items-center justify-center shadow-lg animate-pulse border-2 border-white">
               {unreadMessages > 9 ? '9+' : unreadMessages}
-            </Badge>
+            </div>
           )}
           
-          {/* Pulse Animation */}
+          {/* Professional Pulse Animation */}
           {!isOpen && (
-            <div className="absolute inset-0 rounded-full bg-blue-600 animate-ping opacity-20"></div>
+            <>
+              <div className="absolute inset-0 rounded-full bg-blue-500 animate-ping opacity-30"></div>
+              <div className="absolute inset-0 rounded-full bg-blue-400 animate-ping opacity-20" style={{ animationDelay: '0.5s' }}></div>
+            </>
+          )}
+          
+          {/* Online Status Indicator */}
+          {connectionStatus === 'connected' && !isOpen && (
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
           )}
         </div>
       </div>
 
-      {/* Chat Window */}
+      {/* Professional Chat Window */}
       {isOpen && (
-        <div className={`fixed bottom-24 left-6 w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border dark:border-gray-700 z-50 flex flex-col overflow-hidden transition-all duration-300 ${
+        <div className={`fixed bottom-24 left-6 w-96 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 z-50 flex flex-col overflow-hidden transition-all duration-500 ${
           isMinimized ? 'h-16' : 'h-[600px]'
         }`}>
           
-          {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Avatar className="w-10 h-10 border-2 border-white/20">
-                  <AvatarImage src="/api/placeholder/40/40" />
-                  <AvatarFallback className="bg-white/20 text-white">
-                    <Bot className="w-5 h-5" />
-                  </AvatarFallback>
-                </Avatar>
+          {/* Professional Header */}
+          <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-purple-600 text-white p-5 flex-shrink-0 relative overflow-hidden">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-50"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
+            
+            <div className="flex items-center justify-between relative z-10">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <Avatar className="w-12 h-12 border-3 border-white/30 shadow-lg">
+                    <AvatarImage src="/api/placeholder/48/48" />
+                    <AvatarFallback className="bg-white/20 text-white font-bold text-lg">
+                      <Bot className="w-6 h-6" />
+                    </AvatarFallback>
+                  </Avatar>
+                  {connectionStatus === 'connected' && (
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+                  )}
+                </div>
                 <div>
-                  <h3 className="font-bold text-lg">{company.name}</h3>
-                  <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-xl mb-1">{company.name}</h3>
+                  <div className="flex items-center gap-3">
                     {getConnectionStatusBadge()}
                     {currentSession && (
-                      <span className="text-xs opacity-90">
+                      <span className="text-xs opacity-90 bg-white/20 px-2 py-1 rounded-full">
                         ID: {currentSession.id.slice(-6)}
                       </span>
                     )}

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import AdminLayout from '@/components/layout/AdminLayout';
+import { notificationService } from '@/services/notificationService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -114,6 +115,11 @@ const AdminChat = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
 
+  // Request notification permission on mount
+  useEffect(() => {
+    notificationService.requestPermission();
+  }, []);
+
   // Auto-scroll to bottom
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -135,17 +141,28 @@ const AdminChat = () => {
     }
   }, [autoRefresh, sessions]);
 
-  // Play notification sound
+  // Enhanced notification system
   useEffect(() => {
-    if (soundEnabled && notifications.length > 0) {
+    if (notifications.length > 0) {
       const latestNotif = notifications[0];
-      if (!latestNotif.read && latestNotif.type === 'new_message') {
-        // Create audio notification
-        const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7bVnHgU8k9n1unEpBSF+zPLaizsIGGS57OihUBELTKXh8bllHgg2jdT0xXkrBSJ7yO/eizEIHWq+8+OWT' + 'QwNUqzn77RpHgU7k9j1vHAqBSJ9y/PajDwIF2K37OihURELTKXh8bllHgg2jdT0xXkrBSJ7yO/eizEIHWq+8+OWTQ==');
-        audio.volume = 0.3;
-        audio.play().catch(() => {
-          console.log('Audio notification failed');
-        });
+      if (!latestNotif.read) {
+        // Show browser notification
+        if (latestNotif.type === 'new_message') {
+          notificationService.showChatNotification('new_message', {
+            visitorName: latestNotif.message || 'مشتری',
+            sessionId: latestNotif.sessionId
+          });
+        } else if (latestNotif.type === 'new_session') {
+          notificationService.showChatNotification('new_session', {
+            visitorName: latestNotif.message || 'مشتری جدید',
+            sessionId: latestNotif.sessionId
+          });
+        }
+
+        // Play notification sound
+        if (soundEnabled) {
+          notificationService.playNotificationSound();
+        }
       }
     }
   }, [notifications, soundEnabled]);

@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useReducer, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useReducer, useEffect, useState, useCallback } from 'react';
 import { toast } from 'sonner';
+import { chatService } from '@/services/chatService';
+import { notificationService } from '@/services/notificationService';
 
 // انواع TypeScript
 export interface ChatMessage {
@@ -367,8 +369,60 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('chatSessions', JSON.stringify(state.sessions));
   }, [state.sessions]);
 
+  // Initialize real-time chat service
+  useEffect(() => {
+    // Connect to real-time service
+    chatService.connect();
+
+    // Listen for real-time messages
+    const handleMessage = (data: any) => {
+      if (data.type === 'new_message' && data.message) {
+        dispatch({ 
+          type: 'ADD_MESSAGE', 
+          payload: { 
+            sessionId: data.sessionId, 
+            message: data.message 
+          } 
+        });
+
+        // Show notification for new messages
+        if (data.message.sender === 'user') {
+          const session = state.sessions.find(s => s.id === data.sessionId);
+          notificationService.showChatNotification('new_message', {
+            visitorName: session?.visitorName || 'مشتری',
+            sessionId: data.sessionId
+          });
+        }
+      }
+    };
+
+    const handleConnection = () => {
+      dispatch({ type: 'SET_CONNECTION_STATUS', payload: true });
+    };
+
+    const handleDisconnection = () => {
+      dispatch({ type: 'SET_CONNECTION_STATUS', payload: false });
+    };
+
+    // Register event listeners
+    chatService.on('message', handleMessage);
+    chatService.on('connected', handleConnection);
+    chatService.on('disconnected', handleDisconnection);
+
+    // Request notification permission
+    notificationService.requestPermission();
+
+    // Cleanup on unmount
+    return () => {
+      chatService.off('message', handleMessage);
+      chatService.off('connected', handleConnection);
+      chatService.off('disconnected', handleDisconnection);
+      chatService.disconnect();
+    };
+  }, [state.sessions]);
+
   // Actions
-  const sendMessage = useCallback((text: string, sessionId: string, sender: 'user' | 'admin' = 'user', attachments: Attachment[] = []) => {
+  const sendMessage = useCallback(async (text: string, sessionId: string, sender: 'user' | 'admin' = 'user', attachments: Attachment[] = []) => {
     const message: ChatMessage = {
       id: generateId('msg-'),
       text,
@@ -379,10 +433,44 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       attachments
     };
 
+    // Add message to local state immediately
     dispatch({ type: 'ADD_MESSAGE', payload: { sessionId, message } });
+
+    // Send to server via real-time service
+    try {
+      await chatService.sendMessage({
+        text,
+        sessionId,
+        sender,
+        attachments
+      });
+      
+      // Update message status to delivered
+      setTimeout(() => {
+        dispatch({ 
+          type: 'UPDATE_MESSAGE', 
+          payload: { 
+            sessionId, 
+            messageId: message.id, 
+            updates: { status: 'delivered' } 
+          } 
+        });
+      }, 1000);
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      // Update message status to failed
+      dispatch({ 
+        type: 'UPDATE_MESSAGE', 
+        payload: { 
+          sessionId, 
+          messageId: message.id, 
+          updates: { status: 'sent' } 
+        } 
+      });
+    }
   }, []);
 
-  const createSession = useCallback((visitorInfo: { 
+  const createSession = useCallback(async (visitorInfo: { 
     name: string; 
     email?: string; 
     phone?: string;
@@ -390,31 +478,68 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     userAgent?: string;
     pageUrl?: string;
     department?: string;
-  }): string => {
-    const sessionId = generateId('session-');
-    
-    const newSession: ChatSession = {
-      id: sessionId,
-      visitorName: visitorInfo.name,
-      visitorEmail: visitorInfo.email,
-      visitorPhone: visitorInfo.phone,
-      status: 'active',
-      priority: 'medium',
-      messages: [],
-      unreadCount: 0,
-      tags: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      lastMessage: '',
-      lastActivity: new Date().toISOString(),
-      ipAddress: visitorInfo.ipAddress,
-      userAgent: visitorInfo.userAgent,
-      pageUrl: visitorInfo.pageUrl,
-      department: visitorInfo.department || 'عمومی'
-    };
+  }): Promise<string> => {
+    try {
+      // Create session via real-time service
+      const sessionData = await chatService.createSession(visitorInfo);
+      
+      const newSession: ChatSession = {
+        id: sessionData.id,
+        visitorName: visitorInfo.name,
+        visitorEmail: visitorInfo.email,
+        visitorPhone: visitorInfo.phone,
+        status: 'active',
+        priority: 'medium',
+        messages: [],
+        unreadCount: 0,
+        tags: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        lastMessage: '',
+        lastActivity: new Date().toISOString(),
+        ipAddress: visitorInfo.ipAddress,
+        userAgent: visitorInfo.userAgent,
+        pageUrl: visitorInfo.pageUrl,
+        department: visitorInfo.department || 'عمومی'
+      };
 
-    dispatch({ type: 'ADD_SESSION', payload: newSession });
-    return sessionId;
+      dispatch({ type: 'ADD_SESSION', payload: newSession });
+      
+      // Show notification for new session
+      notificationService.showChatNotification('new_session', {
+        visitorName: visitorInfo.name,
+        sessionId: sessionData.id
+      });
+
+      return sessionData.id;
+    } catch (error) {
+      console.error('Failed to create session:', error);
+      
+      // Fallback to local session creation
+      const sessionId = generateId('session-');
+      const newSession: ChatSession = {
+        id: sessionId,
+        visitorName: visitorInfo.name,
+        visitorEmail: visitorInfo.email,
+        visitorPhone: visitorInfo.phone,
+        status: 'active',
+        priority: 'medium',
+        messages: [],
+        unreadCount: 0,
+        tags: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        lastMessage: '',
+        lastActivity: new Date().toISOString(),
+        ipAddress: visitorInfo.ipAddress,
+        userAgent: visitorInfo.userAgent,
+        pageUrl: visitorInfo.pageUrl,
+        department: visitorInfo.department || 'عمومی'
+      };
+
+      dispatch({ type: 'ADD_SESSION', payload: newSession });
+      return sessionId;
+    }
   }, []);
 
   const markAsRead = useCallback((sessionId: string) => {
