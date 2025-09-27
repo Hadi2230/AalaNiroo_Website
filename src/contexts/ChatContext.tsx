@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
+import { toast } from 'sonner';
 
 export interface ChatMessage {
   id: string;
@@ -10,6 +11,25 @@ export interface ChatMessage {
   sessionId: string;
   adminId?: string;
   isTyping?: boolean;
+  attachments?: Attachment[];
+}
+
+export interface Attachment {
+  id: string;
+  name: string;
+  type: 'image' | 'file' | 'audio' | 'video';
+  url: string;
+  size: number;
+}
+
+export interface ChatNotification {
+  id: string;
+  type: 'new_session' | 'new_message' | 'session_closed';
+  title: string;
+  message: string;
+  sessionId: string;
+  timestamp: string;
+  read: boolean;
 }
 
 export interface ChatSession {
@@ -32,13 +52,18 @@ interface ChatContextType {
   activeSession: ChatSession | null;
   isTyping: boolean;
   unreadCount: number;
-  sendMessage: (message: string, sessionId: string) => Promise<void>;
+  notifications: ChatNotification[];
+  isLoading: boolean;
+  sendMessage: (message: string, sessionId: string, sender?: 'user' | 'admin', attachments?: Attachment[]) => Promise<void>;
   createSession: (visitorInfo: { name: string; email?: string; phone?: string }) => string;
   closeSession: (sessionId: string) => void;
   assignSession: (sessionId: string, adminId: string) => void;
   markAsRead: (sessionId: string) => void;
   setActiveSession: (session: ChatSession | null) => void;
   getUnreadCount: () => number;
+  addNotification: (notification: ChatNotification) => void;
+  markNotificationAsRead: (notificationId: string) => void;
+  clearNotifications: () => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -83,6 +108,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [activeSession, setActiveSession] = useState<ChatSession | null>(null);
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState<ChatNotification[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
 
   // Load sessions from localStorage on mount
@@ -147,16 +174,31 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return newSession.id;
   };
 
-  const sendMessage = async (message: string, sessionId: string) => {
+  const addNotification = useCallback((notification: ChatNotification) => {
+    setNotifications(prev => [notification, ...prev]);
+  }, []);
+
+  const markNotificationAsRead = useCallback((notificationId: string) => {
+    setNotifications(prev => prev.map(notif =>
+      notif.id === notificationId ? { ...notif, read: true } : notif
+    ));
+  }, []);
+
+  const clearNotifications = useCallback(() => {
+    setNotifications([]);
+  }, []);
+
+  const sendMessage = async (message: string, sessionId: string, sender: 'user' | 'admin' = 'user', attachments: Attachment[] = []) => {
     if (!message.trim()) return;
 
     const newMessage: ChatMessage = {
       id: `msg-${Date.now()}`,
       text: message,
-      sender: 'user',
+      sender,
       timestamp: new Date().toISOString(),
       status: 'sent',
-      sessionId
+      sessionId,
+      attachments
     };
 
     // Update session with new message
@@ -245,13 +287,18 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       activeSession,
       isTyping,
       unreadCount,
+      notifications,
+      isLoading,
       sendMessage,
       createSession,
       closeSession,
       assignSession,
       markAsRead,
       setActiveSession,
-      getUnreadCount
+      getUnreadCount,
+      addNotification,
+      markNotificationAsRead,
+      clearNotifications
     }}>
       {children}
     </ChatContext.Provider>
