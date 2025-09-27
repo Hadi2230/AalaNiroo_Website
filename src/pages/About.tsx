@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Target, Eye, Award, Users, Calendar, MapPin, Building, Zap, Shield, CheckCircle, Image, X, ZoomIn, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Target, Eye, Award, Users, Calendar, MapPin, Building, Zap, Shield, CheckCircle, Image, X, ZoomIn, ChevronLeft, ChevronRight, Upload } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useMedia } from '@/contexts/MediaContext';
