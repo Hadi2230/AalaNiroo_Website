@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,11 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMedia, MediaFile } from '@/contexts/MediaContext';
+import { toast } from 'sonner';
 import {
   Upload,
   Image,
@@ -22,18 +23,9 @@ import {
   Search,
   Filter,
   Folder,
-  FolderOpen,
   Grid,
   List,
-  ZoomIn,
-  ZoomOut,
-  RotateCw,
-  Crop,
-  Edit3,
-  Copy,
-  Share,
   Star,
-  Archive,
   MoreVertical,
   Plus,
   X,
@@ -49,42 +41,43 @@ import {
   BarChart3,
   Tag,
   Calendar,
-  User
+  User,
+  Edit3,
+  Copy,
+  ExternalLink,
+  Maximize2,
+  ImageIcon,
+  FolderPlus
 } from 'lucide-react';
-
-interface MediaFile {
-  id: string;
-  name: string;
-  type: 'image' | 'document' | 'video' | 'audio';
-  url: string;
-  size: string;
-  uploadedAt: string;
-  folder?: string;
-  tags?: string[];
-  description?: string;
-  alt?: string;
-  copyright?: string;
-  dimensions?: { width: number; height: number };
-  thumbnail?: string;
-  isFavorite?: boolean;
-  usageCount?: number;
-  lastUsed?: string;
-  versions?: MediaFile[];
-}
-
-interface Folder {
-  id: string;
-  name: string;
-  parentId?: string;
-  color: string;
-  icon?: string;
-}
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function AdminMedia() {
   const { user } = useAuth();
-  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  const {
+    mediaFiles,
+    folders,
+    uploadFile,
+    deleteFile,
+    updateFile,
+    createFolder,
+    deleteFolder,
+    getFilesByFolder,
+    getFilesByType,
+    searchFiles,
+    toggleFavorite,
+    getGalleryImages,
+    isLoading,
+    error
+  } = useMedia();
+
   const [dragActive, setDragActive] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<{[key: string]: number}>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<'all' | 'image' | 'document' | 'video' | 'audio'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -92,184 +85,114 @@ export default function AdminMedia() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<MediaFile | null>(null);
-  const [previewMode, setPreviewMode] = useState(false);
+  const [showCreateFolder, setShowCreateFolder] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [uploadMetadata, setUploadMetadata] = useState({
+    description: '',
+    alt: '',
+    tags: '',
+    copyright: ''
+  });
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
 
-  // Advanced mock data
-  const [folders] = useState<Folder[]>([
-    { id: 'all', name: 'همه فایل‌ها', color: '#3b82f6' },
-    { id: 'images', name: 'تصاویر', color: '#10b981', icon: '🖼️' },
-    { id: 'documents', name: 'اسناد', color: '#f59e0b', icon: '📄' },
-    { id: 'hero', name: 'هیرو', color: '#8b5cf6', icon: '🎯' },
-    { id: 'products', name: 'محصولات', color: '#ef4444', icon: '📦' },
-    { id: 'logos', name: 'لوگوها', color: '#06b6d4', icon: '🏷️' }
-  ]);
+  // Filter files based on current filters
+  const filteredFiles = (() => {
+    let files = mediaFiles;
 
-  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([
-    {
-      id: '1',
-      name: 'hero-background.jpg',
-      type: 'image',
-      url: '/images/hero-bg.jpg',
-      size: '2.5 MB',
-      uploadedAt: '2024-01-15',
-      folder: 'hero',
-      tags: ['hero', 'background', 'main'],
-      description: 'تصویر پس‌زمینه اصلی صفحه اول',
-      alt: 'ژنراتورهای صنعتی اعلا نیرو',
-      dimensions: { width: 1920, height: 1080 },
-      thumbnail: '/images/hero-bg-thumb.jpg',
-      isFavorite: true,
-      usageCount: 45,
-      lastUsed: '2024-01-20'
-    },
-    {
-      id: '2',
-      name: 'company-logo.png',
-      type: 'image',
-      url: '/images/logo.png',
-      size: '156 KB',
-      uploadedAt: '2024-01-10',
-      folder: 'logos',
-      tags: ['logo', 'brand', 'company'],
-      description: 'لوگوی اصلی شرکت اعلا نیرو',
-      alt: 'لوگوی اعلا نیرو',
-      dimensions: { width: 500, height: 300 },
-      thumbnail: '/images/logo-thumb.png',
-      isFavorite: true,
-      usageCount: 120,
-      lastUsed: '2024-01-21'
-    },
-    {
-      id: '3',
-      name: 'product-catalog.pdf',
-      type: 'document',
-      url: '/documents/catalog.pdf',
-      size: '5.2 MB',
-      uploadedAt: '2024-01-12',
-      folder: 'documents',
-      tags: ['catalog', 'products', 'document'],
-      description: 'کاتالوگ محصولات 2024',
-      usageCount: 23,
-      lastUsed: '2024-01-18'
-    },
-    {
-      id: '4',
-      name: 'generator-demo.mp4',
-      type: 'video',
-      url: '/videos/generator-demo.mp4',
-      size: '45.8 MB',
-      uploadedAt: '2024-01-14',
-      folder: 'products',
-      tags: ['video', 'demo', 'generator'],
-      description: 'ویدیوی دمو ژنراتورهای دیزلی',
-      dimensions: { width: 1920, height: 1080 },
-      thumbnail: '/videos/generator-demo-thumb.jpg',
-      usageCount: 8,
-      lastUsed: '2024-01-19'
-    },
-    {
-      id: '5',
-      name: 'diesel-generator.jpg',
-      type: 'image',
-      url: '/images/diesel-generator.jpg',
-      size: '3.2 MB',
-      uploadedAt: '2024-01-13',
-      folder: 'products',
-      tags: ['product', 'diesel', 'generator'],
-      description: 'تصویر ژنراتور دیزلی صنعتی',
-      alt: 'ژنراتور دیزلی FG Wilson',
-      dimensions: { width: 1200, height: 800 },
-      thumbnail: '/images/diesel-generator-thumb.jpg',
-      usageCount: 15,
-      lastUsed: '2024-01-20'
+    // Search filter
+    if (searchTerm) {
+      files = searchFiles(searchTerm);
     }
-  ]);
 
-  // Drag & Drop handlers
-  const handleDrag = (e: React.DragEvent) => {
+    // Folder filter
+    if (selectedFolder !== 'all') {
+      files = getFilesByFolder(selectedFolder);
+    }
+
+    // Type filter
+    if (selectedType !== 'all') {
+      files = files.filter(file => file.type === selectedType);
+    }
+
+    return files;
+  })();
+
+  // Drag and drop handlers
+  const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
+    if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
-    } else if (e.type === "dragleave") {
+    } else if (e.type === 'dragleave') {
       setDragActive(false);
     }
-  };
+  }, []);
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFiles(Array.from(e.dataTransfer.files));
+      const files = Array.from(e.dataTransfer.files);
+      await handleFilesUpload(files);
+    }
+  }, [selectedFolder]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      handleFilesUpload(files);
     }
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      handleFiles(Array.from(files));
-    }
-  };
-
-  const handleFiles = async (files: File[]) => {
-    setShowUploadModal(true);
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const fileId = `temp-${Date.now()}-${i}`;
-
-      setUploadProgress(prev => ({ ...prev, [fileId]: 0 }));
-
-      // Simulate upload progress
-      for (let progress = 0; progress <= 100; progress += 10) {
-        setUploadProgress(prev => ({ ...prev, [fileId]: progress }));
-        await new Promise(resolve => setTimeout(resolve, 100));
+  const handleFilesUpload = async (files: File[]) => {
+    for (const file of files) {
+      try {
+        await uploadFile(file, selectedFolder === 'all' ? 'gallery' : selectedFolder, {
+          description: uploadMetadata.description,
+          alt: uploadMetadata.alt,
+          tags: uploadMetadata.tags.split(',').map(tag => tag.trim()).filter(Boolean),
+          copyright: uploadMetadata.copyright
+        });
+      } catch (error) {
+        console.error('Upload failed for file:', file.name, error);
       }
-
-      // Add file to media library
-      const newFile: MediaFile = {
-        id: fileId.replace('temp-', ''),
-        name: file.name,
-        type: getFileType(file.type),
-        url: URL.createObjectURL(file),
-        size: formatFileSize(file.size),
-        uploadedAt: new Date().toISOString().split('T')[0],
-        folder: selectedFolder !== 'all' ? selectedFolder : undefined,
-        tags: [],
-        description: '',
-        dimensions: file.type.startsWith('image/') ? await getImageDimensions(file) : undefined,
-        thumbnail: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
-        usageCount: 0
-      };
-
-      setMediaFiles(prev => [...prev, newFile]);
     }
-
-    setShowUploadModal(false);
-    setUploadProgress({});
-  };
-
-  const getFileType = (mimeType: string): MediaFile['type'] => {
-    if (mimeType.startsWith('image/')) return 'image';
-    if (mimeType.startsWith('video/')) return 'video';
-    if (mimeType.startsWith('audio/')) return 'audio';
-    return 'document';
-  };
-
-  const getImageDimensions = (file: File): Promise<{width: number, height: number}> => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        resolve({ width: img.naturalWidth, height: img.naturalHeight });
-      };
-      img.src = URL.createObjectURL(file);
+    
+    // Reset upload metadata
+    setUploadMetadata({
+      description: '',
+      alt: '',
+      tags: '',
+      copyright: ''
     });
   };
 
-  const formatFileSize = (bytes: number): string => {
+  const handleCreateFolder = async () => {
+    if (newFolderName.trim()) {
+      await createFolder(newFolderName.trim());
+      setNewFolderName('');
+      setShowCreateFolder(false);
+    }
+  };
+
+  const getFileIcon = (file: MediaFile) => {
+    switch (file.type) {
+      case 'image':
+        return <Image className="w-5 h-5 text-green-600" />;
+      case 'video':
+        return <Video className="w-5 h-5 text-purple-600" />;
+      case 'audio':
+        return <Music className="w-5 h-5 text-blue-600" />;
+      default:
+        return <FileText className="w-5 h-5 text-gray-600" />;
+    }
+  };
+
+  const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -277,260 +200,717 @@ export default function AdminMedia() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const handleDelete = (id: string) => {
-    setMediaFiles(prev => prev.filter(file => file.id !== id));
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fa-IR');
   };
-
-  const handlePreview = (file: MediaFile) => {
-    setSelectedFile(file);
-    setPreviewMode(true);
-  };
-
-  const handleEdit = (file: MediaFile) => {
-    setSelectedFile(file);
-    setShowEditModal(true);
-  };
-
-  const handleSaveEdit = () => {
-    if (selectedFile) {
-      setMediaFiles(prev => prev.map(file =>
-        file.id === selectedFile.id ? selectedFile : file
-      ));
-    }
-    setShowEditModal(false);
-    setSelectedFile(null);
-  };
-
-  const handleToggleFavorite = (id: string) => {
-    setMediaFiles(prev => prev.map(file =>
-      file.id === id ? { ...file, isFavorite: !file.isFavorite } : file
-    ));
-  };
-
-  const handleDuplicate = (file: MediaFile) => {
-    const duplicatedFile: MediaFile = {
-      ...file,
-      id: `dup-${Date.now()}`,
-      name: `کپی-${file.name}`,
-      usageCount: 0,
-      lastUsed: undefined
-    };
-    setMediaFiles(prev => [...prev, duplicatedFile]);
-  };
-
-  // Filter and search files
-  const filteredFiles = mediaFiles.filter(file => {
-    const matchesSearch = file.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         file.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         file.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-
-    const matchesType = selectedType === 'all' || file.type === selectedType;
-    const matchesFolder = selectedFolder === 'all' || file.folder === selectedFolder;
-
-    return matchesSearch && matchesType && matchesFolder;
-  });
 
   // Statistics
   const stats = {
     total: mediaFiles.length,
-    images: mediaFiles.filter(f => f.type === 'image').length,
-    documents: mediaFiles.filter(f => f.type === 'document').length,
-    videos: mediaFiles.filter(f => f.type === 'video').length,
-    audio: mediaFiles.filter(f => f.type === 'audio').length,
-    totalSize: mediaFiles.reduce((acc, file) => {
-      const sizeInMB = parseFloat(file.size.replace(' MB', '')) || 0;
-      return acc + sizeInMB;
-    }, 0),
-    favorites: mediaFiles.filter(f => f.isFavorite).length
+    images: getFilesByType('image').length,
+    documents: getFilesByType('document').length,
+    videos: getFilesByType('video').length,
+    totalSize: mediaFiles.reduce((acc, file) => acc + file.size, 0),
+    galleryImages: getGalleryImages().length
   };
-
-  if (!user) {
-    return (
-      <AdminLayout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">دسترسی محدود</h2>
-            <p className="text-gray-600 dark:text-gray-400">لطفاً وارد حساب کاربری خود شوید</p>
-          </div>
-        </div>
-      </AdminLayout>
-    );
-  }
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">مدیریت رسانه</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
-              آپلود، مدیریت و سازماندهی تصاویر و فایل‌ها
-            </p>
-          </div>
-          <div className="flex gap-4">
+        {/* Header */}
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div>
-              <input
-                type="file"
-                multiple
-                accept="image/*,.pdf,.doc,.docx,.txt"
-                onChange={handleFileUpload}
-                className="hidden"
-                id="file-upload"
-              />
-              <Button asChild>
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <Upload className="w-4 h-4 mr-2" />
-                  آپلود فایل
-                </label>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                مدیریت رسانه پیشرفته
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-2 text-lg">
+                آپلود، مدیریت و سازماندهی تصاویر و فایل‌های شرکت
+              </p>
+              <div className="flex items-center gap-4 mt-3">
+                <Badge variant="outline" className="flex items-center gap-2">
+                  <HardDrive className="w-4 h-4" />
+                  {stats.total} فایل
+                </Badge>
+                <Badge variant="outline" className="flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4" />
+                  {stats.galleryImages} عکس گالری
+                </Badge>
+                <Badge variant="outline" className="flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  کاربر: {user?.name}
+                </Badge>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
+                <Upload className="w-5 h-5 mr-2" />
+                آپلود فایل
+              </Button>
+
+              <Button
+                onClick={() => setShowCreateFolder(true)}
+                variant="outline"
+                size="lg"
+              >
+                <FolderPlus className="w-5 h-5 mr-2" />
+                پوشه جدید
+              </Button>
+
+              <Button
+                onClick={() => window.open('/about', '_blank')}
+                variant="outline"
+                size="lg"
+                className="text-green-600 hover:text-green-700"
+              >
+                <ExternalLink className="w-5 h-5 mr-2" />
+                مشاهده گالری
               </Button>
             </div>
           </div>
+
+          {/* Statistics Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6">
+            <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">کل فایل‌ها</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-green-600">{stats.images}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">تصاویر</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-purple-600">{stats.galleryImages}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">گالری</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-yellow-600">{stats.documents}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">اسناد</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800">
+              <CardContent className="p-4 text-center">
+                <div className="text-xl font-bold text-gray-600">{formatFileSize(stats.totalSize)}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">حجم کل</div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
-        <Tabs defaultValue="images" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="images" className="flex items-center gap-2">
-              <Image className="w-4 h-4" />
-              تصاویر
-            </TabsTrigger>
-            <TabsTrigger value="documents" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              اسناد
-            </TabsTrigger>
-            <TabsTrigger value="all" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              همه فایل‌ها
-            </TabsTrigger>
-          </TabsList>
+        {/* Filters and Search */}
+        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row gap-4 items-center">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="جستجو در فایل‌ها..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pr-10"
+                />
+              </div>
 
-          <TabsContent value="images" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {mediaFiles.filter(file => file.type === 'image').map((file) => (
-                <Card key={file.id} className="overflow-hidden">
-                  <div className="aspect-video bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                    <Image className="w-12 h-12 text-gray-400" />
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2">{file.name}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                      اندازه: {file.size}
-                    </p>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => handlePreview(file.url)}>
-                        <Eye className="w-3 h-3 mr-1" />
-                        نمایش
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDelete(file.id)}>
-                        <Trash2 className="w-3 h-3 mr-1" />
-                        حذف
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="documents" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {mediaFiles.filter(file => file.type === 'document').map((file) => (
-                <Card key={file.id} className="overflow-hidden">
-                  <div className="aspect-video bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                    <FileText className="w-12 h-12 text-gray-400" />
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2">{file.name}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                      اندازه: {file.size}
-                    </p>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => handlePreview(file.url)}>
-                        <Eye className="w-3 h-3 mr-1" />
-                        نمایش
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => window.open(file.url, '_blank')}>
-                        <Download className="w-3 h-3 mr-1" />
-                        دانلود
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDelete(file.id)}>
-                        <Trash2 className="w-3 h-3 mr-1" />
-                        حذف
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="all" className="space-y-6">
-            <div className="overflow-x-auto">
-              <table className="w-full bg-white dark:bg-gray-800 rounded-lg">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-right p-4">نام فایل</th>
-                    <th className="text-right p-4">نوع</th>
-                    <th className="text-right p-4">اندازه</th>
-                    <th className="text-right p-4">تاریخ آپلود</th>
-                    <th className="text-right p-4">عملیات</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {mediaFiles.map((file) => (
-                    <tr key={file.id} className="border-b">
-                      <td className="p-4 font-medium">{file.name}</td>
-                      <td className="p-4">
-                        <Badge variant={file.type === 'image' ? 'default' : 'secondary'}>
-                          {file.type === 'image' ? 'تصویر' : 'سند'}
-                        </Badge>
-                      </td>
-                      <td className="p-4">{file.size}</td>
-                      <td className="p-4">{file.uploadedAt}</td>
-                      <td className="p-4">
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline" onClick={() => handlePreview(file.url)}>
-                            <Eye className="w-3 h-3" />
-                          </Button>
-                          {file.type === 'document' && (
-                            <Button size="sm" variant="outline" onClick={() => window.open(file.url, '_blank')}>
-                              <Download className="w-3 h-3" />
-                            </Button>
-                          )}
-                          <Button size="sm" variant="destructive" onClick={() => handleDelete(file.id)}>
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
+              <Select value={selectedFolder} onValueChange={setSelectedFolder}>
+                <SelectTrigger className="w-48">
+                  <Folder className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder="انتخاب پوشه" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">همه پوشه‌ها</SelectItem>
+                  {folders.map((folder) => (
+                    <SelectItem key={folder.id} value={folder.id}>
+                      {folder.name} ({folder.fileCount})
+                    </SelectItem>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </TabsContent>
-        </Tabs>
+                </SelectContent>
+              </Select>
 
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>آمار رسانه</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <p className="text-2xl font-bold text-blue-600">{mediaFiles.filter(f => f.type === 'image').length}</p>
-                <p className="text-sm text-gray-600">تصویر</p>
-              </div>
-              <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <p className="text-2xl font-bold text-green-600">{mediaFiles.filter(f => f.type === 'document').length}</p>
-                <p className="text-sm text-gray-600">سند</p>
-              </div>
-              <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                <p className="text-2xl font-bold text-purple-600">{mediaFiles.length}</p>
-                <p className="text-sm text-gray-600">کل فایل‌ها</p>
+              <Select value={selectedType} onValueChange={(value: any) => setSelectedType(value)}>
+                <SelectTrigger className="w-40">
+                  <Filter className="w-4 h-4 mr-2" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">همه انواع</SelectItem>
+                  <SelectItem value="image">تصاویر</SelectItem>
+                  <SelectItem value="document">اسناد</SelectItem>
+                  <SelectItem value="video">ویدیو</SelectItem>
+                  <SelectItem value="audio">صوت</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                <Button
+                  size="sm"
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  onClick={() => setViewMode('grid')}
+                >
+                  <Grid className="w-4 h-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  onClick={() => setViewMode('list')}
+                >
+                  <List className="w-4 h-4" />
+                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* Drag and Drop Upload Area */}
+        <Card 
+          ref={dropRef}
+          className={`relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-dashed transition-all duration-300 ${
+            dragActive 
+              ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/20' 
+              : 'border-gray-300 dark:border-gray-600'
+          }`}
+          onDragEnter={handleDrag}
+          onDragLeave={handleDrag}
+          onDragOver={handleDrag}
+          onDrop={handleDrop}
+        >
+          <CardContent className="p-8 text-center">
+            <div className="space-y-4">
+              <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center transition-colors ${
+                dragActive ? 'bg-blue-100 dark:bg-blue-900' : 'bg-gray-100 dark:bg-gray-700'
+              }`}>
+                <Upload className={`w-10 h-10 ${dragActive ? 'text-blue-600' : 'text-gray-400'}`} />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold mb-2">
+                  {dragActive ? 'فایل‌ها را اینجا رها کنید' : 'آپلود فایل‌های جدید'}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  فایل‌ها را بکشید و رها کنید یا کلیک کنید تا انتخاب کنید
+                </p>
+                <div className="flex justify-center gap-4">
+                  <Button
+                    onClick={() => fileInputRef.current?.click()}
+                    variant="outline"
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    انتخاب فایل
+                  </Button>
+                  <Button
+                    onClick={() => setShowUploadModal(true)}
+                    variant="outline"
+                  >
+                    <Settings className="w-4 h-4 mr-2" />
+                    آپلود پیشرفته
+                  </Button>
+                </div>
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                فرمت‌های پشتیبانی شده: JPG, PNG, GIF, PDF, DOC, MP4, MP3
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Hidden File Input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept="image/*,video/*,audio/*,.pdf,.doc,.docx"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
+
+        {/* Files Grid/List */}
+        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center gap-3">
+                <HardDrive className="w-6 h-6 text-blue-600" />
+                فایل‌های رسانه ({filteredFiles.length})
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                {selectedFolder !== 'all' && (
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    <Folder className="w-3 h-3" />
+                    {folders.find(f => f.id === selectedFolder)?.name}
+                  </Badge>
+                )}
+                {isLoading && (
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    <Clock className="w-3 h-3 animate-spin" />
+                    در حال پردازش...
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-red-600" />
+                  <span className="text-red-800 dark:text-red-300">{error}</span>
+                </div>
+              </div>
+            )}
+
+            {viewMode === 'grid' ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+                {filteredFiles.map((file) => (
+                  <Card key={file.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden">
+                    <div className="relative aspect-square bg-gray-100 dark:bg-gray-700">
+                      {file.type === 'image' ? (
+                        <img
+                          src={file.url}
+                          alt={file.alt}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          {getFileIcon(file)}
+                        </div>
+                      )}
+                      
+                      {/* Overlay Actions */}
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => {
+                              setSelectedFile(file);
+                              setShowEditModal(true);
+                            }}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => toggleFavorite(file.id)}
+                          >
+                            <Star className={`w-4 h-4 ${file.isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => deleteFile(file.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* File Type Badge */}
+                      <div className="absolute top-2 right-2">
+                        <Badge variant="secondary" className="text-xs">
+                          {file.type === 'image' ? 'عکس' : 
+                           file.type === 'video' ? 'ویدیو' :
+                           file.type === 'audio' ? 'صوت' : 'سند'}
+                        </Badge>
+                      </div>
+
+                      {/* Favorite Star */}
+                      {file.isFavorite && (
+                        <div className="absolute top-2 left-2">
+                          <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                        </div>
+                      )}
+                    </div>
+
+                    <CardContent className="p-4">
+                      <div className="space-y-2">
+                        <h3 className="font-medium text-sm truncate" title={file.name}>
+                          {file.name}
+                        </h3>
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span>{formatFileSize(file.size)}</span>
+                          <span>{formatDate(file.uploadedAt)}</span>
+                        </div>
+                        {file.folder && (
+                          <Badge variant="outline" className="text-xs">
+                            {folders.find(f => f.id === file.folder)?.name}
+                          </Badge>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredFiles.map((file) => (
+                  <div key={file.id} className="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <div className="w-12 h-12 flex-shrink-0">
+                      {file.type === 'image' ? (
+                        <img
+                          src={file.url}
+                          alt={file.alt}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                          {getFileIcon(file)}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-medium truncate">{file.name}</h3>
+                        {file.isFavorite && <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />}
+                      </div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        {formatFileSize(file.size)} • {formatDate(file.uploadedAt)}
+                      </div>
+                      {file.description && (
+                        <div className="text-sm text-gray-600 dark:text-gray-300 truncate">
+                          {file.description}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedFile(file);
+                          setShowEditModal(true);
+                        }}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => toggleFavorite(file.id)}
+                      >
+                        <Star className={`w-4 h-4 ${file.isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="sm" variant="outline">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuLabel>عملیات</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => navigator.clipboard.writeText(file.url)}>
+                            <Copy className="w-4 h-4 mr-2" />
+                            کپی لینک
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Download className="w-4 h-4 mr-2" />
+                            دانلود
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            onClick={() => deleteFile(file.id)}
+                            className="text-red-600"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            حذف
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {filteredFiles.length === 0 && (
+              <div className="text-center py-12">
+                <Image className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                  فایلی یافت نشد
+                </h3>
+                <p className="text-gray-500 dark:text-gray-500">
+                  {searchTerm ? 'نتیجه‌ای برای جستجوی شما یافت نشد' : 'هنوز فایلی آپلود نشده است'}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Upload Modal */}
+        <Dialog open={showUploadModal} onOpenChange={setShowUploadModal}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>آپلود پیشرفته</DialogTitle>
+              <DialogDescription>
+                اطلاعات اضافی برای فایل‌های آپلودی وارد کنید
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label>پوشه مقصد</Label>
+                <Select value={selectedFolder === 'all' ? 'gallery' : selectedFolder} onValueChange={setSelectedFolder}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {folders.filter(f => f.id !== 'all').map((folder) => (
+                      <SelectItem key={folder.id} value={folder.id}>
+                        {folder.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>توضیحات</Label>
+                <Textarea
+                  value={uploadMetadata.description}
+                  onChange={(e) => setUploadMetadata(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="توضیحات فایل..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>متن جایگزین (Alt Text)</Label>
+                  <Input
+                    value={uploadMetadata.alt}
+                    onChange={(e) => setUploadMetadata(prev => ({ ...prev, alt: e.target.value }))}
+                    placeholder="توضیح تصویر برای accessibility"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>کپی‌رایت</Label>
+                  <Input
+                    value={uploadMetadata.copyright}
+                    onChange={(e) => setUploadMetadata(prev => ({ ...prev, copyright: e.target.value }))}
+                    placeholder="© 2024 اعلا نیرو"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>تگ‌ها (جدا شده با کاما)</Label>
+                <Input
+                  value={uploadMetadata.tags}
+                  onChange={(e) => setUploadMetadata(prev => ({ ...prev, tags: e.target.value }))}
+                  placeholder="ژنراتور, صنعتی, اعلا نیرو"
+                />
+              </div>
+
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={() => setShowUploadModal(false)}>
+                  انصراف
+                </Button>
+                <Button onClick={() => fileInputRef.current?.click()}>
+                  <Upload className="w-4 h-4 mr-2" />
+                  انتخاب و آپلود فایل‌ها
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Create Folder Modal */}
+        <Dialog open={showCreateFolder} onOpenChange={setShowCreateFolder}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>ایجاد پوشه جدید</DialogTitle>
+              <DialogDescription>
+                نام پوشه جدید را وارد کنید
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>نام پوشه</Label>
+                <Input
+                  value={newFolderName}
+                  onChange={(e) => setNewFolderName(e.target.value)}
+                  placeholder="نام پوشه..."
+                />
+              </div>
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={() => setShowCreateFolder(false)}>
+                  انصراف
+                </Button>
+                <Button onClick={handleCreateFolder} disabled={!newFolderName.trim()}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  ایجاد پوشه
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* File Edit Modal */}
+        <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+            {selectedFile && (
+              <>
+                <DialogHeader>
+                  <DialogTitle>ویرایش فایل: {selectedFile.name}</DialogTitle>
+                  <DialogDescription>
+                    مشاهده و ویرایش اطلاعات فایل
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Preview */}
+                  <div className="space-y-4">
+                    <div className="aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
+                      {selectedFile.type === 'image' ? (
+                        <img
+                          src={selectedFile.url}
+                          alt={selectedFile.alt}
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          {getFileIcon(selectedFile)}
+                          <div className="ml-3">
+                            <div className="font-medium">{selectedFile.name}</div>
+                            <div className="text-sm text-gray-500">{selectedFile.originalName}</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="font-medium">حجم:</span> {formatFileSize(selectedFile.size)}
+                      </div>
+                      <div>
+                        <span className="font-medium">نوع:</span> {selectedFile.mimeType}
+                      </div>
+                      {selectedFile.dimensions && (
+                        <>
+                          <div>
+                            <span className="font-medium">عرض:</span> {selectedFile.dimensions.width}px
+                          </div>
+                          <div>
+                            <span className="font-medium">ارتفاع:</span> {selectedFile.dimensions.height}px
+                          </div>
+                        </>
+                      )}
+                      <div>
+                        <span className="font-medium">آپلود:</span> {formatDate(selectedFile.uploadedAt)}
+                      </div>
+                      <div>
+                        <span className="font-medium">توسط:</span> {selectedFile.uploadedBy}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Edit Form */}
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>نام فایل</Label>
+                      <Input
+                        value={selectedFile.name}
+                        onChange={(e) => setSelectedFile(prev => prev ? { ...prev, name: e.target.value } : null)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>توضیحات</Label>
+                      <Textarea
+                        value={selectedFile.description}
+                        onChange={(e) => setSelectedFile(prev => prev ? { ...prev, description: e.target.value } : null)}
+                        rows={3}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>متن جایگزین (Alt Text)</Label>
+                      <Input
+                        value={selectedFile.alt}
+                        onChange={(e) => setSelectedFile(prev => prev ? { ...prev, alt: e.target.value } : null)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>تگ‌ها</Label>
+                      <Input
+                        value={selectedFile.tags.join(', ')}
+                        onChange={(e) => setSelectedFile(prev => prev ? { 
+                          ...prev, 
+                          tags: e.target.value.split(',').map(tag => tag.trim()).filter(Boolean)
+                        } : null)}
+                        placeholder="تگ1, تگ2, تگ3"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>پوشه</Label>
+                      <Select 
+                        value={selectedFile.folder} 
+                        onValueChange={(value) => setSelectedFile(prev => prev ? { ...prev, folder: value } : null)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {folders.filter(f => f.id !== 'all').map((folder) => (
+                            <SelectItem key={folder.id} value={folder.id}>
+                              {folder.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="flex items-center gap-4 pt-4">
+                      <Button
+                        onClick={async () => {
+                          if (selectedFile) {
+                            await updateFile(selectedFile.id, selectedFile);
+                            setShowEditModal(false);
+                          }
+                        }}
+                        className="flex-1"
+                      >
+                        <Check className="w-4 h-4 mr-2" />
+                        ذخیره تغییرات
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          if (selectedFile?.url) {
+                            navigator.clipboard.writeText(selectedFile.url);
+                            toast.success('لینک کپی شد');
+                          }
+                        }}
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => selectedFile && deleteFile(selectedFile.id)}
+                        className="text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );
