@@ -51,7 +51,9 @@ import {
   Minimize2,
   ExternalLink,
   Copy,
-  Edit3
+  Edit3,
+  Bot,
+  X
 } from 'lucide-react';
 import {
   Select,
