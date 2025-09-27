@@ -233,7 +233,9 @@ const validateMessage = (message: Partial<ChatMessage>): boolean => {
 
 // Reducer (expanded)
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
-  console.log('🔄 ChatReducer Action:', action.type);
+  if (action.type !== 'MARK_AS_READ') {
+    console.log('🔄 ChatReducer Action:', action.type);
+  }
 
   switch (action.type) {
     case 'SET_LOADING':
@@ -510,6 +512,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const tabIdRef = useRef<string>(generateId('tab-'));
   const bcRef = useRef<BroadcastChannel | null>(null);
   const skipBroadcastNextRef = useRef<boolean>(false);
+  const lastMarkedRef = useRef<Record<string, number>>({});
 
   // Load from localStorage
   useEffect(() => {
@@ -665,6 +668,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!current || current.unreadCount === 0) {
       return; // avoid redundant dispatch/broadcast loops
     }
+
+    // Throttle per session to avoid rapid repeated calls
+    const now = Date.now();
+    const last = lastMarkedRef.current[sessionId] || 0;
+    if (now - last < 500) {
+      return;
+    }
+    lastMarkedRef.current[sessionId] = now;
 
     dispatch({ type: 'MARK_AS_READ', payload: sessionId });
     try {
