@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AdminLayout from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -455,6 +456,16 @@ export default function AdminPages() {
     ));
   };
 
+  const handleToggleFavorite = (pageId: string) => {
+    setPages(prev => prev.map(p => {
+      if (p.id !== pageId) return p;
+      const tags = p.tags.includes('featured') 
+        ? p.tags.filter(tag => tag !== 'featured')
+        : [...p.tags, 'featured'];
+      return { ...p, tags };
+    }));
+  };
+
   const handleWorkflowAction = (pageId: string, action: 'approve' | 'reject' | 'request_review') => {
     setPages(prev => prev.map(p => {
       if (p.id !== pageId) return p;
@@ -527,19 +538,21 @@ export default function AdminPages() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-950">
-        <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">دسترسی محدود</h2>
-          <p className="text-gray-600 dark:text-gray-400">لطفاً وارد حساب کاربری خود شوید</p>
+      <AdminLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">دسترسی محدود</h2>
+            <p className="text-gray-600 dark:text-gray-400">لطفاً وارد حساب کاربری خود شوید</p>
+          </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-950 transition-all duration-300 ${isFullscreen ? 'p-0' : 'p-6'}`}>
-      <div className={`mx-auto transition-all duration-300 ${isFullscreen ? 'max-w-none' : 'max-w-7xl'}`}>
+    <AdminLayout>
+      <div className="space-y-6">
         {/* Header */}
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 mb-8">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
@@ -1117,6 +1130,6 @@ export default function AdminPages() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

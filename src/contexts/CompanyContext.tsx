@@ -94,16 +94,24 @@ export const CompanyProvider: React.FC<CompanyProviderProps> = ({ children }) =>
 
   const saveCompanyData = async () => {
     try {
+      const timestamp = new Date().toISOString();
       const dataToSave = {
         ...companyData,
-        lastModified: new Date().toISOString(),
+        lastModified: timestamp,
         modifiedBy: 'Admin User' // In real app, get from auth context
       };
 
       localStorage.setItem('companyContent', JSON.stringify(dataToSave));
       localStorage.setItem('contentHistory', JSON.stringify(contentHistory));
-      setLastModified(dataToSave.lastModified);
-      setModifiedBy(dataToSave.modifiedBy);
+      
+      // Update state immediately
+      setLastModified(timestamp);
+      setModifiedBy('Admin User');
+
+      // Trigger a custom event to notify other components
+      window.dispatchEvent(new CustomEvent('companyDataUpdated', {
+        detail: dataToSave
+      }));
 
       console.log('Company data saved successfully');
       return true;

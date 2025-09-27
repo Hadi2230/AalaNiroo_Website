@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AdminLayout from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompany } from '@/contexts/CompanyContext';
+import { toast } from 'sonner';
 import {
   Save,
   Edit,
@@ -130,11 +132,16 @@ export default function AdminContent() {
           user: user?.name || 'Unknown'
         }]);
 
-        console.log('Content saved successfully');
-        // Show success notification
+        toast.success('محتوا با موفقیت ذخیره شد', {
+          description: 'تغییرات در وبسایت اعمال خواهد شد'
+        });
+        setIsEditing(false);
       }
     } catch (error) {
       console.error('Save failed:', error);
+      toast.error('خطا در ذخیره محتوا', {
+        description: 'لطفاً دوباره تلاش کنید'
+      });
     } finally {
       setIsSaving(false);
     }
@@ -174,19 +181,21 @@ export default function AdminContent() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-950">
-        <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">دسترسی محدود</h2>
-          <p className="text-gray-600 dark:text-gray-400">لطفاً وارد حساب کاربری خود شوید</p>
+      <AdminLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">دسترسی محدود</h2>
+            <p className="text-gray-600 dark:text-gray-400">لطفاً وارد حساب کاربری خود شوید</p>
+          </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-950 transition-all duration-300 ${isFullscreen ? 'p-0' : 'p-6'}`}>
-      <div className={`mx-auto transition-all duration-300 ${isFullscreen ? 'max-w-none' : 'max-w-7xl'}`}>
+    <AdminLayout>
+      <div className="space-y-6">
         {/* Header */}
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 mb-8">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
@@ -334,17 +343,20 @@ export default function AdminContent() {
                   { id: 'menus', title: 'ساختار منوها', icon: List },
                   { id: 'seo', title: 'SEO و متادیتا', icon: Tag },
                   { id: 'translations', title: 'مدیریت ترجمه', icon: Globe }
-                ].map((section) => (
-                  <Button
-                    key={section.id}
-                    variant={selectedSection === section.id ? "default" : "ghost"}
-                    className="w-full justify-start"
-                    onClick={() => setSelectedSection(section.id)}
-                  >
-                    <section.icon className="w-4 h-4 mr-2" />
-                    {section.title}
-                  </Button>
-                ))}
+                ].map((section) => {
+                  const IconComponent = section.icon;
+                  return (
+                    <Button
+                      key={section.id}
+                      variant={selectedSection === section.id ? "default" : "ghost"}
+                      className="w-full justify-start"
+                      onClick={() => setSelectedSection(section.id)}
+                    >
+                      <IconComponent className="w-4 h-4 mr-2" />
+                      {section.title}
+                    </Button>
+                  );
+                })}
               </CardContent>
             </Card>
           </div>
@@ -666,6 +678,6 @@ export default function AdminContent() {
           </div>
         )}
       </div>
-    </div>
+    </AdminLayout>
   );
 }
