@@ -105,14 +105,19 @@ const ChatWidget = () => {
         new Date(msg.timestamp) > new Date(lastSeen)
       );
       setUnreadMessages(newMessages.length);
-    } else if (isOpen) {
+    }
+  }, [isOpen, messages, lastSeen, currentSession]);
+
+  // Mark as read only when widget transitions to open
+  const prevIsOpenRef = useRef(isOpen);
+  useEffect(() => {
+    if (isOpen && sessionId && prevIsOpenRef.current !== isOpen) {
       setUnreadMessages(0);
       setLastSeen(new Date().toISOString());
-      if (sessionId) {
-        markAsRead(sessionId);
-      }
+      markAsRead(sessionId);
     }
-  }, [isOpen, messages, lastSeen, sessionId, currentSession, markAsRead]);
+    prevIsOpenRef.current = isOpen;
+  }, [isOpen, sessionId, markAsRead]);
 
   // Listen for new notifications
   useEffect(() => {
