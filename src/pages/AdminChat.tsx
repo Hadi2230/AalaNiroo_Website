@@ -148,12 +148,12 @@ const AdminChat = () => {
     }
   }, [notifications, soundEnabled]);
 
-  // Filter sessions
-  const filteredSessions = sessions.filter(session => {
+  // Filter sessions (with null check)
+  const filteredSessions = (sessions || []).filter(session => {
     const matchesSearch = !searchTerm || 
       session.visitorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       session.lastMessage.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      session.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      (session.tags || []).some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
       
     const matchesStatus = statusFilter === 'all' || session.status === statusFilter;
     const matchesPriority = priorityFilter === 'all' || session.priority === priorityFilter;
@@ -302,7 +302,14 @@ const AdminChat = () => {
     'از وقتی که گذاشتید متشکرم.'
   ];
 
-  const stats = getSessionStats();
+  const stats = getSessionStats ? getSessionStats() : {
+    total: 0,
+    active: 0,
+    waiting: 0,
+    closed: 0,
+    archived: 0,
+    unread: 0
+  };
 
   return (
     <AdminLayout>
@@ -495,16 +502,16 @@ const AdminChat = () => {
                           </div>
 
                           {/* Tags */}
-                          {session.tags.length > 0 && (
+                          {(session.tags || []).length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-2">
-                              {session.tags.slice(0, 2).map((tag, index) => (
+                              {(session.tags || []).slice(0, 2).map((tag, index) => (
                                 <Badge key={index} variant="outline" className="text-xs px-1.5 py-0.5">
                                   {tag}
                                 </Badge>
                               ))}
-                              {session.tags.length > 2 && (
+                              {(session.tags || []).length > 2 && (
                                 <Badge variant="outline" className="text-xs px-1.5 py-0.5">
-                                  +{session.tags.length - 2}
+                                  +{(session.tags || []).length - 2}
                                 </Badge>
                               )}
                             </div>
@@ -904,7 +911,7 @@ const AdminChat = () => {
                   </h4>
                   <div className="space-y-2">
                     <div className="flex flex-wrap gap-1">
-                      {selectedSession.tags.map((tag, index) => (
+                      {(selectedSession.tags || []).map((tag, index) => (
                         <Badge key={index} variant="outline" className="text-xs">
                           {tag}
                           <Button
