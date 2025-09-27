@@ -49,7 +49,7 @@ const ChatWidget = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { 
     sessions, 
@@ -194,8 +194,8 @@ const ChatWidget = () => {
       setIsTyping(false);
       
       // Clear typing timeout
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current as unknown as number);
       }
       
       // Simulate admin typing after user message
@@ -215,7 +215,7 @@ const ChatWidget = () => {
   const handleTyping = useCallback(() => {
     // Clear existing timeout
     if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
+      clearTimeout(typingTimeoutRef.current as unknown as number);
     }
     
     // Set new timeout to stop typing indicator
@@ -309,23 +309,23 @@ const ChatWidget = () => {
 
   return (
     <>
-      {/* Chat Button */}
+      {/* Chat Button - refined launcher */}
       <div className="fixed bottom-6 left-6 z-50">
         <div className="relative">
           <Button
             onClick={() => setIsOpen(!isOpen)}
-            className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 group"
+            className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-[0_10px_25px_rgba(59,130,246,0.35)] hover:shadow-[0_14px_32px_rgba(124,58,237,0.45)] transition-all duration-300 hover:scale-110 group border border-white/10 backdrop-blur-sm"
           >
             {isOpen ? (
               <X className="w-6 h-6 group-hover:rotate-90 transition-transform" />
             ) : (
-              <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+              <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform drop-shadow-[0_2px_4px_rgba(0,0,0,0.25)]" />
             )}
           </Button>
           
           {/* Unread Badge */}
           {unreadMessages > 0 && !isOpen && (
-            <Badge className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0 flex items-center justify-center bg-red-500 text-white text-xs animate-bounce">
+            <Badge className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0 flex items-center justify-center bg-red-500 text-white text-xs animate-bounce shadow-lg">
               {unreadMessages > 9 ? '9+' : unreadMessages}
             </Badge>
           )}

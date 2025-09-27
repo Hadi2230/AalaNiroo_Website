@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useState, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 
 // انواع TypeScript
@@ -231,7 +231,7 @@ const validateMessage = (message: Partial<ChatMessage>): boolean => {
   return !!(message.id && message.text && message.sender && message.timestamp);
 };
 
-// Reducer (simplified but complete)
+// Reducer (expanded)
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   console.log('🔄 ChatReducer Action:', action.type);
 
@@ -241,6 +241,11 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
 
     case 'SET_SESSIONS':
       return { ...state, sessions: action.payload, isLoading: false };
+
+    case 'UPDATE_SESSION': {
+      const updated = state.sessions.map(s => s.id === action.payload.id ? { ...s, ...action.payload, updatedAt: new Date().toISOString() } : s);
+      return { ...state, sessions: updated };
+    }
 
     case 'ADD_SESSION':
       const sessionNotification: ChatNotification = {
@@ -298,12 +303,42 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         notifications: newNotifications
       };
 
+    case 'UPDATE_MESSAGE': {
+      const { sessionId, messageId, updates } = action.payload;
+      return {
+        ...state,
+        sessions: state.sessions.map(s => s.id === sessionId ? {
+          ...s,
+          messages: s.messages.map(m => m.id === messageId ? { ...m, ...updates } as ChatMessage : m),
+          updatedAt: new Date().toISOString()
+        } : s)
+      };
+    }
+
+    case 'DELETE_MESSAGE': {
+      const { sessionId, messageId } = action.payload;
+      return {
+        ...state,
+        sessions: state.sessions.map(s => s.id === sessionId ? {
+          ...s,
+          messages: s.messages.filter(m => m.id !== messageId),
+          updatedAt: new Date().toISOString()
+        } : s)
+      };
+    }
+
     case 'MARK_AS_READ':
       return {
         ...state,
         sessions: state.sessions.map(session =>
           session.id === action.payload ? { ...session, unreadCount: 0 } : session
         )
+      };
+
+    case 'MARK_ALL_AS_READ':
+      return {
+        ...state,
+        sessions: state.sessions.map(session => ({ ...session, unreadCount: 0 }))
       };
 
     case 'CLOSE_SESSION':
@@ -317,6 +352,85 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         )
       };
 
+    case 'REOPEN_SESSION':
+      return {
+        ...state,
+        sessions: state.sessions.map(session =>
+          session.id === action.payload 
+            ? { ...session, status: 'active' as const, updatedAt: new Date().toISOString() }
+            : session
+        )
+      };
+
+    case 'ARCHIVE_SESSION':
+      return {
+        ...state,
+        sessions: state.sessions.map(session =>
+          session.id === action.payload 
+            ? { ...session, status: 'archived' as const, updatedAt: new Date().toISOString() }
+            : session
+        )
+      };
+
+    case 'DELETE_SESSION':
+      return { ...state, sessions: state.sessions.filter(s => s.id !== action.payload) };
+
+    case 'ASSIGN_SESSION': {
+      const { sessionId, adminId, adminName } = action.payload;
+      return {
+        ...state,
+        sessions: state.sessions.map(s => s.id === sessionId ? {
+          ...s,
+          assignedTo: adminId,
+          assignedAdmin: adminName,
+          updatedAt: new Date().toISOString()
+        } : s)
+      };
+    }
+
+    case 'UNASSIGN_SESSION':
+      return {
+        ...state,
+        sessions: state.sessions.map(s => s.id === action.payload ? {
+          ...s,
+          assignedTo: undefined,
+          assignedAdmin: undefined,
+          updatedAt: new Date().toISOString()
+        } : s)
+      };
+
+    case 'SET_PRIORITY': {
+      const { sessionId, priority } = action.payload as { sessionId: string; priority: any };
+      return {
+        ...state,
+        sessions: state.sessions.map(s => s.id === sessionId ? { ...s, priority: priority as any, updatedAt: new Date().toISOString() } : s)
+      };
+    }
+
+    case 'ADD_TAG': {
+      const { sessionId, tag } = action.payload;
+      return {
+        ...state,
+        sessions: state.sessions.map(s => s.id === sessionId ? {
+          ...s,
+          tags: s.tags.includes(tag) ? s.tags : [...s.tags, tag],
+          updatedAt: new Date().toISOString()
+        } : s)
+      };
+    }
+
+    case 'REMOVE_TAG': {
+      const { sessionId, tag } = action.payload;
+      return {
+        ...state,
+        sessions: state.sessions.map(s => s.id === sessionId ? {
+          ...s,
+          tags: s.tags.filter(t => t !== tag),
+          updatedAt: new Date().toISOString()
+        } : s)
+      };
+    }
+
     case 'SET_ACTIVE_SESSION':
       return {
         ...state,
@@ -325,10 +439,19 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
           : null
       };
 
+    case 'SET_CONNECTION_STATUS':
+      return { ...state, isConnected: action.payload };
+
     case 'ADD_NOTIFICATION':
       return {
         ...state,
         notifications: [action.payload, ...state.notifications]
+      };
+
+    case 'MARK_NOTIFICATION_READ':
+      return {
+        ...state,
+        notifications: state.notifications.map(n => n.id === action.payload ? { ...n, read: true } : n)
       };
 
     case 'CLEAR_NOTIFICATIONS':
@@ -336,6 +459,42 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state,
         notifications: []
       };
+
+    case 'SET_FILTER':
+      return {
+        ...state,
+        filters: { ...state.filters, [action.payload.key]: action.payload.value }
+      };
+
+    case 'SET_SEARCH_TERM':
+      return { ...state, searchTerm: action.payload };
+
+    case 'SET_ONLINE_ADMINS':
+      return { ...state, onlineAdmins: action.payload };
+
+    case 'ADD_FEEDBACK': {
+      const { sessionId, rating, feedback } = action.payload;
+      return {
+        ...state,
+        sessions: state.sessions.map(s => s.id === sessionId ? { ...s, rating, feedback, updatedAt: new Date().toISOString() } : s)
+      };
+    }
+
+    case 'SYNC_WITH_LOCAL_STORAGE': {
+      try {
+        const saved = localStorage.getItem('chatSessions');
+        if (saved) {
+          const sessions = JSON.parse(saved) as ChatSession[];
+          return { ...state, sessions };
+        }
+      } catch (e) {
+        console.error('SYNC_WITH_LOCAL_STORAGE failed', e);
+      }
+      return state;
+    }
+
+    case 'CLEAR_CHAT_DATA':
+      return { ...state, sessions: [], activeSession: null, notifications: [] };
 
     default:
       return state;
@@ -348,6 +507,9 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined);
 // Provider
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(chatReducer, initialState);
+  const tabIdRef = useRef<string>(generateId('tab-'));
+  const bcRef = useRef<BroadcastChannel | null>(null);
+  const skipBroadcastNextRef = useRef<boolean>(false);
 
   // Load from localStorage
   useEffect(() => {
@@ -365,7 +527,65 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Save to localStorage
   useEffect(() => {
     localStorage.setItem('chatSessions', JSON.stringify(state.sessions));
+    // Optional: custom event for other listeners
+    window.dispatchEvent(new CustomEvent('chatSessionsUpdated', { detail: state.sessions }));
+
+    // Broadcast to other tabs unless it's from an external update we just processed
+    if (!skipBroadcastNextRef.current && bcRef.current) {
+      try {
+        bcRef.current.postMessage({ type: 'SESSIONS_UPDATED', sessions: state.sessions, source: tabIdRef.current });
+      } catch (e) {
+        console.warn('BroadcastChannel post failed', e);
+      }
+    }
+    // Reset skip flag after performing potential broadcast
+    if (skipBroadcastNextRef.current) {
+      skipBroadcastNextRef.current = false;
+    }
   }, [state.sessions]);
+
+  // Setup cross-tab sync via BroadcastChannel and storage
+  useEffect(() => {
+    // BroadcastChannel
+    if ('BroadcastChannel' in window) {
+      try {
+        bcRef.current = new BroadcastChannel('chat_channel');
+        dispatch({ type: 'SET_CONNECTION_STATUS', payload: true });
+        bcRef.current.onmessage = (event: MessageEvent) => {
+          const data = event.data || {};
+          if (data.source && data.source === tabIdRef.current) return;
+          if (data.type === 'SESSIONS_UPDATED' && Array.isArray(data.sessions)) {
+            skipBroadcastNextRef.current = true; // avoid rebroadcast loops
+            dispatch({ type: 'SET_SESSIONS', payload: data.sessions });
+          }
+        };
+      } catch (e) {
+        console.warn('BroadcastChannel init failed', e);
+        dispatch({ type: 'SET_CONNECTION_STATUS', payload: false });
+      }
+    }
+
+    // storage event (fallback)
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === 'chatSessions' && event.newValue) {
+        try {
+          const sessions = JSON.parse(event.newValue);
+          skipBroadcastNextRef.current = true;
+          dispatch({ type: 'SET_SESSIONS', payload: sessions });
+        } catch (e) {
+          console.error('Failed to parse chatSessions from storage', e);
+        }
+      }
+    };
+    window.addEventListener('storage', onStorage);
+
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      try {
+        bcRef.current?.close();
+      } catch {}
+    };
+  }, []);
 
   // Actions
   const sendMessage = useCallback((text: string, sessionId: string, sender: 'user' | 'admin' = 'user', attachments: Attachment[] = []) => {
@@ -380,6 +600,21 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     dispatch({ type: 'ADD_MESSAGE', payload: { sessionId, message } });
+    // Broadcast action for instant sync
+    try {
+      const sessions = JSON.parse(localStorage.getItem('chatSessions') || '[]');
+      const nextSessions = (sessions as ChatSession[]).map(s => s.id === sessionId ? {
+        ...s,
+        messages: [...s.messages, message],
+        lastMessage: message.text,
+        lastActivity: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        unreadCount: message.sender === 'user' ? s.unreadCount + 1 : s.unreadCount
+      } : s);
+      localStorage.setItem('chatSessions', JSON.stringify(nextSessions));
+      window.dispatchEvent(new CustomEvent('chatSessionsUpdated', { detail: nextSessions }));
+      if (bcRef.current) bcRef.current.postMessage({ type: 'SESSIONS_UPDATED', sessions: nextSessions, source: tabIdRef.current });
+    } catch {}
   }, []);
 
   const createSession = useCallback((visitorInfo: { 
@@ -414,11 +649,26 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     dispatch({ type: 'ADD_SESSION', payload: newSession });
+    // Broadcast creation
+    try {
+      const sessions = JSON.parse(localStorage.getItem('chatSessions') || '[]');
+      const nextSessions = [newSession, ...(sessions as ChatSession[])];
+      localStorage.setItem('chatSessions', JSON.stringify(nextSessions));
+      window.dispatchEvent(new CustomEvent('chatSessionsUpdated', { detail: nextSessions }));
+      if (bcRef.current) bcRef.current.postMessage({ type: 'SESSIONS_UPDATED', sessions: nextSessions, source: tabIdRef.current });
+    } catch {}
     return sessionId;
   }, []);
 
   const markAsRead = useCallback((sessionId: string) => {
     dispatch({ type: 'MARK_AS_READ', payload: sessionId });
+    try {
+      const sessions = JSON.parse(localStorage.getItem('chatSessions') || '[]');
+      const nextSessions = (sessions as ChatSession[]).map(s => s.id === sessionId ? { ...s, unreadCount: 0 } : s);
+      localStorage.setItem('chatSessions', JSON.stringify(nextSessions));
+      window.dispatchEvent(new CustomEvent('chatSessionsUpdated', { detail: nextSessions }));
+      if (bcRef.current) bcRef.current.postMessage({ type: 'SESSIONS_UPDATED', sessions: nextSessions, source: tabIdRef.current });
+    } catch {}
   }, []);
 
   const markAllAsRead = useCallback(() => {

@@ -112,7 +112,14 @@ const AdminChat = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Request notification permission for admins
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().catch(() => {});
+    }
+  }, []);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -146,6 +153,17 @@ const AdminChat = () => {
         audio.play().catch(() => {
           console.log('Audio notification failed');
         });
+
+        // Browser notification
+        if ('Notification' in window && Notification.permission === 'granted') {
+          try {
+            new Notification('پیام جدید مشتری', {
+              body: latestNotif.message,
+              tag: latestNotif.sessionId,
+              icon: '/favicon.ico'
+            });
+          } catch {}
+        }
       }
     }
   }, [notifications, soundEnabled]);
@@ -216,7 +234,7 @@ const AdminChat = () => {
     
     // Clear existing timeout
     if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
+      clearTimeout(typingTimeoutRef.current as unknown as number);
     }
     
     // Set new timeout
