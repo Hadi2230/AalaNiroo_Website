@@ -661,6 +661,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const markAsRead = useCallback((sessionId: string) => {
+    const current = state.sessions.find(s => s.id === sessionId);
+    if (!current || current.unreadCount === 0) {
+      return; // avoid redundant dispatch/broadcast loops
+    }
+
     dispatch({ type: 'MARK_AS_READ', payload: sessionId });
     try {
       const sessions = JSON.parse(localStorage.getItem('chatSessions') || '[]');
@@ -669,7 +674,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       window.dispatchEvent(new CustomEvent('chatSessionsUpdated', { detail: nextSessions }));
       if (bcRef.current) bcRef.current.postMessage({ type: 'SESSIONS_UPDATED', sessions: nextSessions, source: tabIdRef.current });
     } catch {}
-  }, []);
+  }, [state.sessions]);
 
   const markAllAsRead = useCallback(() => {
     dispatch({ type: 'MARK_ALL_AS_READ' });
