@@ -6,9 +6,9 @@ import { viteSourceLocator } from "@metagptx/vite-plugin-source-locator";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [
-    viteSourceLocator({
-      prefix: "mgx",
-    }),
+    ...(mode === 'development'
+      ? [viteSourceLocator({ prefix: 'mgx' })]
+      : []),
     react(),
   ],
   resolve: {
