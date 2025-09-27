@@ -80,6 +80,21 @@ export const CompanyProvider: React.FC<CompanyProviderProps> = ({ children }) =>
     };
 
     loadCompanyData();
+
+    // Listen for company data updates from other components
+    const handleCompanyDataUpdate = (event: CustomEvent) => {
+      if (event.detail) {
+        setCompanyData(event.detail);
+        setLastModified(event.detail.lastModified);
+        setModifiedBy(event.detail.modifiedBy);
+      }
+    };
+
+    window.addEventListener('companyDataUpdated', handleCompanyDataUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('companyDataUpdated', handleCompanyDataUpdate as EventListener);
+    };
   }, []);
 
   const updateCompanyData = (lang: 'fa' | 'en', field: string, value: string) => {

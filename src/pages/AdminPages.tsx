@@ -21,7 +21,7 @@ import {
   Search,
   History,
   Copy,
-  Template,
+  Layout,
   Workflow,
   BarChart3,
   Users,
@@ -586,8 +586,8 @@ export default function AdminPages() {
                 size="lg"
                 className="min-w-[140px]"
               >
-                <Template className="w-5 h-5 mr-2" />
-                تمپلیت جدید
+                  <Layout className="w-5 h-5 mr-2" />
+                  تمپلیت جدید
               </Button>
 
               <Button
@@ -877,7 +877,7 @@ export default function AdminPages() {
                   onClick={() => setSelectedTemplate(template.id)}
                 >
                   <div className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-t-lg flex items-center justify-center">
-                    <Template className="w-12 h-12 text-gray-400" />
+                    <Layout className="w-12 h-12 text-gray-400" />
                   </div>
                   <CardContent className="p-4">
                     <h3 className="font-semibold mb-2">{template.name}</h3>

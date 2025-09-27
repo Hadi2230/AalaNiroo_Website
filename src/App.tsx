@@ -74,6 +74,7 @@ import AdminIntegrations from './pages/AdminIntegrations';
 import AdminChat from './pages/AdminChat';
 import AdminContent from './pages/AdminContent';
 import AdminMedia from './pages/AdminMedia';
+import AdminPages from './pages/AdminPages';
 
 // ---------- React Query Client ----------
 const queryClient = new QueryClient();
@@ -178,6 +179,14 @@ const App = () => (
                     element={
                       <RequireAuth roles={['admin', 'manager']}>
                         <AdminMedia />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/admin/pages"
+                    element={
+                      <RequireAuth roles={['admin', 'manager']}>
+                        <AdminPages />
                       </RequireAuth>
                     }
                   />

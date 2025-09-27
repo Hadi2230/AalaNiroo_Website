@@ -26,7 +26,10 @@ import {
   X,
   Home,
   ChevronRight,
-  MessageCircle
+  MessageCircle,
+  FileText,
+  Image,
+  Zap
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -48,6 +51,9 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { name: 'مشتریان', href: '/admin/customers', icon: Users, roles: ['admin', 'manager', 'sales'] },
     { name: 'گزارش‌ها', href: '/admin/reports', icon: BarChart3, roles: ['admin', 'manager'] },
     { name: 'مدیریت چت', href: '/admin/chat', icon: MessageCircle, roles: ['admin', 'manager', 'sales'] },
+    { name: 'مدیریت محتوا', href: '/admin/content', icon: FileText, roles: ['admin', 'manager'] },
+    { name: 'مدیریت رسانه', href: '/admin/media', icon: Image, roles: ['admin', 'manager'] },
+    { name: 'مدیریت صفحات', href: '/admin/pages', icon: Settings, roles: ['admin', 'manager'] },
     { name: 'ادغام خارجی', href: '/admin/integrations', icon: Zap, roles: ['admin', 'manager'] },
   ];
 
