@@ -159,7 +159,7 @@ const AdminProducts = () => {
     dimensions: { length: 0, width: 0, height: 0 },
     warranty: '',
     warrantyPeriod: 12,
-    status: 'draft',
+    status: 'active',
     visibility: 'public',
     isFeatured: false,
     isNew: true,
@@ -421,6 +421,40 @@ const AdminProducts = () => {
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   محصول جدید
+                </Button>
+
+                <Button
+                  onClick={() => window.open('/products', '_blank')}
+                  variant="outline"
+                  className="text-green-600 hover:text-green-700"
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  مشاهده سایت
+                </Button>
+
+                <Button
+                  onClick={async () => {
+                    try {
+                      const testProduct = await createProduct({
+                        name: `محصول تست ${Date.now()}`,
+                        brand: 'تست',
+                        category: 'diesel-generators',
+                        price: 100000000,
+                        stock: 5,
+                        description: 'این یک محصول تست است',
+                        status: 'active',
+                        visibility: 'public'
+                      });
+                      toast.success('محصول تست ایجاد شد! صفحه محصولات را چک کنید');
+                    } catch (error) {
+                      toast.error('خطا در ایجاد محصول تست');
+                    }
+                  }}
+                  variant="outline"
+                  className="text-purple-600 hover:text-purple-700"
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  تست سریع
                 </Button>
               </div>
             </div>

@@ -418,7 +418,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         barcode: productData.barcode,
         weight: productData.weight || 0,
         dimensions: productData.dimensions || { length: 0, width: 0, height: 0 },
-        status: productData.status || 'draft',
+        status: productData.status || 'active',
         visibility: productData.visibility || 'public',
         isFeatured: productData.isFeatured || false,
         isNew: productData.isNew || true,

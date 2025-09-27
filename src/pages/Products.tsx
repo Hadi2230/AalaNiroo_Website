@@ -64,6 +64,13 @@ export default function Products() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [favorites, setFavorites] = useState<string[]>([]);
 
+  // Debug: Log products to see what we have
+  useEffect(() => {
+    console.log('🔍 Products in /products page:', products);
+    console.log('📊 Total products:', products.length);
+    console.log('🔍 Public products:', products.filter(p => p.status === 'active' && p.visibility === 'public'));
+  }, [products]);
+
   // Filter only active and public products for frontend
   const publicProducts = products.filter(product => 
     product.status === 'active' && 
@@ -107,7 +114,7 @@ export default function Products() {
       <ModernHeader />
       
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-blue-900 via-purple-900 to-gray-900 text-white">
+      <section className="py-20 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
             <Badge className="bg-blue-100 text-blue-800 mb-6">
@@ -148,7 +155,7 @@ export default function Products() {
       </section>
 
       {/* Filters and Search */}
-      <section className="py-8 bg-white shadow-sm">
+      <section className="py-8 bg-gray-50 border-b border-gray-200">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
             {/* Search */}
@@ -237,7 +244,7 @@ export default function Products() {
       </section>
 
       {/* Products Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           {publicProducts.length > 0 ? (
             <>
