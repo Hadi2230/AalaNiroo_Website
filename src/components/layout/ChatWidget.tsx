@@ -1,51 +1,256 @@
-import { useState, useEffect } from 'react';
-import { MessageCircle, X, Send, User, Bot, Phone, Mail, Loader2 } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { 
+  MessageCircle, 
+  X, 
+  Send, 
+  User, 
+  Bot, 
+  Phone, 
+  Mail, 
+  Loader2, 
+  Paperclip,
+  Image,
+  FileText,
+  Minimize2,
+  Maximize2,
+  Settings,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Zap
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useChat } from '@/contexts/ChatContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCompany } from '@/contexts/CompanyContext';
+import { toast } from 'sonner';
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [message, setMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const [visitorInfo, setVisitorInfo] = useState({
     name: '',
     email: '',
-    phone: ''
+    phone: '',
+    department: 'عمومی'
   });
   const [showVisitorForm, setShowVisitorForm] = useState(true);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
+  const [lastSeen, setLastSeen] = useState<string>('');
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
-  const { sessions, activeSession, sendMessage, createSession, setActiveSession } = useChat();
-  const { t, dir } = useLanguage();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+
+  const { 
+    sessions, 
+    sendMessage, 
+    createSession, 
+    markAsRead,
+    notifications,
+    isConnected,
+    getUnreadCount
+  } = useChat();
+  
+  const { language, t, dir } = useLanguage();
+  const { companyData } = useCompany();
+  const company = companyData[language];
 
   const currentSession = sessionId ? sessions.find(s => s.id === sessionId) : null;
   const messages = currentSession?.messages || [];
 
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    // Check if there's an existing session
-    const existingSession = sessions.find(s => s.status === 'active');
-    if (existingSession) {
-      setSessionId(existingSession.id);
-      setShowVisitorForm(false);
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
+  // Check for existing session on mount
+  useEffect(() => {
+    const existingSessionId = localStorage.getItem('chatWidgetSessionId');
+    if (existingSessionId) {
+      const existingSession = sessions.find(s => s.id === existingSessionId && s.status !== 'closed');
+      if (existingSession) {
+        setSessionId(existingSessionId);
+        setShowVisitorForm(false);
+        setConnectionStatus('connected');
+      } else {
+        localStorage.removeItem('chatWidgetSessionId');
+      }
     }
   }, [sessions]);
 
-  const handleStartChat = () => {
-    if (visitorInfo.name.trim()) {
-      const newSessionId = createSession(visitorInfo);
-      setSessionId(newSessionId);
-      setShowVisitorForm(false);
+  // Update connection status
+  useEffect(() => {
+    if (sessionId) {
+      setConnectionStatus(isConnected ? 'connected' : 'disconnected');
     }
-  };
+  }, [isConnected, sessionId]);
 
-  const handleSendMessage = async () => {
-    if (message.trim() && sessionId) {
-      await sendMessage(message, sessionId);
-      setMessage('');
+  // Update unread count when widget is closed
+  useEffect(() => {
+    if (!isOpen && currentSession) {
+      const newMessages = messages.filter(msg => 
+        msg.sender === 'admin' && 
+        new Date(msg.timestamp) > new Date(lastSeen)
+      );
+      setUnreadMessages(newMessages.length);
+    } else if (isOpen) {
+      setUnreadMessages(0);
+      setLastSeen(new Date().toISOString());
+      if (sessionId) {
+        markAsRead(sessionId);
+      }
     }
-  };
+  }, [isOpen, messages, lastSeen, sessionId, currentSession, markAsRead]);
+
+  // Listen for new notifications
+  useEffect(() => {
+    const unreadNotifs = notifications.filter(n => 
+      !n.read && 
+      n.sessionId === sessionId && 
+      n.type === 'new_message'
+    );
+    
+    if (unreadNotifs.length > 0 && !isOpen) {
+      setUnreadMessages(prev => prev + unreadNotifs.length);
+      
+      // Show browser notification
+      if ('Notification' in window && Notification.permission === 'granted') {
+        const latestNotif = unreadNotifs[0];
+        new Notification('پیام جدید از پشتیبانی', {
+          body: latestNotif.message,
+          icon: '/favicon.ico',
+          tag: 'chat-widget'
+        });
+      }
+    }
+  }, [notifications, sessionId, isOpen]);
+
+  // Request notification permission
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  const handleStartChat = useCallback(() => {
+    if (!visitorInfo.name.trim()) {
+      toast.error('لطفاً نام خود را وارد کنید');
+      return;
+    }
+
+    try {
+      setConnectionStatus('connecting');
+      
+      const newSessionId = createSession({
+        name: visitorInfo.name,
+        email: visitorInfo.email || undefined,
+        phone: visitorInfo.phone || undefined,
+        department: visitorInfo.department,
+        pageUrl: window.location.href,
+        userAgent: navigator.userAgent,
+        ipAddress: 'Unknown' // In real app, get from backend
+      });
+      
+      setSessionId(newSessionId);
+      localStorage.setItem('chatWidgetSessionId', newSessionId);
+      setShowVisitorForm(false);
+      setConnectionStatus('connected');
+      
+      // Send welcome message
+      setTimeout(() => {
+        sendMessage(
+          `سلام ${visitorInfo.name}! چطور می‌تونم کمکتون کنم؟`, 
+          newSessionId, 
+          'admin'
+        );
+      }, 1000);
+      
+      toast.success('چت با موفقیت شروع شد');
+    } catch (error) {
+      console.error('Error starting chat:', error);
+      setConnectionStatus('disconnected');
+      toast.error('خطا در شروع چت');
+    }
+  }, [visitorInfo, createSession, sendMessage]);
+
+  const handleSendMessage = useCallback(async () => {
+    if (!message.trim() || !sessionId) return;
+
+    try {
+      await sendMessage(message.trim(), sessionId, 'user');
+      setMessage('');
+      setIsTyping(false);
+      
+      // Clear typing timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      
+      // Simulate admin typing after user message
+      setTimeout(() => {
+        setIsTyping(true);
+        setTimeout(() => {
+          setIsTyping(false);
+        }, 2000 + Math.random() * 3000);
+      }, 500);
+      
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error('خطا در ارسال پیام');
+    }
+  }, [message, sessionId, sendMessage]);
+
+  const handleTyping = useCallback(() => {
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    
+    // Set new timeout to stop typing indicator
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false);
+    }, 1000);
+  }, []);
+
+  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    } else {
+      handleTyping();
+    }
+  }, [handleSendMessage, handleTyping]);
+
+  const handleCloseChat = useCallback(() => {
+    setIsOpen(false);
+    if (sessionId) {
+      setLastSeen(new Date().toISOString());
+    }
+  }, [sessionId]);
+
+  const handleEndChat = useCallback(() => {
+    if (sessionId && window.confirm('آیا مطمئن هستید که می‌خواهید چت را پایان دهید؟')) {
+      localStorage.removeItem('chatWidgetSessionId');
+      setSessionId(null);
+      setShowVisitorForm(true);
+      setConnectionStatus('disconnected');
+      setMessage('');
+      setIsOpen(false);
+      toast.info('چت پایان یافت');
+    }
+  }, [sessionId]);
 
   const formatTime = (timestamp: string) => {
     return new Date(timestamp).toLocaleTimeString('fa-IR', {
@@ -76,185 +281,458 @@ const ChatWidget = () => {
     }
   };
 
+  const getConnectionStatusBadge = () => {
+    switch (connectionStatus) {
+      case 'connecting':
+        return (
+          <Badge variant="outline" className="flex items-center gap-1">
+            <Loader2 className="w-3 h-3 animate-spin" />
+            در حال اتصال...
+          </Badge>
+        );
+      case 'connected':
+        return (
+          <Badge className="bg-green-100 text-green-800 flex items-center gap-1">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            آنلاین
+          </Badge>
+        );
+      case 'disconnected':
+        return (
+          <Badge variant="outline" className="flex items-center gap-1">
+            <div className="w-2 h-2 bg-red-500 rounded-full" />
+            آفلاین
+          </Badge>
+        );
+    }
+  };
+
   return (
     <>
       {/* Chat Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <Button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-14 h-14 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
-        >
-          {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
-          {sessions.length > 0 && (
-            <Badge className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0 flex items-center justify-center bg-red-500 text-white text-xs">
-              {sessions.filter(s => s.status === 'active').length}
+      <div className="fixed bottom-6 left-6 z-50">
+        <div className="relative">
+          <Button
+            onClick={() => setIsOpen(!isOpen)}
+            className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 group"
+          >
+            {isOpen ? (
+              <X className="w-6 h-6 group-hover:rotate-90 transition-transform" />
+            ) : (
+              <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            )}
+          </Button>
+          
+          {/* Unread Badge */}
+          {unreadMessages > 0 && !isOpen && (
+            <Badge className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0 flex items-center justify-center bg-red-500 text-white text-xs animate-bounce">
+              {unreadMessages > 9 ? '9+' : unreadMessages}
             </Badge>
           )}
-        </Button>
+          
+          {/* Pulse Animation */}
+          {!isOpen && (
+            <div className="absolute inset-0 rounded-full bg-blue-600 animate-ping opacity-20"></div>
+          )}
+        </div>
       </div>
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-96 h-[600px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border dark:border-gray-700 z-50 flex flex-col overflow-hidden">
+        <div className={`fixed bottom-24 left-6 w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border dark:border-gray-700 z-50 flex flex-col overflow-hidden transition-all duration-300 ${
+          isMinimized ? 'h-16' : 'h-[600px]'
+        }`}>
+          
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 flex-shrink-0">
             <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-bold text-lg">پشتیبانی آنلاین</h3>
-                <p className="text-sm opacity-90">
-                  {currentSession?.status === 'active' ? 'در حال چت' : 'آماده پاسخگویی'}
-                </p>
+              <div className="flex items-center gap-3">
+                <Avatar className="w-10 h-10 border-2 border-white/20">
+                  <AvatarImage src="/api/placeholder/40/40" />
+                  <AvatarFallback className="bg-white/20 text-white">
+                    <Bot className="w-5 h-5" />
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="font-bold text-lg">{company.name}</h3>
+                  <div className="flex items-center gap-2">
+                    {getConnectionStatusBadge()}
+                    {currentSession && (
+                      <span className="text-xs opacity-90">
+                        ID: {currentSession.id.slice(-6)}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
+              
               <div className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded-full ${currentSession?.status === 'active' ? 'bg-green-400' : 'bg-yellow-400'} animate-pulse`} />
-                <span className="text-xs">
-                  {currentSession?.status === 'active' ? 'آنلاین' : 'منتظر'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Visitor Info Form */}
-          {showVisitorForm && (
-            <div className="flex-1 p-6 bg-gray-50 dark:bg-gray-700">
-              <div className="text-center mb-6">
-                <MessageCircle className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-                <h4 className="font-semibold mb-2">شروع چت</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  لطفاً اطلاعات خود را وارد کنید تا بتوانیم بهتر کمک کنیم
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">نام شما *</label>
-                  <Input
-                    value={visitorInfo.name}
-                    onChange={(e) => setVisitorInfo({...visitorInfo, name: e.target.value})}
-                    placeholder="نام و نام خانوادگی"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">ایمیل (اختیاری)</label>
-                  <Input
-                    type="email"
-                    value={visitorInfo.email}
-                    onChange={(e) => setVisitorInfo({...visitorInfo, email: e.target.value})}
-                    placeholder="email@example.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">شماره تماس (اختیاری)</label>
-                  <Input
-                    value={visitorInfo.phone}
-                    onChange={(e) => setVisitorInfo({...visitorInfo, phone: e.target.value})}
-                    placeholder="09xxxxxxxxx"
-                  />
-                </div>
-
                 <Button
-                  onClick={handleStartChat}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                  disabled={!visitorInfo.name.trim()}
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsMinimized(!isMinimized)}
+                  className="text-white hover:bg-white/20 w-8 h-8"
                 >
-                  شروع چت
+                  {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
+                </Button>
+                
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCloseChat}
+                  className="text-white hover:bg-white/20 w-8 h-8"
+                >
+                  <X className="w-4 h-4" />
                 </Button>
               </div>
             </div>
-          )}
+            
+            {/* Connection Info */}
+            <div className="mt-2 text-sm opacity-90">
+              {connectionStatus === 'connected' && currentSession ? (
+                <span>متصل به پشتیبانی • {messages.length} پیام</span>
+              ) : connectionStatus === 'connecting' ? (
+                <span>در حال اتصال به پشتیبانی...</span>
+              ) : (
+                <span>آماده شروع گفتگو</span>
+              )}
+            </div>
+          </div>
 
-          {/* Chat Messages */}
-          {!showVisitorForm && currentSession && (
+          {!isMinimized && (
             <>
-              {/* Messages */}
-              <div className="flex-1 p-4 overflow-y-auto bg-gray-50 dark:bg-gray-700">
-                <div className="space-y-4">
-                  {messages.map((msg, index) => (
-                    <div
-                      key={msg.id}
-                      className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} ${index === messages.length - 1 ? 'animate-fade-in' : ''}`}
+              {/* Visitor Info Form */}
+              {showVisitorForm ? (
+                <div className="flex-1 p-6 bg-gray-50 dark:bg-gray-700 overflow-y-auto">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <MessageCircle className="w-8 h-8 text-white" />
+                    </div>
+                    <h4 className="font-bold text-xl mb-2 text-gray-900 dark:text-white">
+                      {language === 'fa' ? 'شروع گفتگو' : 'Start Conversation'}
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {language === 'fa' 
+                        ? 'لطفاً اطلاعات خود را وارد کنید تا بتوانیم بهتر کمک کنیم'
+                        : 'Please enter your information so we can help you better'
+                      }
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                        {language === 'fa' ? 'نام شما' : 'Your Name'} *
+                      </label>
+                      <Input
+                        value={visitorInfo.name}
+                        onChange={(e) => setVisitorInfo({...visitorInfo, name: e.target.value})}
+                        placeholder={language === 'fa' ? 'نام و نام خانوادگی' : 'Full Name'}
+                        className="border-gray-300 dark:border-gray-600"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                        {language === 'fa' ? 'ایمیل (اختیاری)' : 'Email (Optional)'}
+                      </label>
+                      <Input
+                        type="email"
+                        value={visitorInfo.email}
+                        onChange={(e) => setVisitorInfo({...visitorInfo, email: e.target.value})}
+                        placeholder="email@example.com"
+                        className="border-gray-300 dark:border-gray-600"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                        {language === 'fa' ? 'شماره تماس (اختیاری)' : 'Phone (Optional)'}
+                      </label>
+                      <Input
+                        value={visitorInfo.phone}
+                        onChange={(e) => setVisitorInfo({...visitorInfo, phone: e.target.value})}
+                        placeholder="09xxxxxxxxx"
+                        className="border-gray-300 dark:border-gray-600"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                        {language === 'fa' ? 'موضوع مورد نظر' : 'Subject'}
+                      </label>
+                      <select
+                        value={visitorInfo.department}
+                        onChange={(e) => setVisitorInfo({...visitorInfo, department: e.target.value})}
+                        className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      >
+                        <option value="عمومی">سوال عمومی</option>
+                        <option value="فروش">فروش و قیمت‌گذاری</option>
+                        <option value="فنی">پشتیبانی فنی</option>
+                        <option value="خدمات">خدمات پس از فروش</option>
+                        <option value="شکایات">شکایات و پیشنهادات</option>
+                      </select>
+                    </div>
+
+                    <Button
+                      onClick={handleStartChat}
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 h-12 text-lg font-semibold"
+                      disabled={!visitorInfo.name.trim() || connectionStatus === 'connecting'}
                     >
-                      <div className="flex items-start gap-2 max-w-[85%]">
-                        {msg.sender !== 'user' && (
-                          <div className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
-                            {getMessageIcon(msg.sender)}
-                          </div>
-                        )}
+                      {connectionStatus === 'connecting' ? (
+                        <>
+                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                          در حال اتصال...
+                        </>
+                      ) : (
+                        <>
+                          <MessageCircle className="w-5 h-5 mr-2" />
+                          {language === 'fa' ? 'شروع چت' : 'Start Chat'}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  {/* Quick Contact Info */}
+                  <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+                    <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+                      <p className="mb-3">{language === 'fa' ? 'یا با ما تماس بگیرید:' : 'Or contact us:'}</p>
+                      <div className="flex items-center justify-center gap-4">
+                        <div className="flex items-center gap-1">
+                          <Phone className="w-4 h-4 text-blue-600" />
+                          <span className="font-medium">{company.phone}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Mail className="w-4 h-4 text-blue-600" />
+                          <span className="font-medium">{company.email}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* Chat Messages */}
+                  <div className="flex-1 p-4 overflow-y-auto bg-gray-50 dark:bg-gray-700">
+                    {/* Welcome Message */}
+                    {messages.length === 0 && (
+                      <div className="text-center py-8">
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <Bot className="w-6 h-6 text-white" />
+                        </div>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm">
+                          {language === 'fa' 
+                            ? 'سلام! چطور می‌تونم کمکتون کنم؟'
+                            : 'Hello! How can I help you?'
+                          }
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Messages */}
+                    <div className="space-y-4">
+                      {messages.map((msg, index) => (
                         <div
-                          className={`p-3 rounded-2xl ${getMessageStyle(msg.sender)} shadow-sm`}
+                          key={msg.id}
+                          className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} ${
+                            index === messages.length - 1 ? 'animate-fade-in' : ''
+                          }`}
                         >
-                          <p className="text-sm leading-relaxed">{msg.text}</p>
-                          <div className="flex items-center justify-between mt-2 text-xs opacity-70">
-                            <span>{formatTime(msg.timestamp)}</span>
+                          <div className="flex items-start gap-2 max-w-[85%]">
+                            {msg.sender !== 'user' && (
+                              <Avatar className="w-8 h-8 flex-shrink-0">
+                                <AvatarFallback className="bg-gray-200 dark:bg-gray-600">
+                                  {getMessageIcon(msg.sender)}
+                                </AvatarFallback>
+                              </Avatar>
+                            )}
+                            
+                            <div className={`p-3 rounded-2xl shadow-sm ${getMessageStyle(msg.sender)}`}>
+                              <p className="text-sm leading-relaxed">{msg.text}</p>
+                              
+                              {/* Attachments */}
+                              {msg.attachments && msg.attachments.length > 0 && (
+                                <div className="mt-2 space-y-2">
+                                  {msg.attachments.map((attachment) => (
+                                    <div key={attachment.id} className="flex items-center gap-2 p-2 bg-white/10 rounded-lg">
+                                      {attachment.type === 'image' ? (
+                                        <Image className="w-4 h-4" />
+                                      ) : (
+                                        <FileText className="w-4 h-4" />
+                                      )}
+                                      <span className="text-xs">{attachment.name}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              
+                              <div className="flex items-center justify-between mt-2 text-xs opacity-70">
+                                <span>{formatTime(msg.timestamp)}</span>
+                                {msg.sender === 'user' && (
+                                  <span className="flex items-center gap-1">
+                                    {msg.status === 'sent' && <Clock className="w-3 h-3" />}
+                                    {msg.status === 'delivered' && <CheckCircle className="w-3 h-3" />}
+                                    {msg.status === 'read' && <CheckCircle className="w-3 h-3 text-green-400" />}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            
                             {msg.sender === 'user' && (
-                              <span>{msg.status === 'sent' ? '✓' : msg.status === 'delivered' ? '✓✓' : '✓✓'}</span>
+                              <Avatar className="w-8 h-8 flex-shrink-0">
+                                <AvatarFallback className="bg-blue-600 text-white">
+                                  <User className="w-4 h-4" />
+                                </AvatarFallback>
+                              </Avatar>
                             )}
                           </div>
                         </div>
-                        {msg.sender === 'user' && (
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                            <User className="w-4 h-4 text-white" />
+                      ))}
+
+                      {/* Typing Indicator */}
+                      {isTyping && (
+                        <div className="flex justify-start">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="w-8 h-8">
+                              <AvatarFallback className="bg-gray-200 dark:bg-gray-600">
+                                <Bot className="w-4 h-4" />
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-600 p-3 rounded-2xl">
+                              <div className="flex gap-1">
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                              </div>
+                              <span className="text-xs text-gray-500">در حال تایپ...</span>
+                            </div>
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Typing Indicator */}
-                  {currentSession?.status === 'active' && (
-                    <div className="flex justify-start">
-                      <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-600 p-3 rounded-2xl">
-                        <div className="flex gap-1">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                         </div>
-                        <span className="text-xs text-gray-500">در حال تایپ...</span>
+                      )}
+                      
+                      <div ref={messagesEndRef} />
+                    </div>
+                  </div>
+
+                  {/* Chat Input */}
+                  <div className="p-4 border-t dark:border-gray-600 bg-white dark:bg-gray-800 flex-shrink-0">
+                    {/* Quick Actions */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => sendMessage('سلام، می‌خواستم قیمت ژنراتور بپرسم', sessionId!, 'user')}
+                        className="text-xs h-7 px-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                      >
+                        💰 قیمت محصولات
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => sendMessage('می‌خواستم درباره خدمات پس از فروش بپرسم', sessionId!, 'user')}
+                        className="text-xs h-7 px-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                      >
+                        🔧 خدمات
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => sendMessage('لطفاً با من تماس بگیرید', sessionId!, 'user')}
+                        className="text-xs h-7 px-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                      >
+                        📞 تماس
+                      </Button>
+                    </div>
+
+                    <div className="flex gap-2 items-end">
+                      <div className="flex-1">
+                        <Textarea
+                          ref={messageInputRef}
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          onKeyDown={handleKeyPress}
+                          placeholder={language === 'fa' ? 'پیام خود را بنویسید...' : 'Type your message...'}
+                          className="min-h-[40px] max-h-[120px] resize-none border-gray-300 dark:border-gray-600 focus:border-blue-500"
+                          disabled={connectionStatus !== 'connected'}
+                        />
+                      </div>
+                      
+                      <div className="flex flex-col gap-1">
+                        <Button
+                          onClick={handleSendMessage}
+                          disabled={!message.trim() || connectionStatus !== 'connected'}
+                          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 w-10 h-10 p-0"
+                        >
+                          <Send className="w-4 h-4" />
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="w-10 h-10 p-0"
+                          disabled
+                        >
+                          <Paperclip className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
-                  )}
-                </div>
-              </div>
 
-              {/* Chat Input */}
-              <div className="p-4 border-t dark:border-gray-600 bg-white dark:bg-gray-800">
-                <div className="flex gap-3 items-end">
-                  <div className="flex-1">
-                    <Input
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      placeholder="پیام خود را بنویسید..."
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                      className="border-gray-300 dark:border-gray-600 focus:border-blue-500"
-                      disabled={currentSession?.status === 'closed'}
-                    />
+                    {/* Session Actions */}
+                    {currentSession && (
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                          <Clock className="w-3 h-3" />
+                          <span>شروع: {formatTime(currentSession.createdAt)}</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleEndChat}
+                            className="text-red-600 hover:text-red-700 text-xs h-7"
+                          >
+                            پایان چت
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <Button
-                    onClick={handleSendMessage}
-                    size="sm"
-                    disabled={!message.trim() || currentSession?.status === 'closed'}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-4"
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </div>
-
-                {/* Contact Info */}
-                <div className="flex items-center justify-center gap-4 mt-3 text-xs text-gray-500 dark:text-gray-400">
-                  <div className="flex items-center gap-1">
-                    <Phone className="w-3 h-3" />
-                    <span>021-58635</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Mail className="w-3 h-3" />
-                    <span>info@aalaniroo.com</span>
-                  </div>
-                </div>
-              </div>
+                </>
+              )}
             </>
           )}
+        </div>
+      )}
+
+      {/* Floating Help Button */}
+      {!isOpen && (
+        <div className="fixed bottom-24 left-6 z-40">
+          <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-0 shadow-lg max-w-xs">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                  <MessageCircle className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {language === 'fa' ? 'سوالی دارید؟' : 'Have a question?'}
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    {language === 'fa' ? 'همین الان با ما چت کنید' : 'Chat with us now'}
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsOpen(true)}
+                  className="w-6 h-6 p-0 ml-auto"
+                >
+                  <Zap className="w-4 h-4 text-blue-600" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </>
