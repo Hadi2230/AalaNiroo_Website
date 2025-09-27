@@ -9,6 +9,7 @@ import { ChatProvider } from '@/contexts/ChatContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CompanyProvider } from '@/contexts/CompanyContext';
 import { MediaProvider } from '@/contexts/MediaContext';
+import { ProductsProvider } from '@/contexts/ProductsContext';
 
 // ---------- ProtectedRoute ----------
 const RequireAuth = ({
@@ -88,7 +89,8 @@ const App = () => (
         <LanguageProvider>
           <CompanyProvider>
             <MediaProvider>
-              <TooltipProvider>
+              <ProductsProvider>
+                <TooltipProvider>
             <Toaster position="top-right" richColors expand={true} />
 
             <ErrorBoundary>
@@ -198,7 +200,8 @@ const App = () => (
                 </Routes>
               </BrowserRouter>
             </ErrorBoundary>
-              </TooltipProvider>
+                </TooltipProvider>
+              </ProductsProvider>
             </MediaProvider>
           </CompanyProvider>
         </LanguageProvider>
