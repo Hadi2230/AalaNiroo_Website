@@ -299,7 +299,7 @@ export default function AdminContent() {
               />
             </div>
 
-            <Select value={editorMode} onValueChange={(value: any) => setEditorMode(value)}>
+            <Select value={editorMode} onValueChange={(value: 'wysiwyg' | 'html' | 'text') => setEditorMode(value)}>
               <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>

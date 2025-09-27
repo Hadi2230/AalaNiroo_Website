@@ -60,7 +60,7 @@ const AdminReports = () => {
     return new Intl.NumberFormat('fa-IR').format(amount) + ' تومان';
   };
 
-  const calculateTotal = (data: any[], field: string) => {
+  const calculateTotal = (data: Record<string, number>[], field: string) => {
     return data.reduce((sum, item) => sum + item[field], 0);
   };
 

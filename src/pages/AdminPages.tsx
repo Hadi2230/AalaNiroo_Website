@@ -640,7 +640,7 @@ export default function AdminPages() {
               </div>
             </div>
 
-            <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
+            <Select value={statusFilter} onValueChange={(value: 'all' | 'published' | 'draft' | 'review') => setStatusFilter(value)}>
               <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>
@@ -652,7 +652,7 @@ export default function AdminPages() {
               </SelectContent>
             </Select>
 
-            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+            <Select value={sortBy} onValueChange={(value: 'title' | 'modified' | 'created' | 'views') => setSortBy(value)}>
               <SelectTrigger className="w-32">
                 <SelectValue />
               </SelectTrigger>

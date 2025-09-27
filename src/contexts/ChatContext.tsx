@@ -214,8 +214,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    window.addEventListener('newChatMessage' as any, handleNewMessage);
-    return () => window.removeEventListener('newChatMessage' as any, handleNewMessage);
+    window.addEventListener('newChatMessage', handleNewMessage as EventListener);
+    return () => window.removeEventListener('newChatMessage', handleNewMessage as EventListener);
   }, []);
 
   const createSession = (visitorInfo: { name: string; email?: string; phone?: string }) => {

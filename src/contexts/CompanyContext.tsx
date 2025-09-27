@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { companyInfo as defaultCompanyInfo } from '@/data/companyData';
 
+interface ContentHistoryItem {
+  content: CompanyData;
+  timestamp: string;
+  user: string;
+}
+
 interface CompanyData {
   fa: {
     name: string;
@@ -28,8 +34,8 @@ interface CompanyContextType {
   isLoading: boolean;
   lastModified: string | null;
   modifiedBy: string | null;
-  contentHistory: any[];
-  setContentHistory: React.Dispatch<React.SetStateAction<any[]>>;
+  contentHistory: ContentHistoryItem[];
+  setContentHistory: React.Dispatch<React.SetStateAction<ContentHistoryItem[]>>;
 }
 
 const CompanyContext = createContext<CompanyContextType | undefined>(undefined);
@@ -51,7 +57,7 @@ export const CompanyProvider: React.FC<CompanyProviderProps> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true);
   const [lastModified, setLastModified] = useState<string | null>(null);
   const [modifiedBy, setModifiedBy] = useState<string | null>(null);
-  const [contentHistory, setContentHistory] = useState<any[]>([]);
+  const [contentHistory, setContentHistory] = useState<ContentHistoryItem[]>([]);
 
   // Load data from localStorage on mount
   useEffect(() => {
