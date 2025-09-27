@@ -73,100 +73,6 @@ const initialSessions: ChatSession[] = [
         timestamp: '2024-01-15T14:10:00Z',
         status: 'delivered',
         sessionId: 'session-1'
-      },
-      {
-        id: 'msg-3',
-        text: 'چه نوع ژنراتوری مد نظرتون هست؟',
-        sender: 'admin',
-        timestamp: '2024-01-15T14:15:00Z',
-        status: 'read',
-        sessionId: 'session-1',
-        adminId: 'admin-1'
-      },
-      {
-        id: 'msg-4',
-        text: 'برای یک شرکت صنعتی نیاز دارم',
-        sender: 'user',
-        timestamp: '2024-01-15T14:20:00Z',
-        status: 'delivered',
-        sessionId: 'session-1'
-      },
-      {
-        id: 'msg-5',
-        text: 'برای اطلاعات بیشتر لطفاً با شماره 021-58635 تماس بگیرید',
-        sender: 'admin',
-        timestamp: '2024-01-15T14:25:00Z',
-        status: 'sent',
-        sessionId: 'session-1',
-        adminId: 'admin-1'
-      },
-      {
-        id: 'msg-6',
-        text: 'ممنون از راهنمایی شما',
-        sender: 'user',
-        timestamp: '2024-01-15T14:30:00Z',
-        status: 'sent',
-        sessionId: 'session-1'
-      }
-    ]
-  },
-  {
-    id: 'session-2',
-    visitorName: 'مریم احمدی',
-    visitorEmail: 'maryam@example.com',
-    status: 'waiting',
-    createdAt: '2024-01-15T13:45:00Z',
-    updatedAt: '2024-01-15T13:50:00Z',
-    lastMessage: 'قیمت ژنراتور 50 کیلووات چقدر است؟',
-    unreadCount: 1,
-    priority: 'high',
-    messages: [
-      {
-        id: 'msg-7',
-        text: 'قیمت ژنراتور 50 کیلووات چقدر است؟',
-        sender: 'user',
-        timestamp: '2024-01-15T13:50:00Z',
-        status: 'sent',
-        sessionId: 'session-2'
-      }
-    ]
-  },
-  {
-    id: 'session-3',
-    visitorName: 'علی محمدی',
-    visitorEmail: 'ali@example.com',
-    visitorPhone: '09345678901',
-    status: 'closed',
-    createdAt: '2024-01-15T12:30:00Z',
-    updatedAt: '2024-01-15T13:00:00Z',
-    lastMessage: 'سفارش ثبت شد، ممنون',
-    unreadCount: 0,
-    priority: 'low',
-    messages: [
-      {
-        id: 'msg-8',
-        text: 'سلام، می‌خواستم سفارش ژنراتور بدم',
-        sender: 'user',
-        timestamp: '2024-01-15T12:35:00Z',
-        status: 'read',
-        sessionId: 'session-3'
-      },
-      {
-        id: 'msg-9',
-        text: 'سلام، خوش آمدید. چه کمکی می‌تونم بکنم؟',
-        sender: 'admin',
-        timestamp: '2024-01-15T12:40:00Z',
-        status: 'read',
-        sessionId: 'session-3',
-        adminId: 'admin-1'
-      },
-      {
-        id: 'msg-10',
-        text: 'سفارش ثبت شد، ممنون',
-        sender: 'user',
-        timestamp: '2024-01-15T13:00:00Z',
-        status: 'read',
-        sessionId: 'session-3'
       }
     ]
   }
@@ -183,7 +89,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const savedSessions = localStorage.getItem('chatSessions');
     if (savedSessions) {
-      setSessions(JSON.parse(savedSessions));
+      try {
+        setSessions(JSON.parse(savedSessions));
+      } catch (error) {
+        console.error('Error loading chat sessions:', error);
+      }
     }
 
     // Calculate initial unread count
