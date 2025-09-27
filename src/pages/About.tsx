@@ -21,6 +21,20 @@ export default function About() {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
 
+  // Helper function for file size formatting
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  // Helper function for date formatting
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fa-IR');
+  };
+
   const milestones = language === 'fa' ? [
     { year: '1369', event: 'تأسیس شرکت اعلا نیرو' },
     { year: '1375', event: 'نمایندگی رسمی FG Wilson' },
