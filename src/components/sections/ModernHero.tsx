@@ -2,15 +2,24 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Phone, FileText, Calendar, Play, Award, Users, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
+import { useHomeContent } from '@/contexts/HomeContentContext';
 
 const ModernHero = () => {
   const { language, t, dir } = useLanguage();
   const { companyData } = useCompany();
+  const { content: home } = useHomeContent();
   const company = companyData[language];
 
   return (
     <section className="relative min-h-screen flex items-center bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800 text-white overflow-hidden">
-      {/* Background Video/Image Overlay */}
+      {/* Dynamic Media Background */}
+      {home.hero.type === 'video' && home.hero.videoUrl && (
+        <video className="absolute inset-0 w-full h-full object-cover opacity-50" autoPlay={home.hero.autoplay} muted={home.hero.muted} loop={home.hero.loop} poster={home.hero.posterUrl || undefined} />
+      )}
+      {home.hero.type === 'image' && home.hero.imageUrl && (
+        <img src={home.hero.imageUrl} alt={home.hero.title || ''} className="absolute inset-0 w-full h-full object-cover opacity-60" />
+      )}
+      {/* Background Overlay */}
       <div className="absolute inset-0 bg-black/40 z-10"></div>
       
       {/* Industrial Background Pattern */}
@@ -43,7 +52,9 @@ const ModernHero = () => {
 
             <div className="space-y-6">
               <h1 className="text-5xl lg:text-7xl font-bold leading-tight">
-                {language === 'fa' ? (
+                {home.hero.title ? (
+                  home.hero.title
+                ) : language === 'fa' ? (
                   <>
                     پیشرو در تولید
                     <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
@@ -61,7 +72,7 @@ const ModernHero = () => {
               </h1>
               
               <p className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-2xl">
-                {company.description}
+                {home.hero.subtitle || company.description}
               </p>
             </div>
 
@@ -106,9 +117,9 @@ const ModernHero = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4 group">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4 group" onClick={() => { if (home.hero.ctaUrl) window.location.href = home.hero.ctaUrl; }}>
                 <FileText className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-                {t('hero.cta.quote')}
+                {home.hero.ctaText || t('hero.cta.quote')}
                 <ArrowRight className={`w-5 h-5 ${dir === 'rtl' ? 'mr-2' : 'ml-2'} group-hover:translate-x-1 transition-transform`} />
               </Button>
               

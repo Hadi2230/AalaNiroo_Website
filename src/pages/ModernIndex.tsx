@@ -4,6 +4,7 @@ import ModernHeader from '@/components/layout/ModernHeader';
 import Footer from '@/components/layout/Footer';
 import ChatWidget from '@/components/layout/ChatWidget';
 import GallerySection from '@/components/sections/GallerySection';
+import { useHomeContent } from '@/contexts/HomeContentContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -34,6 +35,7 @@ export default function ModernIndex() {
   const { language, t, dir } = useLanguage();
   const { companyData, isLoading } = useCompany();
   const { listGalleries, mediaFiles } = useMedia();
+  const { content: home } = useHomeContent();
   const currentProducts = products[language];
   const currentServices = services[language];
   const currentProjects = projects[language];
@@ -101,6 +103,25 @@ export default function ModernIndex() {
           </div>
         </div>
       </section>
+
+      {/* Homepage Gallery (from Admin Content) */}
+      {home.gallery.length > 0 && (
+        <section className="py-12 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {home.gallery.sort((a,b) => a.order - b.order).slice(0, 8).map(item => (
+                <div key={item.id} className="relative group overflow-hidden rounded-xl shadow hover:shadow-lg transition-shadow">
+                  {item.type === 'image' ? (
+                    <img src={item.url} alt={item.alt} className="w-full h-48 object-cover group-hover:scale-105 transition-transform" />
+                  ) : (
+                    <video src={item.url} className="w-full h-48 object-cover" muted />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Company Introduction */}
       <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
