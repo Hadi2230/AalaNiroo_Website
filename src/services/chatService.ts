@@ -23,9 +23,13 @@ export class ChatService {
     }
 
     try {
-      // In a real app, this would connect to your backend WebSocket/SSE endpoint
-      // For now, we'll simulate real-time updates
-      this.eventSource = new EventSource('/api/chat/events');
+      // Prefer simulated updates in dev unless CHAT_SSE_URL is provided
+      const sseUrl = (import.meta as any)?.env?.VITE_CHAT_SSE_URL;
+      if (!sseUrl) {
+        this.simulateRealTimeUpdates();
+        return;
+      }
+      this.eventSource = new EventSource(sseUrl);
       
       this.eventSource.onopen = () => {
         console.log('🔗 Chat service connected');

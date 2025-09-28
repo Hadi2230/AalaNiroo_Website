@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import ModernHeader from '@/components/layout/ModernHeader';
 import Footer from '@/components/layout/Footer';
 import ChatWidget from '@/components/layout/ChatWidget';
@@ -75,7 +75,7 @@ export default function Products() {
   }, [products]);
 
   // Force refresh products from localStorage
-  const forceRefresh = useCallback(() => {
+  const forceRefresh = React.useCallback(() => {
     const savedProducts = localStorage.getItem('products');
     if (savedProducts) {
       try {
