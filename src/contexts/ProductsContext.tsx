@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import { useMedia } from './MediaContext';
 
@@ -357,6 +357,12 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const { getFilesByFolder } = useMedia();
 
+  // Cross-tab/port sync (BroadcastChannel + WebSocket relay in dev)
+  const bcRef = useRef<BroadcastChannel | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
+  const skipBroadcastNextRef = useRef<boolean>(false);
+  const tabIdRef = useRef<string>(`tab-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+
   // Load data from localStorage
   useEffect(() => {
     const savedProducts = localStorage.getItem('products');
@@ -409,20 +415,75 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     window.addEventListener('productsUpdated', handleProductsUpdate as EventListener);
     window.addEventListener('storage', handleStorageChange);
     
+    // BroadcastChannel for same-origin tabs
+    try {
+      // @ts-ignore
+      bcRef.current = new BroadcastChannel('products_channel');
+      bcRef.current.onmessage = (event: MessageEvent) => {
+        const data = event.data;
+        if (data && data.type === 'PRODUCTS_UPDATED' && data.source !== tabIdRef.current) {
+          skipBroadcastNextRef.current = true;
+          try {
+            localStorage.setItem('products', JSON.stringify(data.products));
+          } catch {}
+          setProducts(data.products as Product[]);
+        }
+      };
+    } catch {}
+
+    // WebSocket relay in dev (cross-origin/port)
+    if (import.meta.env.DEV) {
+      try {
+        wsRef.current = new WebSocket('ws://localhost:3001');
+        wsRef.current.onmessage = (evt) => {
+          try {
+            const msg = JSON.parse(evt.data);
+            if (msg && msg.type === 'PRODUCTS_UPDATED' && msg.source !== tabIdRef.current) {
+              skipBroadcastNextRef.current = true;
+              try {
+                localStorage.setItem('products', JSON.stringify(msg.products));
+              } catch {}
+              setProducts(msg.products as Product[]);
+            }
+          } catch {}
+        };
+      } catch {}
+    }
+
     return () => {
       window.removeEventListener('productsUpdated', handleProductsUpdate as EventListener);
       window.removeEventListener('storage', handleStorageChange);
+      try { bcRef.current?.close(); } catch {}
+      try { wsRef.current?.close(); } catch {}
     };
   }, []);
 
   // Save to localStorage and trigger sync event
   useEffect(() => {
-    localStorage.setItem('products', JSON.stringify(products));
-    
-    // Trigger custom event for real-time sync
-    window.dispatchEvent(new CustomEvent('productsUpdated', {
-      detail: products
-    }));
+    try {
+      localStorage.setItem('products', JSON.stringify(products));
+    } catch {}
+
+    // Avoid echo when this update came from a remote broadcast
+    if (skipBroadcastNextRef.current) {
+      skipBroadcastNextRef.current = false;
+      return;
+    }
+
+    // Trigger custom event for real-time sync (same tab/components)
+    window.dispatchEvent(new CustomEvent('productsUpdated', { detail: products }));
+
+    // BroadcastChannel broadcast (same origin tabs)
+    try {
+      bcRef.current?.postMessage({ type: 'PRODUCTS_UPDATED', products, source: tabIdRef.current });
+    } catch {}
+
+    // WebSocket relay broadcast (cross-port in dev)
+    if (import.meta.env.DEV && wsRef.current && wsRef.current.readyState === 1) {
+      try {
+        wsRef.current.send(JSON.stringify({ type: 'PRODUCTS_UPDATED', products, source: tabIdRef.current }));
+      } catch {}
+    }
   }, [products]);
 
   useEffect(() => {
