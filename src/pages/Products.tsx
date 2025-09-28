@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ModernHeader from '@/components/layout/ModernHeader';
 import Footer from '@/components/layout/Footer';
 import ChatWidget from '@/components/layout/ChatWidget';
@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useProducts } from '@/contexts/ProductsContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { toast } from 'sonner';
 import { 
   Search, 
   Filter, 

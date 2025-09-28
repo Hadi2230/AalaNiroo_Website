@@ -49,7 +49,7 @@ const ChatWidget = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { 
     sessions, 
@@ -194,8 +194,8 @@ const ChatWidget = () => {
       setIsTyping(false);
       
       // Clear typing timeout
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current as unknown as number);
       }
       
       // Simulate admin typing after user message
@@ -215,7 +215,7 @@ const ChatWidget = () => {
   const handleTyping = useCallback(() => {
     // Clear existing timeout
     if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
+      clearTimeout(typingTimeoutRef.current as unknown as number);
     }
     
     // Set new timeout to stop typing indicator
@@ -309,48 +309,30 @@ const ChatWidget = () => {
 
   return (
     <>
-      {/* Professional Chat Button */}
+      {/* Chat Button - refined launcher */}
       <div className="fixed bottom-6 left-6 z-50">
-        <div className="relative group">
-          {/* Main Chat Button */}
+        <div className="relative">
           <Button
             onClick={() => setIsOpen(!isOpen)}
-            className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 hover:from-blue-600 hover:via-blue-700 hover:to-purple-700 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-110 group relative overflow-hidden"
+            className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-[0_10px_25px_rgba(59,130,246,0.35)] hover:shadow-[0_14px_32px_rgba(124,58,237,0.45)] transition-all duration-300 hover:scale-110 group border border-white/10 backdrop-blur-sm"
           >
-            {/* Animated Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            
-            {/* Icon with Animation */}
-            <div className="relative z-10">
-              {isOpen ? (
-                <X className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300 text-white" />
-              ) : (
-                <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform duration-300 text-white" />
-              )}
-            </div>
-            
-            {/* Shine Effect */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            {isOpen ? (
+              <X className="w-6 h-6 group-hover:rotate-90 transition-transform" />
+            ) : (
+              <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform drop-shadow-[0_2px_4px_rgba(0,0,0,0.25)]" />
+            )}
           </Button>
           
-          {/* Professional Unread Badge */}
+          {/* Unread Badge */}
           {unreadMessages > 0 && !isOpen && (
-            <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold flex items-center justify-center shadow-lg animate-pulse border-2 border-white">
+            <Badge className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0 flex items-center justify-center bg-red-500 text-white text-xs animate-bounce shadow-lg">
               {unreadMessages > 9 ? '9+' : unreadMessages}
-            </div>
+            </Badge>
           )}
           
-          {/* Professional Pulse Animation */}
+          {/* Pulse Animation */}
           {!isOpen && (
-            <>
-              <div className="absolute inset-0 rounded-full bg-blue-500 animate-ping opacity-30"></div>
-              <div className="absolute inset-0 rounded-full bg-blue-400 animate-ping opacity-20" style={{ animationDelay: '0.5s' }}></div>
-            </>
-          )}
-          
-          {/* Online Status Indicator */}
-          {connectionStatus === 'connected' && !isOpen && (
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
+            <div className="absolute inset-0 rounded-full bg-blue-600 animate-ping opacity-20"></div>
           )}
         </div>
       </div>
