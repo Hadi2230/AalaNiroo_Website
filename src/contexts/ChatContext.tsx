@@ -513,6 +513,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const bcRef = useRef<BroadcastChannel | null>(null);
   const skipBroadcastNextRef = useRef<boolean>(false);
   const lastMarkedRef = useRef<Record<string, number>>({});
+  const wsRef = useRef<WebSocket | null>(null);
 
   // Load from localStorage
   useEffect(() => {
@@ -540,6 +541,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (e) {
         console.warn('BroadcastChannel post failed', e);
       }
+    }
+    // WS broadcast in dev
+    if (!skipBroadcastNextRef.current && wsRef.current && wsRef.current.readyState === 1 && import.meta.env.DEV) {
+      try {
+        wsRef.current.send(JSON.stringify({ type: 'SESSIONS_UPDATED', sessions: state.sessions, source: tabIdRef.current }));
+      } catch {}
     }
     // Reset skip flag after performing potential broadcast
     if (skipBroadcastNextRef.current) {
@@ -587,6 +594,37 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         bcRef.current?.close();
       } catch {}
+    };
+  }, []);
+
+  // WebSocket fallback (for cross-origin/port in dev)
+  useEffect(() => {
+    // only in dev
+    if (import.meta.env.DEV) {
+      try {
+        const ws = new WebSocket('ws://localhost:3001');
+        wsRef.current = ws;
+        ws.onopen = () => {
+          dispatch({ type: 'SET_CONNECTION_STATUS', payload: true });
+        };
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data && data.type === 'SESSIONS_UPDATED' && Array.isArray(data.sessions)) {
+              skipBroadcastNextRef.current = true;
+              dispatch({ type: 'SET_SESSIONS', payload: data.sessions });
+            }
+          } catch {}
+        };
+        ws.onclose = () => {
+          dispatch({ type: 'SET_CONNECTION_STATUS', payload: false });
+        };
+      } catch (e) {
+        console.warn('WS init failed', e);
+      }
+    }
+    return () => {
+      try { wsRef.current?.close(); } catch {}
     };
   }, []);
 
