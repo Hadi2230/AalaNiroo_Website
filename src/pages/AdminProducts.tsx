@@ -242,6 +242,8 @@ const AdminProducts = () => {
       });
       
       setShowAddDialog(false);
+      // Navigate to /products in new tab to verify
+      window.open('/products', '_blank');
       setActiveTab('basic');
     } catch (error) {
       console.error('Error creating product:', error);

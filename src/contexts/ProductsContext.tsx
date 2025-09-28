@@ -556,14 +556,16 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
       setProducts(prev => {
         const updatedProducts = [newProduct, ...prev];
-        
-        // Force immediate sync
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('productsUpdated', {
-            detail: updatedProducts
-          }));
-        }, 100);
-        
+        // Persist immediately
+        try { localStorage.setItem('products', JSON.stringify(updatedProducts)); } catch {}
+        // Local event
+        try { window.dispatchEvent(new CustomEvent('productsUpdated', { detail: updatedProducts })); } catch {}
+        // BroadcastChannel
+        try { bcRef.current?.postMessage({ type: 'PRODUCTS_UPDATED', products: updatedProducts, source: tabIdRef.current }); } catch {}
+        // WS relay in dev
+        if (import.meta.env.DEV && wsRef.current && wsRef.current.readyState === 1) {
+          try { wsRef.current.send(JSON.stringify({ type: 'PRODUCTS_UPDATED', products: updatedProducts, source: tabIdRef.current })); } catch {}
+        }
         return updatedProducts;
       });
       
@@ -587,16 +589,25 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setError(null);
 
     try {
-      setProducts(prev => prev.map(product => 
-        product.id === id 
-          ? { 
-              ...product, 
-              ...updates, 
-              updatedAt: new Date().toISOString(),
-              updatedBy: 'admin'
-            }
-          : product
-      ));
+      setProducts(prev => {
+        const next = prev.map(product => 
+          product.id === id 
+            ? { 
+                ...product, 
+                ...updates, 
+                updatedAt: new Date().toISOString(),
+                updatedBy: 'admin'
+              }
+            : product
+        );
+        try { localStorage.setItem('products', JSON.stringify(next)); } catch {}
+        try { window.dispatchEvent(new CustomEvent('productsUpdated', { detail: next })); } catch {}
+        try { bcRef.current?.postMessage({ type: 'PRODUCTS_UPDATED', products: next, source: tabIdRef.current }); } catch {}
+        if (import.meta.env.DEV && wsRef.current && wsRef.current.readyState === 1) {
+          try { wsRef.current.send(JSON.stringify({ type: 'PRODUCTS_UPDATED', products: next, source: tabIdRef.current })); } catch {}
+        }
+        return next;
+      });
 
       toast.success('محصول با موفقیت به‌روزرسانی شد');
       return true;
@@ -615,7 +626,16 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const product = products.find(p => p.id === id);
       if (!product) return false;
 
-      setProducts(prev => prev.filter(p => p.id !== id));
+      setProducts(prev => {
+        const next = prev.filter(p => p.id !== id);
+        try { localStorage.setItem('products', JSON.stringify(next)); } catch {}
+        try { window.dispatchEvent(new CustomEvent('productsUpdated', { detail: next })); } catch {}
+        try { bcRef.current?.postMessage({ type: 'PRODUCTS_UPDATED', products: next, source: tabIdRef.current }); } catch {}
+        if (import.meta.env.DEV && wsRef.current && wsRef.current.readyState === 1) {
+          try { wsRef.current.send(JSON.stringify({ type: 'PRODUCTS_UPDATED', products: next, source: tabIdRef.current })); } catch {}
+        }
+        return next;
+      });
       toast.success(`محصول "${product.name}" حذف شد`);
       
       return true;
