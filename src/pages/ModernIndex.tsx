@@ -3,11 +3,13 @@ import ModernProductCard from '@/components/sections/ModernProductCard';
 import ModernHeader from '@/components/layout/ModernHeader';
 import Footer from '@/components/layout/Footer';
 import ChatWidget from '@/components/layout/ChatWidget';
+import GallerySection from '@/components/sections/GallerySection';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
+import { useMedia } from '@/contexts/MediaContext';
 import { products, services, projects } from '@/data/companyData';
 import { 
   ArrowRight, 
@@ -31,6 +33,7 @@ import {
 export default function ModernIndex() {
   const { language, t, dir } = useLanguage();
   const { companyData, isLoading } = useCompany();
+  const { listGalleries, mediaFiles } = useMedia();
   const currentProducts = products[language];
   const currentServices = services[language];
   const currentProjects = projects[language];
@@ -313,6 +316,31 @@ export default function ModernIndex() {
           </div>
         </div>
       </section>
+
+      {/* Dedicated Galleries Sections (e.g., Exhibitions per year) */}
+      {(() => {
+        const galleries = listGalleries();
+        const expoThisYear = galleries.find(g => g.tags.map(x => x.toLowerCase()).includes('نمایشگاه امسال') || g.title.includes('امسال'));
+        const expoLastYear = galleries.find(g => g.tags.map(x => x.toLowerCase()).includes('نمایشگاه پارسال') || g.title.includes('پارسال'));
+        return (
+          <>
+            {expoThisYear && (
+              <GallerySection
+                title={language === 'fa' ? 'نمایشگاه امسال' : 'This Year Exhibition'}
+                gallery={expoThisYear}
+                files={mediaFiles}
+              />
+            )}
+            {expoLastYear && (
+              <GallerySection
+                title={language === 'fa' ? 'نمایشگاه پارسال' : 'Last Year Exhibition'}
+                gallery={expoLastYear}
+                files={mediaFiles}
+              />
+            )}
+          </>
+        );
+      })()}
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
