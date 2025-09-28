@@ -34,9 +34,22 @@ export interface MediaFolder {
   fileCount: number;
 }
 
+export interface MediaGallery {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  coverImageId?: string;
+  imageIds: string[];
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface MediaContextType {
   mediaFiles: MediaFile[];
   folders: MediaFolder[];
+  galleries: MediaGallery[];
   uploadFile: (file: File, folder?: string, metadata?: Partial<MediaFile>) => Promise<MediaFile>;
   deleteFile: (fileId: string) => Promise<boolean>;
   updateFile: (fileId: string, updates: Partial<MediaFile>) => Promise<boolean>;
@@ -47,6 +60,14 @@ interface MediaContextType {
   searchFiles: (query: string) => MediaFile[];
   toggleFavorite: (fileId: string) => Promise<boolean>;
   getGalleryImages: () => MediaFile[];
+  // Galleries API
+  createGallery: (data: { title: string; description?: string; tags?: string[]; coverImageId?: string }) => Promise<MediaGallery>;
+  updateGallery: (galleryId: string, updates: Partial<MediaGallery>) => Promise<boolean>;
+  deleteGallery: (galleryId: string) => Promise<boolean>;
+  addImagesToGallery: (galleryId: string, imageIds: string[]) => Promise<boolean>;
+  removeImageFromGallery: (galleryId: string, imageId: string) => Promise<boolean>;
+  listGalleries: () => MediaGallery[];
+  getGalleryBySlug: (slug: string) => MediaGallery | undefined;
   isLoading: boolean;
   error: string | null;
 }
@@ -105,6 +126,7 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
       fileCount: 0
     }
   ]);
+  const [galleries, setGalleries] = useState<MediaGallery[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -120,6 +142,11 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
         const savedFolders = localStorage.getItem('mediaFolders');
         if (savedFolders) {
           setFolders(JSON.parse(savedFolders));
+        }
+
+        const savedGalleries = localStorage.getItem('mediaGalleries');
+        if (savedGalleries) {
+          setGalleries(JSON.parse(savedGalleries));
         }
       } catch (error) {
         console.error('Error loading media data:', error);
@@ -138,6 +165,10 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('mediaFolders', JSON.stringify(folders));
   }, [folders]);
+
+  useEffect(() => {
+    localStorage.setItem('mediaGalleries', JSON.stringify(galleries));
+  }, [galleries]);
 
   const uploadFile = async (file: File, folder = 'gallery', metadata: Partial<MediaFile> = {}): Promise<MediaFile> => {
     setIsLoading(true);
@@ -331,9 +362,69 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
     return 'document';
   };
 
+  const slugify = (title: string): string => {
+    return title
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
+  };
+
+  // Galleries API implementations
+  const createGallery = async (data: { title: string; description?: string; tags?: string[]; coverImageId?: string }): Promise<MediaGallery> => {
+    const now = new Date().toISOString();
+    const gallery: MediaGallery = {
+      id: `gal-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      slug: slugify(data.title),
+      title: data.title,
+      description: data.description || '',
+      coverImageId: data.coverImageId,
+      imageIds: [],
+      tags: data.tags || [],
+      createdAt: now,
+      updatedAt: now,
+    };
+    setGalleries(prev => [gallery, ...prev]);
+    toast.success('گالری ایجاد شد');
+    return gallery;
+  };
+
+  const updateGallery = async (galleryId: string, updates: Partial<MediaGallery>): Promise<boolean> => {
+    setGalleries(prev => prev.map(g => g.id === galleryId ? { ...g, ...updates, slug: updates.title ? slugify(updates.title) : g.slug, updatedAt: new Date().toISOString() } : g));
+    toast.success('گالری به‌روزرسانی شد');
+    return true;
+  };
+
+  const deleteGallery = async (galleryId: string): Promise<boolean> => {
+    setGalleries(prev => prev.filter(g => g.id !== galleryId));
+    toast.success('گالری حذف شد');
+    return true;
+  };
+
+  const addImagesToGallery = async (galleryId: string, imageIds: string[]): Promise<boolean> => {
+    setGalleries(prev => prev.map(g => {
+      if (g.id !== galleryId) return g;
+      const unique = Array.from(new Set([...(g.imageIds || []), ...imageIds]));
+      return { ...g, imageIds: unique, updatedAt: new Date().toISOString() };
+    }));
+    toast.success('تصاویر به گالری افزوده شد');
+    return true;
+  };
+
+  const removeImageFromGallery = async (galleryId: string, imageId: string): Promise<boolean> => {
+    setGalleries(prev => prev.map(g => g.id === galleryId ? { ...g, imageIds: g.imageIds.filter(id => id !== imageId), updatedAt: new Date().toISOString() } : g));
+    return true;
+  };
+
+  const listGalleries = (): MediaGallery[] => galleries;
+  const getGalleryBySlug = (slug: string): MediaGallery | undefined => galleries.find(g => g.slug === slug);
+
   const value: MediaContextType = {
     mediaFiles,
     folders,
+    galleries,
     uploadFile,
     deleteFile,
     updateFile,
@@ -344,6 +435,13 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
     searchFiles,
     toggleFavorite,
     getGalleryImages,
+    createGallery,
+    updateGallery,
+    deleteGallery,
+    addImagesToGallery,
+    removeImageFromGallery,
+    listGalleries,
+    getGalleryBySlug,
     isLoading,
     error
   };

@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
-import { useMedia, MediaFile } from '@/contexts/MediaContext';
+import { useMedia, MediaFile, MediaGallery } from '@/contexts/MediaContext';
 import { toast } from 'sonner';
 import {
   Upload,
