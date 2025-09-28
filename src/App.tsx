@@ -9,6 +9,7 @@ import { ChatProvider } from '@/contexts/ChatContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CompanyProvider } from '@/contexts/CompanyContext';
 import { MediaProvider } from '@/contexts/MediaContext';
+import { HomeContentProvider } from '@/contexts/HomeContentContext';
 import { ProductsProvider } from '@/contexts/ProductsContext';
 
 // ---------- ProtectedRoute ----------
@@ -91,6 +92,7 @@ const App = () => (
         <LanguageProvider>
           <CompanyProvider>
             <MediaProvider>
+              <HomeContentProvider>
               <ProductsProvider>
                 <TooltipProvider>
             <Toaster position="top-right" richColors expand={true} />
@@ -206,6 +208,7 @@ const App = () => (
             </ErrorBoundary>
                 </TooltipProvider>
               </ProductsProvider>
+              </HomeContentProvider>
             </MediaProvider>
           </CompanyProvider>
         </LanguageProvider>

@@ -12,6 +12,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompany } from '@/contexts/CompanyContext';
+import { useHomeContent } from '@/contexts/HomeContentContext';
+import MediaPicker from '@/components/media/MediaPicker';
 import { toast } from 'sonner';
 
 // Extend window type for autoSaveTimer
@@ -87,6 +89,9 @@ export default function AdminContent() {
   const [editorMode, setEditorMode] = useState<'wysiwyg' | 'html' | 'text'>('wysiwyg');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const { content: homeContent, setHero, clearHero, addGalleryItem, removeGalleryItem, updateGalleryItem } = useHomeContent();
+  const [showHeroMediaPicker, setShowHeroMediaPicker] = useState(false);
+  const [showGalleryPicker, setShowGalleryPicker] = useState(false);
 
   // Advanced content management
   const [seoData, setSeoData] = useState({
@@ -389,6 +394,7 @@ export default function AdminContent() {
                   { id: 'company', title: 'اطلاعات شرکت', icon: Settings },
                   { id: 'content', title: 'محتوای صفحات', icon: FileText },
                   { id: 'media', title: 'مدیریت رسانه', icon: Image },
+                  { id: 'homeMedia', title: 'رسانه صفحه اصلی', icon: Video },
                   { id: 'menus', title: 'ساختار منوها', icon: List },
                   { id: 'seo', title: 'SEO و متادیتا', icon: Tag },
                   { id: 'translations', title: 'مدیریت ترجمه', icon: Globe }
@@ -645,6 +651,129 @@ export default function AdminContent() {
             </Tabs>
           </div>
         </div>
+
+        {/* Homepage Media Section */}
+        {selectedSection === 'homeMedia' && (
+          <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <Video className="w-6 h-6 text-blue-600" />
+                رسانه صفحه اصلی
+              </CardTitle>
+              <CardDescription>
+                مدیریت ویدیو/تصویر هیرو و گالری صفحه اصلی
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              {/* Hero Media */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">مدیای هیرو</h3>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setShowHeroMediaPicker(true)}>
+                      انتخاب رسانه
+                    </Button>
+                    <Button variant="outline" className="text-red-600" onClick={clearHero}>حذف</Button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>عنوان</Label>
+                    <Input value={homeContent.hero.title || ''} onChange={(e) => setHero({ title: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>زیرعنوان</Label>
+                    <Input value={homeContent.hero.subtitle || ''} onChange={(e) => setHero({ subtitle: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>CTA متن</Label>
+                    <Input value={homeContent.hero.ctaText || ''} onChange={(e) => setHero({ ctaText: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>CTA لینک</Label>
+                    <Input value={homeContent.hero.ctaUrl || ''} onChange={(e) => setHero({ ctaUrl: e.target.value })} />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Switch checked={homeContent.hero.overlay ?? true} onCheckedChange={(v) => setHero({ overlay: !!v })} />
+                      <Label>اورلی</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch checked={homeContent.hero.autoplay ?? true} onCheckedChange={(v) => setHero({ autoplay: !!v })} />
+                      <Label>AutoPlay</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch checked={homeContent.hero.muted ?? true} onCheckedChange={(v) => setHero({ muted: !!v })} />
+                      <Label>Mute</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch checked={homeContent.hero.loop ?? true} onCheckedChange={(v) => setHero({ loop: !!v })} />
+                      <Label>Loop</Label>
+                    </div>
+                  </div>
+                </div>
+                {/* Preview */}
+                <div className="rounded-lg overflow-hidden border">
+                  {homeContent.hero.videoUrl ? (
+                    <video className="w-full" controls poster={homeContent.hero.posterUrl || undefined} autoPlay={homeContent.hero.autoplay} muted={homeContent.hero.muted} loop={homeContent.hero.loop}>
+                      <source src={homeContent.hero.videoUrl} />
+                    </video>
+                  ) : homeContent.hero.imageUrl ? (
+                    <img src={homeContent.hero.imageUrl} alt={homeContent.hero.title || ''} className="w-full" />
+                  ) : (
+                    <div className="p-8 text-center text-gray-500">مدیایی انتخاب نشده است</div>
+                  )}
+                </div>
+              </div>
+
+              {/* Gallery Manager */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">گالری صفحه اصلی</h3>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setShowGalleryPicker(true)}>افزودن از رسانه‌ها</Button>
+                  </div>
+                </div>
+                {homeContent.gallery.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500 border rounded-lg">آیتمی در گالری نیست</div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {homeContent.gallery.sort((a,b) => a.order - b.order).map(item => (
+                      <div key={item.id} className="relative group">
+                        {item.type === 'image' ? (
+                          <img src={item.url} alt={item.alt} className="w-full h-40 object-cover rounded" />
+                        ) : (
+                          <video src={item.url} className="w-full h-40 object-cover rounded" />
+                        )}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <Button size="sm" variant="secondary" onClick={() => updateGalleryItem(item.id, { caption: (item.caption || '') + '' })}>ویرایش</Button>
+                          <Button size="sm" variant="destructive" onClick={() => removeGalleryItem(item.id)}>حذف</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Media Pickers */}
+        <MediaPicker
+          open={showHeroMediaPicker}
+          onOpenChange={setShowHeroMediaPicker}
+          onSelect={(file) => {
+            if (file.type === 'image') setHero({ type: 'image', imageUrl: file.url, posterUrl: file.url });
+            else setHero({ type: 'video', videoUrl: file.url, posterUrl: homeContent.hero.posterUrl });
+          }}
+          accept={['image','video']}
+        />
+        <MediaPicker
+          open={showGalleryPicker}
+          onOpenChange={setShowGalleryPicker}
+          onSelect={(file) => addGalleryItem({ type: file.type === 'image' ? 'image' : 'video', url: file.url, alt: file.alt || '' })}
+          accept={['image','video']}
+        />
 
         {/* Preview Modal */}
         <Dialog open={showPreview} onOpenChange={setShowPreview}>
