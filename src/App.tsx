@@ -64,6 +64,8 @@ import Services from './pages/Services';
 import Contact from './pages/Contact';
 import Blog from './pages/Blog';
 import NotFound from './pages/NotFound';
+import Galleries from './pages/Galleries';
+import GalleryDetail from './pages/GalleryDetail';
 
 // ---------- Admin Pages ----------
 import AdminLogin from './pages/AdminLogin';
@@ -109,6 +111,8 @@ const App = () => (
                   <Route path="/services" element={<Services />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/blog" element={<Blog />} />
+                  <Route path="/galleries" element={<Galleries />} />
+                  <Route path="/galleries/:slug" element={<GalleryDetail />} />
 
                   {/* 🔑 Authentication */}
                   <Route path="/admin/login" element={<AdminLogin />} />

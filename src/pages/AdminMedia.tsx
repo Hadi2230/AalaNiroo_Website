@@ -73,6 +73,12 @@ export default function AdminMedia() {
     searchFiles,
     toggleFavorite,
     getGalleryImages,
+    galleries,
+    createGallery,
+    updateGallery,
+    deleteGallery,
+    addImagesToGallery,
+    removeImageFromGallery,
     isLoading,
     error
   } = useMedia();
@@ -93,6 +99,12 @@ export default function AdminMedia() {
     tags: '',
     copyright: ''
   });
+
+  // Galleries UI state
+  const [showCreateGallery, setShowCreateGallery] = useState(false);
+  const [showEditGallery, setShowEditGallery] = useState(false);
+  const [selectedGallery, setSelectedGallery] = useState<MediaGallery | null>(null);
+  const [newGallery, setNewGallery] = useState({ title: '', description: '', tags: '' });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
@@ -432,6 +444,190 @@ export default function AdminMedia() {
           onChange={handleFileSelect}
           className="hidden"
         />
+
+        {/* Create Gallery Modal */}
+        <Dialog open={showCreateGallery} onOpenChange={setShowCreateGallery}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>ایجاد گالری جدید</DialogTitle>
+              <DialogDescription>برای پروژه یک گالری با نام و توضیحات بسازید</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>نام گالری</Label>
+                <Input value={newGallery.title} onChange={(e) => setNewGallery(prev => ({ ...prev, title: e.target.value }))} placeholder="مثلاً: پروژه بیمارستان میلاد" />
+              </div>
+              <div className="space-y-2">
+                <Label>توضیحات</Label>
+                <Textarea rows={3} value={newGallery.description} onChange={(e) => setNewGallery(prev => ({ ...prev, description: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>تگ‌ها (با کاما جدا کنید)</Label>
+                <Input value={newGallery.tags} onChange={(e) => setNewGallery(prev => ({ ...prev, tags: e.target.value }))} placeholder="ژنراتور, صنعتی" />
+              </div>
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={() => setShowCreateGallery(false)}>انصراف</Button>
+                <Button onClick={async () => {
+                  if (!newGallery.title.trim()) return;
+                  const g = await createGallery({ title: newGallery.title.trim(), description: newGallery.description.trim(), tags: newGallery.tags.split(',').map(t => t.trim()).filter(Boolean) });
+                  setSelectedGallery(g);
+                  setShowCreateGallery(false);
+                  setShowEditGallery(true);
+                  setNewGallery({ title: '', description: '', tags: '' });
+                }}>ایجاد</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Gallery Modal */}
+        <Dialog open={showEditGallery} onOpenChange={setShowEditGallery}>
+          <DialogContent className="max-w-4xl">
+            {selectedGallery && (
+              <>
+                <DialogHeader>
+                  <DialogTitle>ویرایش گالری: {selectedGallery.title}</DialogTitle>
+                  <DialogDescription>ویرایش اطلاعات و مدیریت تصاویر</DialogDescription>
+                </DialogHeader>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="md:col-span-1 space-y-4">
+                    <div className="space-y-2">
+                      <Label>نام</Label>
+                      <Input value={selectedGallery.title} onChange={(e) => setSelectedGallery(prev => prev ? { ...prev, title: e.target.value } : prev)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>توضیحات</Label>
+                      <Textarea rows={4} value={selectedGallery.description} onChange={(e) => setSelectedGallery(prev => prev ? { ...prev, description: e.target.value } : prev)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>تگ‌ها</Label>
+                      <Input value={selectedGallery.tags.join(', ')} onChange={(e) => setSelectedGallery(prev => prev ? { ...prev, tags: e.target.value.split(',').map(x => x.trim()).filter(Boolean) } : prev)} />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button className="flex-1" onClick={async () => { if (selectedGallery) { await updateGallery(selectedGallery.id, selectedGallery); }}}>ذخیره</Button>
+                      <Button variant="outline" className="text-red-600" onClick={async () => { if (selectedGallery) { await deleteGallery(selectedGallery.id); setShowEditGallery(false); setSelectedGallery(null); }}}>حذف</Button>
+                    </div>
+                  </div>
+                  <div className="md:col-span-2 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">تصاویر گالری</h3>
+                      <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+                          <Upload className="w-4 h-4 mr-2" /> افزودن عکس جدید
+                        </Button>
+                        <Button variant="outline" onClick={() => setSelectedFolder('gallery')}>انتخاب از فایل‌ها</Button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                      {(selectedGallery.imageIds || []).map(id => {
+                        const img = mediaFiles.find(f => f.id === id);
+                        if (!img) return null;
+                        const isCover = selectedGallery.coverImageId === id;
+                        return (
+                          <div key={id} className="relative group">
+                            <img src={img.url} alt={img.alt} className="w-full h-24 object-cover rounded" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                              <Button size="sm" variant="secondary" onClick={async () => { if (selectedGallery) { await updateGallery(selectedGallery.id, { coverImageId: id }); setSelectedGallery(prev => prev ? { ...prev, coverImageId: id } : prev); } }}>{isCover ? 'کاور' : 'کاور کن'}</Button>
+                              <Button size="sm" variant="destructive" onClick={async () => { if (selectedGallery) { await removeImageFromGallery(selectedGallery.id, id); setSelectedGallery(prev => prev ? { ...prev, imageIds: prev.imageIds.filter(x => x !== id) } : prev); } }}>حذف</Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* Picker from all images */}
+                    <div className="border rounded-lg p-3">
+                      <div className="text-sm text-gray-600 mb-2">افزودن از تصاویر موجود</div>
+                      <div className="grid grid-cols-6 gap-2 max-h-60 overflow-auto">
+                        {mediaFiles.filter(f => f.type === 'image').map(img => (
+                          <button key={img.id} className="relative" onClick={async () => { if (selectedGallery) { await addImagesToGallery(selectedGallery.id, [img.id]); setSelectedGallery(prev => prev ? { ...prev, imageIds: Array.from(new Set([...(prev.imageIds||[]), img.id])) } : prev); } }}>
+                            <img src={img.url} alt={img.alt} className="w-full h-20 object-cover rounded" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Galleries Manager */}
+        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+          <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <CardTitle className="flex items-center gap-3">
+              <ImageIcon className="w-6 h-6 text-purple-600" />
+              گالری‌های پروژه
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Button onClick={() => setShowCreateGallery(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                گالری جدید
+              </Button>
+              <Button variant="outline" onClick={() => window.open('/galleries', '_blank')}>
+                <ExternalLink className="w-4 h-4 mr-2" />
+                مشاهده در سایت
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {galleries.length === 0 ? (
+              <div className="text-gray-500">هنوز گالری‌ای ایجاد نشده است.</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {galleries.map((g) => {
+                  const cover = g.coverImageId ? mediaFiles.find(f => f.id === g.coverImageId) : undefined;
+                  const images = g.imageIds.map(id => mediaFiles.find(f => f.id === id)).filter(Boolean) as MediaFile[];
+                  return (
+                    <Card key={g.id} className="overflow-hidden group">
+                      <div className="relative aspect-video bg-gray-100 dark:bg-gray-700">
+                        {cover ? (
+                          <img src={cover.url} alt={cover.alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <ImageIcon className="w-10 h-10" />
+                          </div>
+                        )}
+                        <div className="absolute top-2 right-2 flex gap-2">
+                          <Badge variant="secondary" className="text-xs">{images.length} عکس</Badge>
+                        </div>
+                      </div>
+                      <CardContent className="p-4 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-semibold truncate" title={g.title}>{g.title}</h3>
+                          <div className="flex items-center gap-2">
+                            <Button size="sm" variant="outline" onClick={() => { setSelectedGallery(g); setShowEditGallery(true); }}>
+                              <Edit3 className="w-4 h-4" />
+                            </Button>
+                            <Button size="sm" variant="outline" className="text-red-600" onClick={() => deleteGallery(g.id)}>
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        {g.description && (
+                          <div className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{g.description}</div>
+                        )}
+                        <div className="flex flex-wrap gap-1">
+                          {g.tags.map(t => (
+                            <Badge key={t} variant="outline" className="text-xs">{t}</Badge>
+                          ))}
+                        </div>
+                        {images.length > 0 && (
+                          <div className="grid grid-cols-5 gap-2 pt-2">
+                            {images.slice(0,5).map(img => (
+                              <img key={img.id} src={img.url} alt={img.alt} className="w-full h-16 object-cover rounded" />
+                            ))}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Files Grid/List */}
         <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
