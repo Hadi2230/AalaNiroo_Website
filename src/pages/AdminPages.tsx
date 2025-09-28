@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import MediaPicker from '@/components/media/MediaPicker';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Save,
@@ -132,6 +133,10 @@ export default function AdminPages() {
   const [sortBy, setSortBy] = useState<'title' | 'modified' | 'created' | 'views'>('modified');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+  const [scheduleDate, setScheduleDate] = useState<string>('');
+  const [seo, setSeo] = useState({ title: '', description: '' });
+  const [featuredImage, setFeaturedImage] = useState<string>('');
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
 
   // Advanced mock data
   const [templates] = useState<PageTemplate[]>([
@@ -337,6 +342,24 @@ export default function AdminPages() {
     }
   ]);
 
+  // Persistence: load from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('adminPages');
+      if (saved) {
+        const parsed: Page[] = JSON.parse(saved);
+        if (Array.isArray(parsed)) setPages(parsed);
+      }
+    } catch {}
+  }, []);
+
+  // Persistence: save to localStorage when pages change
+  useEffect(() => {
+    try {
+      localStorage.setItem('adminPages', JSON.stringify(pages));
+    } catch {}
+  }, [pages]);
+
   const [newPage, setNewPage] = useState({
     title: '',
     slug: '',
@@ -382,8 +405,9 @@ export default function AdminPages() {
       createdAt: new Date().toISOString(),
       author: user?.name || 'Unknown',
       template: newPage.template,
-      seoTitle: newPage.title,
-      seoDescription: '',
+      seoTitle: seo.title || newPage.title,
+      seoDescription: seo.description || '',
+      featuredImage: featuredImage || undefined,
       tags: newPage.tags.split(',').map(tag => tag.trim()).filter(Boolean),
       category: newPage.category,
       views: 0,
@@ -405,6 +429,9 @@ export default function AdminPages() {
 
     setPages(prev => [...prev, newPageData]);
     setNewPage({ title: '', slug: '', content: '', template: '', category: '', tags: '' });
+    setSeo({ title: '', description: '' });
+    setFeaturedImage('');
+    setScheduleDate('');
     setShowTemplates(false);
   };
 
@@ -1038,11 +1065,45 @@ export default function AdminPages() {
                 />
               </div>
 
+              {/* SEO */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label>SEO Title</Label>
+                  <Input value={seo.title} onChange={(e) => setSeo(prev => ({ ...prev, title: e.target.value }))} placeholder="عنوان متا" />
+                </div>
+                <div className="space-y-2">
+                  <Label>SEO Description</Label>
+                  <Input value={seo.description} onChange={(e) => setSeo(prev => ({ ...prev, description: e.target.value }))} placeholder="توضیحات متا" />
+                </div>
+              </div>
+
+              {/* Featured Image & Schedule */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label>عکس شاخص</Label>
+                  <div className="flex items-center gap-2">
+                    <Input value={featuredImage} onChange={(e) => setFeaturedImage(e.target.value)} placeholder="/images/hero.jpg" />
+                    <Button variant="outline" onClick={() => setShowMediaPicker(true)}>انتخاب</Button>
+                  </div>
+                  {featuredImage && (
+                    <img src={featuredImage} alt="featured" className="mt-2 w-full h-40 object-cover rounded" />
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label>زمان‌بندی انتشار (اختیاری)</Label>
+                  <Input type="datetime-local" value={scheduleDate} onChange={(e) => setScheduleDate(e.target.value)} />
+                </div>
+              </div>
+
               <div className="flex justify-between items-center pt-6 border-t">
                 <Button variant="outline" onClick={() => setIsEditing(false)}>
                   انصراف
                 </Button>
-                <Button onClick={handleCreatePage} disabled={!newPage.title || !newPage.slug}>
+                <Button onClick={() => {
+                  // merge seo & featured image into newPage before create
+                  setNewPage(prev => ({ ...prev, content: prev.content }));
+                  handleCreatePage();
+                }} disabled={!newPage.title || !newPage.slug}>
                   <Plus className="w-4 h-4 mr-2" />
                   ایجاد صفحه
                 </Button>
@@ -1050,6 +1111,14 @@ export default function AdminPages() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Media Picker */}
+        <MediaPicker
+          open={showMediaPicker}
+          onOpenChange={setShowMediaPicker}
+          onSelect={(file) => setFeaturedImage(file.url)}
+          accept={['image']}
+        />
 
         {/* Workflow Modal */}
         <Dialog open={showWorkflow} onOpenChange={setShowWorkflow}>
