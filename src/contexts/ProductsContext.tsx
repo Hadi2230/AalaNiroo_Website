@@ -136,6 +136,7 @@ interface ProductsState {
 interface ProductsContextType {
   // State
   products: Product[];
+  allProducts: Product[];
   categories: ProductCategory[];
   isLoading: boolean;
   error: string | null;
@@ -1050,6 +1051,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const value: ProductsContextType = {
     // State
     products: getSortedProducts(getFilteredProducts()),
+    allProducts: products,
     categories,
     isLoading,
     error,

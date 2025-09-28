@@ -42,6 +42,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useProducts, Product, ProductImage, ProductSpecification, ProductFeature } from '@/contexts/ProductsContext';
+import MediaPicker from '@/components/media/MediaPicker';
 import { useMedia } from '@/contexts/MediaContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -134,6 +135,7 @@ const AdminProducts = () => {
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showImageDialog, setShowImageDialog] = useState(false);
   const [showSpecDialog, setShowSpecDialog] = useState(false);
@@ -169,6 +171,17 @@ const AdminProducts = () => {
     features: [],
     images: []
   });
+
+  // helper to add selected media image to form
+  const addFormImage = useCallback((fileUrl: string) => {
+    setNewProduct(prev => ({
+      ...prev,
+      images: [
+        ...(prev.images || []),
+        { id: `img-${Date.now()}`, url: fileUrl, alt: prev.name || 'product image', isPrimary: (prev.images || []).length === 0, order: Date.now() }
+      ]
+    }));
+  }, []);
 
   const [newSpec, setNewSpec] = useState<Omit<ProductSpecification, 'id'>>({
     name: '',
@@ -906,11 +919,12 @@ const AdminProducts = () => {
             </DialogHeader>
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="basic">اطلاعات پایه</TabsTrigger>
                 <TabsTrigger value="details">جزئیات</TabsTrigger>
                 <TabsTrigger value="specs">مشخصات</TabsTrigger>
                 <TabsTrigger value="seo">SEO</TabsTrigger>
+                <TabsTrigger value="images">تصاویر</TabsTrigger>
               </TabsList>
 
               <TabsContent value="basic" className="space-y-6 mt-6">
@@ -1133,6 +1147,35 @@ const AdminProducts = () => {
                 </div>
               </TabsContent>
 
+              <TabsContent value="images" className="space-y-6 mt-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">تصاویر محصول</h3>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setShowMediaPicker(true)}>انتخاب از رسانه‌ها</Button>
+                    <Button variant="outline" onClick={() => fileInputRef.current?.click()}>آپلود از سیستم</Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {(newProduct.images || []).map((img) => (
+                    <div key={img.id} className="relative group">
+                      <img src={img.url} alt={img.alt} className="w-full h-40 object-cover rounded" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <Button size="sm" variant="secondary" onClick={() => setNewProduct(prev => ({ ...prev, images: (prev.images || []).map(i => ({ ...i, isPrimary: i.id === img.id })) }))}>
+                          کاور
+                        </Button>
+                        <Button size="sm" variant="destructive" onClick={() => setNewProduct(prev => ({ ...prev, images: (prev.images || []).filter(i => i.id !== img.id) }))}>
+                          حذف
+                        </Button>
+                      </div>
+                      {img.isPrimary && (
+                        <Badge className="absolute top-2 right-2 bg-green-600">کاور</Badge>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+
               <TabsContent value="specs" className="space-y-6 mt-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -1277,6 +1320,14 @@ const AdminProducts = () => {
           </DialogContent>
         </Dialog>
 
+        {/* Media Picker for Images */}
+        <MediaPicker
+          open={showMediaPicker}
+          onOpenChange={setShowMediaPicker}
+          onSelect={(file) => addFormImage(file.url)}
+          accept={[ 'image' ]}
+        />
+
         {/* Bulk Operations Dialog */}
         <Dialog open={showBulkDialog} onOpenChange={setShowBulkDialog}>
           <DialogContent>
@@ -1325,6 +1376,14 @@ const AdminProducts = () => {
             if (e.target.files && editingProduct) {
               Array.from(e.target.files).forEach(file => {
                 handleImageUpload(editingProduct.id, file);
+              });
+            }
+            if (e.target.files && showAddDialog) {
+              Array.from(e.target.files).forEach(async (file) => {
+                try {
+                  const uploaded = await uploadFile(file, 'products', { alt: file.name });
+                  addFormImage(uploaded.url);
+                } catch {}
               });
             }
           }}
