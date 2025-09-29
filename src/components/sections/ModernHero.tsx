@@ -14,7 +14,9 @@ const ModernHero = () => {
     <section className="relative min-h-screen flex items-center bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800 text-white overflow-hidden">
       {/* Dynamic Media Background */}
       {home.hero.type === 'video' && home.hero.videoUrl && (
-        <video className="absolute inset-0 w-full h-full object-cover opacity-50" autoPlay={home.hero.autoplay} muted={home.hero.muted} loop={home.hero.loop} poster={home.hero.posterUrl || undefined} />
+        <video className="absolute inset-0 w-full h-full object-cover opacity-50" autoPlay={home.hero.autoplay} muted={home.hero.muted} loop={home.hero.loop} poster={home.hero.posterUrl || undefined}>
+          <source src={home.hero.videoUrl} />
+        </video>
       )}
       {home.hero.type === 'image' && home.hero.imageUrl && (
         <img src={home.hero.imageUrl} alt={home.hero.title || ''} className="absolute inset-0 w-full h-full object-cover opacity-60" />

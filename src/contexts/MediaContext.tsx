@@ -99,6 +99,15 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
       fileCount: 0
     },
     {
+      id: 'homepage',
+      name: 'رسانه صفحه اصلی',
+      color: '#00a7bb',
+      icon: 'Home',
+      description: 'ویدیو/تصویر هیرو و گالری صفحه اصلی',
+      createdAt: new Date().toISOString(),
+      fileCount: 0
+    },
+    {
       id: 'products',
       name: 'تصاویر محصولات',
       color: '#3b82f6',

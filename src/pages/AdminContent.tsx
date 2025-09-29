@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useHomeContent } from '@/contexts/HomeContentContext';
 import MediaPicker from '@/components/media/MediaPicker';
+import { useMedia } from '@/contexts/MediaContext';
 import { toast } from 'sonner';
 
 // Extend window type for autoSaveTimer
@@ -90,8 +91,10 @@ export default function AdminContent() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { content: homeContent, setHero, clearHero, addGalleryItem, removeGalleryItem, updateGalleryItem } = useHomeContent();
+  const { uploadFile } = useMedia();
   const [showHeroMediaPicker, setShowHeroMediaPicker] = useState(false);
   const [showGalleryPicker, setShowGalleryPicker] = useState(false);
+  const [heroFileInput, setHeroFileInput] = useState<{ type: 'image' | 'video' | 'poster' } | null>(null);
 
   // Advanced content management
   const [seoData, setSeoData] = useState({
@@ -673,6 +676,9 @@ export default function AdminContent() {
                     <Button variant="outline" onClick={() => setShowHeroMediaPicker(true)}>
                       انتخاب رسانه
                     </Button>
+                    <Button variant="outline" onClick={() => { setHeroFileInput({ type: 'image' }); (document.getElementById('hero-hidden-file') as HTMLInputElement)?.click(); }}>آپلود تصویر</Button>
+                    <Button variant="outline" onClick={() => { setHeroFileInput({ type: 'video' }); (document.getElementById('hero-hidden-file') as HTMLInputElement)?.click(); }}>آپلود ویدیو</Button>
+                    <Button variant="outline" onClick={() => { setHeroFileInput({ type: 'poster' }); (document.getElementById('hero-hidden-file') as HTMLInputElement)?.click(); }}>آپلود پوستر</Button>
                     <Button variant="outline" className="text-red-600" onClick={clearHero}>حذف</Button>
                   </div>
                 </div>
@@ -774,6 +780,20 @@ export default function AdminContent() {
           onSelect={(file) => addGalleryItem({ type: file.type === 'image' ? 'image' : 'video', url: file.url, alt: file.alt || '' })}
           accept={['image','video']}
         />
+
+        {/* Hidden file input for hero uploads */}
+        <input id="hero-hidden-file" type="file" accept="image/*,video/*" className="hidden" onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (!file || !heroFileInput) return;
+          try {
+            const folder = 'homepage';
+            const uploaded = await uploadFile(file, folder);
+            if (heroFileInput.type === 'image') setHero({ type: 'image', imageUrl: uploaded.url, posterUrl: uploaded.url });
+            if (heroFileInput.type === 'poster') setHero({ posterUrl: uploaded.url });
+            if (heroFileInput.type === 'video') setHero({ type: 'video', videoUrl: uploaded.url });
+          } catch {}
+          finally { setHeroFileInput(null); (e.target as HTMLInputElement).value = ''; }
+        }} />
 
         {/* Preview Modal */}
         <Dialog open={showPreview} onOpenChange={setShowPreview}>
