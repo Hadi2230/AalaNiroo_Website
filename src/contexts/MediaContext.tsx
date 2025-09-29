@@ -184,7 +184,7 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
     setError(null);
 
     try {
-      // Create file URL using FileReader
+      // Create file URL using FileReader (base64)
       const fileUrl = await new Promise<string>((resolve) => {
         const reader = new FileReader();
         reader.onload = (e) => resolve(e.target?.result as string);
