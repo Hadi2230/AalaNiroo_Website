@@ -11,7 +11,6 @@ import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useMedia } from '@/contexts/MediaContext';
-import { useHomeContent } from '@/contexts/HomeContentContext';
 import { products, services, projects } from '@/data/companyData';
 import { 
   ArrowRight, 
