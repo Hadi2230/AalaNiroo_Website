@@ -95,7 +95,20 @@ export const HomeContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
   useEffect(() => {
     try {
       const saved = localStorage.getItem('homeContent');
-      if (saved) setContent(JSON.parse(saved));
+      if (saved) {
+        const parsed = JSON.parse(saved) as Partial<HomeContentState>;
+        // migrate to ensure introMedia exists with safe defaults
+        if (!parsed.introMedia) {
+          (parsed as HomeContentState).introMedia = { type: 'none', autoplay: false, muted: true, loop: false } as IntroMedia;
+        }
+        setContent({
+          hero: parsed.hero ?? initialState.hero,
+          gallery: parsed.gallery ?? initialState.gallery,
+          introMedia: (parsed as HomeContentState).introMedia,
+          updatedAt: parsed.updatedAt ?? new Date().toISOString(),
+          updatedBy: parsed.updatedBy,
+        });
+      }
     } catch {}
 
     // BC
