@@ -17,6 +17,16 @@ export interface HomeHero {
   videoUrl?: string;
 }
 
+export interface IntroMedia {
+  type: 'none' | 'image' | 'video';
+  imageUrl?: string;
+  videoUrl?: string;
+  posterUrl?: string;
+  autoplay?: boolean;
+  muted?: boolean;
+  loop?: boolean;
+}
+
 export interface HomeGalleryItem {
   id: string;
   type: MediaType;
@@ -29,6 +39,7 @@ export interface HomeGalleryItem {
 export interface HomeContentState {
   hero: HomeHero;
   gallery: HomeGalleryItem[];
+  introMedia: IntroMedia;
   updatedAt: string;
   updatedBy?: string;
 }
@@ -37,6 +48,8 @@ interface HomeContentContextType {
   content: HomeContentState;
   setHero: (hero: Partial<HomeHero>) => void;
   clearHero: () => void;
+  setIntroMedia: (media: Partial<IntroMedia>) => void;
+  clearIntroMedia: () => void;
   addGalleryItem: (item: Omit<HomeGalleryItem, 'id' | 'order'>) => void;
   removeGalleryItem: (id: string) => void;
   updateGalleryItem: (id: string, updates: Partial<HomeGalleryItem>) => void;
@@ -53,6 +66,12 @@ const initialState: HomeContentState = {
     loop: true,
   },
   gallery: [],
+  introMedia: {
+    type: 'none',
+    autoplay: false,
+    muted: true,
+    loop: false,
+  },
   updatedAt: new Date().toISOString(),
 };
 
@@ -138,6 +157,18 @@ export const HomeContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setContent(prev => ({ ...prev, hero: { type: 'none', overlay: true, autoplay: true, muted: true, loop: true }, updatedAt: new Date().toISOString() }));
   }, []);
 
+  const setIntroMedia = useCallback((media: Partial<IntroMedia>) => {
+    setContent(prev => ({
+      ...prev,
+      introMedia: { ...prev.introMedia, ...media },
+      updatedAt: new Date().toISOString(),
+    }));
+  }, []);
+
+  const clearIntroMedia = useCallback(() => {
+    setContent(prev => ({ ...prev, introMedia: { type: 'none', autoplay: false, muted: true, loop: false }, updatedAt: new Date().toISOString() }));
+  }, []);
+
   const addGalleryItem = useCallback((item: Omit<HomeGalleryItem, 'id' | 'order'>) => {
     const id = `hg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     setContent(prev => ({
@@ -179,6 +210,8 @@ export const HomeContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     content,
     setHero,
     clearHero,
+    setIntroMedia,
+    clearIntroMedia,
     addGalleryItem,
     removeGalleryItem,
     updateGalleryItem,

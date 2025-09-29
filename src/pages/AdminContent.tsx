@@ -90,11 +90,12 @@ export default function AdminContent() {
   const [editorMode, setEditorMode] = useState<'wysiwyg' | 'html' | 'text'>('wysiwyg');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const { content: homeContent, setHero, clearHero, addGalleryItem, removeGalleryItem, updateGalleryItem } = useHomeContent();
+  const { content: homeContent, setHero, clearHero, setIntroMedia, clearIntroMedia, addGalleryItem, removeGalleryItem, updateGalleryItem } = useHomeContent();
   const { uploadFile } = useMedia();
   const [showHeroMediaPicker, setShowHeroMediaPicker] = useState(false);
   const [showGalleryPicker, setShowGalleryPicker] = useState(false);
   const [heroFileInput, setHeroFileInput] = useState<{ type: 'image' | 'video' | 'poster' } | null>(null);
+  const [introFileInput, setIntroFileInput] = useState<{ type: 'image' | 'video' | 'poster' } | null>(null);
 
   // Advanced content management
   const [seoData, setSeoData] = useState({
@@ -760,6 +761,30 @@ export default function AdminContent() {
                   </div>
                 )}
               </div>
+
+              {/* Intro Media (Company Intro Section) */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">مدیای سکشن معرفی شرکت</h3>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setIntroFileInput({ type: 'image' }) || (document.getElementById('intro-hidden-file') as HTMLInputElement)?.click()}>آپلود تصویر</Button>
+                    <Button variant="outline" onClick={() => setIntroFileInput({ type: 'video' }) || (document.getElementById('intro-hidden-file') as HTMLInputElement)?.click()}>آپلود ویدیو</Button>
+                    <Button variant="outline" onClick={() => setIntroFileInput({ type: 'poster' }) || (document.getElementById('intro-hidden-file') as HTMLInputElement)?.click()}>آپلود پوستر</Button>
+                    <Button variant="outline" className="text-red-600" onClick={clearIntroMedia}>حذف</Button>
+                  </div>
+                </div>
+                <div className="rounded-lg overflow-hidden border">
+                  {homeContent.introMedia.type === 'video' && homeContent.introMedia.videoUrl ? (
+                    <video className="w-full" controls poster={homeContent.introMedia.posterUrl || undefined} autoPlay={homeContent.introMedia.autoplay} muted={homeContent.introMedia.muted} loop={homeContent.introMedia.loop}>
+                      <source src={homeContent.introMedia.videoUrl} />
+                    </video>
+                  ) : homeContent.introMedia.type === 'image' && homeContent.introMedia.imageUrl ? (
+                    <img src={homeContent.introMedia.imageUrl} alt="intro" className="w-full" />
+                  ) : (
+                    <div className="p-8 text-center text-gray-500">مدیایی انتخاب نشده است</div>
+                  )}
+                </div>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -793,6 +818,20 @@ export default function AdminContent() {
             if (heroFileInput.type === 'video') setHero({ type: 'video', videoUrl: uploaded.url });
           } catch {}
           finally { setHeroFileInput(null); (e.target as HTMLInputElement).value = ''; }
+        }} />
+
+        {/* Hidden file input for intro uploads */}
+        <input id="intro-hidden-file" type="file" accept="image/*,video/*" className="hidden" onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (!file || !introFileInput) return;
+          try {
+            const folder = 'homepage';
+            const uploaded = await uploadFile(file, folder);
+            if (introFileInput.type === 'image') setIntroMedia({ type: 'image', imageUrl: uploaded.url, posterUrl: uploaded.url });
+            if (introFileInput.type === 'poster') setIntroMedia({ posterUrl: uploaded.url });
+            if (introFileInput.type === 'video') setIntroMedia({ type: 'video', videoUrl: uploaded.url });
+          } catch {}
+          finally { setIntroFileInput(null); (e.target as HTMLInputElement).value = ''; }
         }} />
 
         {/* Preview Modal */}

@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useMedia } from '@/contexts/MediaContext';
+import { useHomeContent } from '@/contexts/HomeContentContext';
 import { products, services, projects } from '@/data/companyData';
 import { 
   ArrowRight, 
@@ -167,11 +168,17 @@ export default function ModernIndex() {
 
             <div className={`relative ${dir === 'rtl' ? 'order-1' : 'order-2'}`}>
               <div className="relative z-10 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 shadow-2xl">
-                <img 
-                  src="/api/placeholder/600/400" 
-                  alt="Aalaniroo Company" 
-                  className="w-full h-auto rounded-lg"
-                />
+                {home.introMedia.type === 'video' && home.introMedia.videoUrl ? (
+                  <video className="w-full h-auto rounded-lg" controls poster={home.introMedia.posterUrl || undefined}>
+                    <source src={home.introMedia.videoUrl} />
+                  </video>
+                ) : (
+                  <img 
+                    src={home.introMedia.imageUrl || '/api/placeholder/600/400'} 
+                    alt="Aalaniroo Company" 
+                    className="w-full h-auto rounded-lg"
+                  />
+                )}
                 
                 {/* Experience Badge */}
                 <div className="absolute -top-4 -right-4 bg-blue-600 text-white p-6 rounded-lg shadow-lg">
