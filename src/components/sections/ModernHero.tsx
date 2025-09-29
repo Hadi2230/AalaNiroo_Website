@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useMediaUrl } from '@/hooks/useMediaUrl';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Phone, FileText, Calendar, Play, Award, Users, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,6 +12,7 @@ const ModernHero = () => {
   const { content: home } = useHomeContent();
   const company = companyData[language];
   const bgVideoRef = useRef<HTMLVideoElement | null>(null);
+  const heroVideoUrl = useMediaUrl(home.hero.type === 'video' ? home.hero.videoUrl : undefined);
 
   useEffect(() => {
     if (home.hero.type === 'video' && home.hero.videoUrl && (home.hero.autoplay ?? true)) {
@@ -23,9 +25,9 @@ const ModernHero = () => {
   return (
     <section className="relative min-h-screen flex items-center bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800 text-white overflow-hidden">
       {/* Dynamic Media Background */}
-      {home.hero.type === 'video' && home.hero.videoUrl && (
+      {home.hero.type === 'video' && heroVideoUrl && (
         <video ref={bgVideoRef} className="absolute inset-0 w-full h-full object-cover opacity-50" autoPlay={home.hero.autoplay} muted={home.hero.muted} loop={home.hero.loop} playsInline preload="metadata" poster={home.hero.posterUrl || undefined}>
-          <source src={home.hero.videoUrl} type={home.hero.videoUrl.startsWith('data:') ? home.hero.videoUrl.substring(5, home.hero.videoUrl.indexOf(';')) : (home.hero.videoUrl.endsWith('.webm') ? 'video/webm' : (home.hero.videoUrl.endsWith('.ogv') || home.hero.videoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4'))} />
+          <source src={heroVideoUrl} type={heroVideoUrl.startsWith('blob:') ? 'video/mp4' : (heroVideoUrl.startsWith('data:') ? heroVideoUrl.substring(5, heroVideoUrl.indexOf(';')) : (heroVideoUrl.endsWith('.webm') ? 'video/webm' : (heroVideoUrl.endsWith('.ogv') || heroVideoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4')))} />
         </video>
       )}
       {home.hero.type === 'image' && home.hero.imageUrl && (
@@ -174,9 +176,9 @@ const ModernHero = () => {
             {/* Main Image/Video Container */}
             <div className="relative z-10 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 shadow-2xl">
               <div className="relative">
-                {home.hero.type === 'video' && home.hero.videoUrl ? (
+                {home.hero.type === 'video' && heroVideoUrl ? (
                   <video className="w-full h-auto rounded-lg" controls playsInline preload="metadata" poster={home.hero.posterUrl || undefined}>
-                    <source src={home.hero.videoUrl} type={home.hero.videoUrl.startsWith('data:') ? home.hero.videoUrl.substring(5, home.hero.videoUrl.indexOf(';')) : (home.hero.videoUrl.endsWith('.webm') ? 'video/webm' : (home.hero.videoUrl.endsWith('.ogv') || home.hero.videoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4'))} />
+                    <source src={heroVideoUrl} type={heroVideoUrl.startsWith('blob:') ? 'video/mp4' : (heroVideoUrl.startsWith('data:') ? heroVideoUrl.substring(5, heroVideoUrl.indexOf(';')) : (heroVideoUrl.endsWith('.webm') ? 'video/webm' : (heroVideoUrl.endsWith('.ogv') || heroVideoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4')))} />
                   </video>
                 ) : home.hero.type === 'image' && home.hero.imageUrl ? (
                   <img src={home.hero.imageUrl} alt={home.hero.title || ''} className="w-full h-auto rounded-lg" />

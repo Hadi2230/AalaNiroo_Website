@@ -12,6 +12,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useMedia } from '@/contexts/MediaContext';
 import { products, services, projects } from '@/data/companyData';
+import { useMediaUrl } from '@/hooks/useMediaUrl';
 import { 
   ArrowRight, 
   CheckCircle, 
@@ -36,6 +37,8 @@ export default function ModernIndex() {
   const { companyData, isLoading } = useCompany();
   const { listGalleries, mediaFiles } = useMedia();
   const { content: home } = useHomeContent();
+  const introVideoUrl = useMediaUrl(home.introMedia?.type === 'video' ? home.introMedia?.videoUrl : undefined);
+  const introImageUrl = useMediaUrl(home.introMedia?.type === 'image' ? home.introMedia?.imageUrl : undefined);
   const currentProducts = products[language];
   const currentServices = services[language];
   const currentProjects = projects[language];
@@ -167,13 +170,13 @@ export default function ModernIndex() {
 
             <div className={`relative ${dir === 'rtl' ? 'order-1' : 'order-2'}`}>
               <div className="relative z-10 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 shadow-2xl">
-                {home.introMedia?.type === 'video' && home.introMedia?.videoUrl ? (
+                {home.introMedia?.type === 'video' && introVideoUrl ? (
                   <video className="w-full h-auto rounded-lg" controls autoPlay={home.introMedia.autoplay} muted={home.introMedia.muted} loop={home.introMedia.loop} playsInline preload="metadata" poster={home.introMedia?.posterUrl || undefined}>
-                    <source src={home.introMedia?.videoUrl} type={home.introMedia?.videoUrl?.startsWith('data:') || home.introMedia?.videoUrl?.startsWith('idb:') ? (home.introMedia?.videoUrl?.startsWith('data:') ? home.introMedia?.videoUrl.substring(5, home.introMedia?.videoUrl.indexOf(';')) : 'video/mp4') : (home.introMedia?.videoUrl?.endsWith('.webm') ? 'video/webm' : (home.introMedia?.videoUrl?.endsWith('.ogv') || home.introMedia?.videoUrl?.endsWith('.ogg') ? 'video/ogg' : 'video/mp4'))} />
+                    <source src={introVideoUrl} type={introVideoUrl.startsWith('blob:') ? 'video/mp4' : (introVideoUrl.startsWith('data:') ? introVideoUrl.substring(5, introVideoUrl.indexOf(';')) : (introVideoUrl.endsWith('.webm') ? 'video/webm' : (introVideoUrl.endsWith('.ogv') || introVideoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4')))} />
                   </video>
                 ) : (
                   <img 
-                    src={home.introMedia?.imageUrl || '/api/placeholder/600/400'} 
+                    src={introImageUrl || '/api/placeholder/600/400'} 
                     alt="Aalaniroo Company" 
                     className="w-full h-auto rounded-lg"
                   />

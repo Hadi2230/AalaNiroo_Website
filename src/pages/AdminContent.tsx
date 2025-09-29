@@ -723,7 +723,7 @@ export default function AdminContent() {
                 <div className="rounded-lg overflow-hidden border">
                   {homeContent.hero.videoUrl ? (
                     <video className="w-full" controls poster={homeContent.hero.posterUrl || undefined} autoPlay={homeContent.hero.autoplay} muted={homeContent.hero.muted} loop={homeContent.hero.loop} playsInline preload="metadata">
-                      <source src={homeContent.hero.videoUrl} type={homeContent.hero.videoUrl.startsWith('data:') ? homeContent.hero.videoUrl.substring(5, homeContent.hero.videoUrl.indexOf(';')) : (homeContent.hero.videoUrl.endsWith('.webm') ? 'video/webm' : (homeContent.hero.videoUrl.endsWith('.ogv') || homeContent.hero.videoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4'))} />
+                      <source src={homeContent.hero.videoUrl.startsWith('idb:') ? '' : homeContent.hero.videoUrl} type={homeContent.hero.videoUrl.startsWith('data:') ? homeContent.hero.videoUrl.substring(5, homeContent.hero.videoUrl.indexOf(';')) : (homeContent.hero.videoUrl.endsWith('.webm') ? 'video/webm' : (homeContent.hero.videoUrl.endsWith('.ogv') || homeContent.hero.videoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4'))} />
                     </video>
                   ) : homeContent.hero.imageUrl ? (
                     <img src={homeContent.hero.imageUrl} alt={homeContent.hero.title || ''} className="w-full" />
@@ -776,7 +776,7 @@ export default function AdminContent() {
                 <div className="rounded-lg overflow-hidden border">
                   {homeContent.introMedia.type === 'video' && homeContent.introMedia.videoUrl ? (
                     <video className="w-full" controls poster={homeContent.introMedia.posterUrl || undefined} autoPlay={homeContent.introMedia.autoplay} muted={homeContent.introMedia.muted} loop={homeContent.introMedia.loop} playsInline preload="metadata">
-                      <source src={homeContent.introMedia.videoUrl} type={homeContent.introMedia.videoUrl.startsWith('data:') ? homeContent.introMedia.videoUrl.substring(5, homeContent.introMedia.videoUrl.indexOf(';')) : (homeContent.introMedia.videoUrl.endsWith('.webm') ? 'video/webm' : (homeContent.introMedia.videoUrl.endsWith('.ogv') || homeContent.introMedia.videoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4'))} />
+                      <source src={homeContent.introMedia.videoUrl.startsWith('idb:') ? '' : homeContent.introMedia.videoUrl} type={homeContent.introMedia.videoUrl.startsWith('data:') ? homeContent.introMedia.videoUrl.substring(5, homeContent.introMedia.videoUrl.indexOf(';')) : (homeContent.introMedia.videoUrl.endsWith('.webm') ? 'video/webm' : (homeContent.introMedia.videoUrl.endsWith('.ogv') || homeContent.introMedia.videoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4'))} />
                     </video>
                   ) : homeContent.introMedia.type === 'image' && homeContent.introMedia.imageUrl ? (
                     <img src={homeContent.introMedia.imageUrl} alt="intro" className="w-full" />
