@@ -794,8 +794,11 @@ export default function AdminContent() {
           open={showHeroMediaPicker}
           onOpenChange={setShowHeroMediaPicker}
           onSelect={(file) => {
-            if (file.type === 'image') setHero({ type: 'image', imageUrl: file.url, posterUrl: file.url });
-            else setHero({ type: 'video', videoUrl: file.url, posterUrl: homeContent.hero.posterUrl });
+            if (file.type === 'image') {
+              setHero({ type: 'image', imageUrl: file.url, posterUrl: file.url });
+            } else {
+              setHero({ type: 'video', videoUrl: file.url, posterUrl: homeContent.hero.posterUrl, autoplay: true, muted: true, loop: true });
+            }
           }}
           accept={['image','video']}
         />
@@ -815,7 +818,7 @@ export default function AdminContent() {
             const uploaded = await uploadFile(file, folder);
             if (heroFileInput.type === 'image') setHero({ type: 'image', imageUrl: uploaded.url, posterUrl: uploaded.url });
             if (heroFileInput.type === 'poster') setHero({ posterUrl: uploaded.url });
-            if (heroFileInput.type === 'video') setHero({ type: 'video', videoUrl: uploaded.url });
+            if (heroFileInput.type === 'video') setHero({ type: 'video', videoUrl: uploaded.url, autoplay: true, muted: true, loop: true });
           } catch {}
           finally { setHeroFileInput(null); (e.target as HTMLInputElement).value = ''; }
         }} />
@@ -829,7 +832,7 @@ export default function AdminContent() {
             const uploaded = await uploadFile(file, folder);
             if (introFileInput.type === 'image') setIntroMedia({ type: 'image', imageUrl: uploaded.url, posterUrl: uploaded.url });
             if (introFileInput.type === 'poster') setIntroMedia({ posterUrl: uploaded.url });
-            if (introFileInput.type === 'video') setIntroMedia({ type: 'video', videoUrl: uploaded.url });
+            if (introFileInput.type === 'video') setIntroMedia({ type: 'video', videoUrl: uploaded.url, autoplay: true, muted: true, loop: true });
           } catch {}
           finally { setIntroFileInput(null); (e.target as HTMLInputElement).value = ''; }
         }} />

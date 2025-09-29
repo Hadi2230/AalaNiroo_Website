@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { idbPutBlob, idbDeleteBlob } from '@/utils/idb';
 import { toast } from 'sonner';
 
 export interface MediaFile {
@@ -184,12 +185,22 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
     setError(null);
 
     try {
-      // Create file URL using FileReader (base64)
-      const fileUrl = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target?.result as string);
-        reader.readAsDataURL(file);
-      });
+      // For videos or large files, store blob in IndexedDB and keep a lightweight reference
+      let fileUrl: string;
+      const isVideo = file.type.startsWith('video/');
+      const isLarge = file.size > 1.5 * 1024 * 1024; // >1.5MB
+      if (isVideo || isLarge) {
+        const blobId = `blob-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        await idbPutBlob(blobId, file, file.type);
+        fileUrl = `idb:${blobId}`;
+      } else {
+        // Create file URL using FileReader (base64) for small images
+        fileUrl = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+      }
 
       // Get image dimensions if it's an image
       let dimensions: { width: number; height: number } | undefined;
@@ -262,6 +273,12 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
           ? { ...f, fileCount: Math.max(0, f.fileCount - 1) }
           : f
       ));
+
+      // Cleanup IDB blob if stored there
+      if (file.url.startsWith('idb:')) {
+        const key = file.url.slice(4);
+        try { await idbDeleteBlob(key); } catch {}
+      }
 
       toast.success('فایل حذف شد');
       return true;
