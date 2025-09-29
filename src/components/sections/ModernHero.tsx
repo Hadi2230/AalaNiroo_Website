@@ -1,3 +1,4 @@
+import React, { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Phone, FileText, Calendar, Play, Award, Users, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -9,13 +10,22 @@ const ModernHero = () => {
   const { companyData } = useCompany();
   const { content: home } = useHomeContent();
   const company = companyData[language];
+  const bgVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    if (home.hero.type === 'video' && home.hero.videoUrl && (home.hero.autoplay ?? true)) {
+      try {
+        bgVideoRef.current?.play?.();
+      } catch {}
+    }
+  }, [home.hero.type, home.hero.videoUrl, home.hero.autoplay]);
 
   return (
     <section className="relative min-h-screen flex items-center bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800 text-white overflow-hidden">
       {/* Dynamic Media Background */}
       {home.hero.type === 'video' && home.hero.videoUrl && (
-        <video className="absolute inset-0 w-full h-full object-cover opacity-50" autoPlay={home.hero.autoplay} muted={home.hero.muted} loop={home.hero.loop} poster={home.hero.posterUrl || undefined}>
-          <source src={home.hero.videoUrl} />
+        <video ref={bgVideoRef} className="absolute inset-0 w-full h-full object-cover opacity-50" autoPlay={home.hero.autoplay} muted={home.hero.muted} loop={home.hero.loop} playsInline preload="metadata" poster={home.hero.posterUrl || undefined}>
+          <source src={home.hero.videoUrl} type={home.hero.videoUrl.startsWith('data:') ? home.hero.videoUrl.substring(5, home.hero.videoUrl.indexOf(';')) : (home.hero.videoUrl.endsWith('.webm') ? 'video/webm' : (home.hero.videoUrl.endsWith('.ogv') || home.hero.videoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4'))} />
         </video>
       )}
       {home.hero.type === 'image' && home.hero.imageUrl && (
@@ -164,18 +174,27 @@ const ModernHero = () => {
             {/* Main Image/Video Container */}
             <div className="relative z-10 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 shadow-2xl">
               <div className="relative">
-                <img 
-                  src="/api/placeholder/600/400" 
-                  alt="Industrial Generator" 
-                  className="w-full h-auto rounded-lg"
-                />
-                
-                {/* Play Button Overlay for Video */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <button className="w-20 h-20 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110">
-                    <Play className="w-8 h-8 text-white ml-1" />
-                  </button>
-                </div>
+                {home.hero.type === 'video' && home.hero.videoUrl ? (
+                  <video className="w-full h-auto rounded-lg" controls playsInline preload="metadata" poster={home.hero.posterUrl || undefined}>
+                    <source src={home.hero.videoUrl} type={home.hero.videoUrl.startsWith('data:') ? home.hero.videoUrl.substring(5, home.hero.videoUrl.indexOf(';')) : (home.hero.videoUrl.endsWith('.webm') ? 'video/webm' : (home.hero.videoUrl.endsWith('.ogv') || home.hero.videoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4'))} />
+                  </video>
+                ) : home.hero.type === 'image' && home.hero.imageUrl ? (
+                  <img src={home.hero.imageUrl} alt={home.hero.title || ''} className="w-full h-auto rounded-lg" />
+                ) : (
+                  <>
+                    <img 
+                      src="/api/placeholder/600/400" 
+                      alt="Industrial Generator" 
+                      className="w-full h-auto rounded-lg"
+                    />
+                    {/* Play Button Overlay for Video */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <button className="w-20 h-20 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110">
+                        <Play className="w-8 h-8 text-white ml-1" />
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
               
               {/* Quality Badge */}

@@ -168,8 +168,8 @@ export default function ModernIndex() {
             <div className={`relative ${dir === 'rtl' ? 'order-1' : 'order-2'}`}>
               <div className="relative z-10 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 shadow-2xl">
                 {home.introMedia?.type === 'video' && home.introMedia?.videoUrl ? (
-                  <video className="w-full h-auto rounded-lg" controls poster={home.introMedia?.posterUrl || undefined}>
-                    <source src={home.introMedia?.videoUrl} />
+                  <video className="w-full h-auto rounded-lg" controls playsInline preload="metadata" poster={home.introMedia?.posterUrl || undefined}>
+                    <source src={home.introMedia?.videoUrl} type={home.introMedia?.videoUrl?.startsWith('data:') ? home.introMedia?.videoUrl.substring(5, home.introMedia?.videoUrl.indexOf(';')) : (home.introMedia?.videoUrl?.endsWith('.webm') ? 'video/webm' : (home.introMedia?.videoUrl?.endsWith('.ogv') || home.introMedia?.videoUrl?.endsWith('.ogg') ? 'video/ogg' : 'video/mp4'))} />
                   </video>
                 ) : (
                   <img 
