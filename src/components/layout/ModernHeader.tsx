@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Phone, Mail, Globe, ChevronDown } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
@@ -12,15 +12,23 @@ const ModernHeader = () => {
   const { language, setLanguage, t, dir } = useLanguage();
   const { companyData } = useCompany();
 
-  const navigation = [
-    { name: t('nav.home'), href: '/' },
-    { name: t('nav.products'), href: '/products' },
-    { name: t('nav.services'), href: '/services' },
-    { name: t('nav.projects'), href: '/projects' },
-    { name: t('nav.blog'), href: '/blog' },
-    { name: t('nav.about'), href: '/about' },
-    { name: t('nav.contact'), href: '/contact' },
-  ];
+  const NAV_ITEMS = useMemo(() => (
+    [
+      { key: 'home', href: '/' },
+      { key: 'products', href: '/products' },
+      { key: 'services', href: '/services' },
+      { key: 'projects', href: '/projects' },
+      { key: 'blog', href: '/blog' },
+      { key: 'about', href: '/about' },
+      { key: 'contact', href: '/contact' },
+    ] as const
+  ), []);
+
+  const navigation = useMemo(() => NAV_ITEMS.map(i => ({
+    key: i.key,
+    href: i.href,
+    name: t(`nav.${i.key}` as any),
+  })), [NAV_ITEMS, t]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -89,7 +97,7 @@ const ModernHeader = () => {
             <nav className="hidden lg:flex items-center gap-8">
               {navigation.map((item) => (
                 <Link
-                  key={item.name}
+                  key={item.key}
                   to={item.href}
                   className={`text-gray-700 hover:text-blue-600 font-medium transition-colors relative ${
                     isActive(item.href) ? 'text-blue-600' : ''
@@ -136,7 +144,7 @@ const ModernHeader = () => {
               <nav className="flex flex-col gap-4">
                 {navigation.map((item) => (
                   <Link
-                    key={item.name}
+                    key={item.key}
                     to={item.href}
                     className={`text-gray-700 hover:text-blue-600 font-medium py-2 ${
                       isActive(item.href) ? 'text-blue-600' : ''
