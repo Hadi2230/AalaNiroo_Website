@@ -676,12 +676,7 @@ export default function AdminContent() {
                           </div>
                           <div className="flex gap-2">
                             <Button variant="outline" onClick={() => setLogoFileInput(true) || (document.getElementById(`logo-hidden-file-${lang}`) as HTMLInputElement)?.click()}>آپلود لوگو</Button>
-                            <MediaPicker
-                              open={false}
-                              onOpenChange={() => {}}
-                              onSelect={(file) => updateCompanyData(lang, 'logoUrl', file.url)}
-                              accept={['image']}
-                            />
+                            <Button variant="outline" onClick={() => setShowMediaPicker(true)}>انتخاب از رسانه‌ها</Button>
                             <Button variant="destructive" onClick={() => updateCompanyData(lang, 'logoUrl', '')}>حذف</Button>
                           </div>
                         </div>
@@ -845,6 +840,12 @@ export default function AdminContent() {
           onOpenChange={setShowGalleryPicker}
           onSelect={(file) => addGalleryItem({ type: file.type === 'image' ? 'image' : 'video', url: file.url, alt: file.alt || '' })}
           accept={['image','video']}
+        />
+        <MediaPicker
+          open={showMediaPicker}
+          onOpenChange={setShowMediaPicker}
+          onSelect={(file) => updateCompanyData(activeTab as 'fa' | 'en', 'logoUrl', file.url)}
+          accept={['image']}
         />
 
         {/* Hidden file input for hero uploads */}
