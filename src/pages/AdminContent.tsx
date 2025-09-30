@@ -97,6 +97,7 @@ export default function AdminContent() {
   const [heroFileInput, setHeroFileInput] = useState<{ type: 'image' | 'video' | 'poster' } | null>(null);
   const [introFileInput, setIntroFileInput] = useState<{ type: 'image' | 'video' | 'poster' } | null>(null);
   const [logoFileInput, setLogoFileInput] = useState(false);
+  const [showLogoPicker, setShowLogoPicker] = useState(false);
 
   // Advanced content management
   const [seoData, setSeoData] = useState({
@@ -676,7 +677,7 @@ export default function AdminContent() {
                           </div>
                           <div className="flex gap-2">
                             <Button variant="outline" onClick={() => setLogoFileInput(true) || (document.getElementById(`logo-hidden-file-${lang}`) as HTMLInputElement)?.click()}>آپلود لوگو</Button>
-                            <Button variant="outline" onClick={() => setShowMediaPicker(true)}>انتخاب از رسانه‌ها</Button>
+                            <Button variant="outline" onClick={() => setShowLogoPicker(true)}>انتخاب از رسانه‌ها</Button>
                             <Button variant="destructive" onClick={() => updateCompanyData(lang, 'logoUrl', '')}>حذف</Button>
                           </div>
                         </div>
@@ -842,8 +843,8 @@ export default function AdminContent() {
           accept={['image','video']}
         />
         <MediaPicker
-          open={showMediaPicker}
-          onOpenChange={setShowMediaPicker}
+          open={showLogoPicker}
+          onOpenChange={setShowLogoPicker}
           onSelect={(file) => updateCompanyData(activeTab as 'fa' | 'en', 'logoUrl', file.url)}
           accept={['image']}
         />
