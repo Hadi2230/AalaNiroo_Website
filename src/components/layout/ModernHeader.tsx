@@ -72,9 +72,13 @@ const ModernHeader = () => {
           <div className="flex justify-between items-center py-4">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">A</span>
-              </div>
+              {company.logoUrl ? (
+                <img src={company.logoUrl} alt={company.name} className="w-12 h-12 object-contain" />
+              ) : (
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-xl">A</span>
+                </div>
+              )}
               <div className={dir === 'rtl' ? 'text-right' : 'text-left'}>
                 <h1 className="text-xl font-bold text-gray-900">{company.name}</h1>
                 <p className="text-sm text-gray-600 hidden lg:block">{company.tagline}</p>

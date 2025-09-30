@@ -976,7 +976,7 @@ export default function AdminPages() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {pages
+                    {[...pages]
                       .sort((a, b) => b.views - a.views)
                       .slice(0, 5)
                       .map((page, index) => (

@@ -112,7 +112,7 @@ export default function ModernIndex() {
         <section className="py-12 bg-white">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {home.gallery.sort((a,b) => a.order - b.order).slice(0, 8).map(item => (
+              {[...home.gallery].sort((a,b) => a.order - b.order).slice(0, 8).map(item => (
                 <div key={item.id} className="relative group overflow-hidden rounded-xl shadow hover:shadow-lg transition-shadow">
                   {item.type === 'image' ? (
                     <img src={item.url} alt={item.alt} className="w-full h-48 object-cover group-hover:scale-105 transition-transform" />

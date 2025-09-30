@@ -15,6 +15,7 @@ interface CompanyData {
     phone: string;
     address: string;
     email: string;
+    logoUrl?: string;
   };
   en: {
     name: string;
@@ -23,6 +24,7 @@ interface CompanyData {
     phone: string;
     address: string;
     email: string;
+    logoUrl?: string;
   };
 }
 

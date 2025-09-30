@@ -96,6 +96,7 @@ export default function AdminContent() {
   const [showGalleryPicker, setShowGalleryPicker] = useState(false);
   const [heroFileInput, setHeroFileInput] = useState<{ type: 'image' | 'video' | 'poster' } | null>(null);
   const [introFileInput, setIntroFileInput] = useState<{ type: 'image' | 'video' | 'poster' } | null>(null);
+  const [logoFileInput, setLogoFileInput] = useState(false);
 
   // Advanced content management
   const [seoData, setSeoData] = useState({
@@ -399,6 +400,7 @@ export default function AdminContent() {
                   { id: 'content', title: 'محتوای صفحات', icon: FileText },
                   { id: 'media', title: 'مدیریت رسانه', icon: Image },
                   { id: 'homeMedia', title: 'رسانه صفحه اصلی', icon: Video },
+                  { id: 'branding', title: 'برندینگ/لوگو', icon: Image },
                   { id: 'menus', title: 'ساختار منوها', icon: List },
                   { id: 'seo', title: 'SEO و متادیتا', icon: Tag },
                   { id: 'translations', title: 'مدیریت ترجمه', icon: Globe }
@@ -650,6 +652,42 @@ export default function AdminContent() {
                       </CardContent>
                     </Card>
                   )}
+
+                  {/* Branding / Logo */}
+                  {selectedSection === 'branding' && (
+                    <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-3">
+                          <Image className="w-6 h-6 text-blue-600" />
+                          مدیریت لوگو ({lang.toUpperCase()})
+                        </CardTitle>
+                        <CardDescription>
+                          آپلود یا انتخاب لوگوی شرکت. این لوگو در هدر سایت نمایش داده می‌شود.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-28 h-28 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                            {companyData[lang].logoUrl ? (
+                              <img src={companyData[lang].logoUrl} alt="logo" className="max-w-full max-h-full object-contain" />
+                            ) : (
+                              <span className="text-gray-400">بدون لوگو</span>
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="outline" onClick={() => setLogoFileInput(true) || (document.getElementById(`logo-hidden-file-${lang}`) as HTMLInputElement)?.click()}>آپلود لوگو</Button>
+                            <MediaPicker
+                              open={false}
+                              onOpenChange={() => {}}
+                              onSelect={(file) => updateCompanyData(lang, 'logoUrl', file.url)}
+                              accept={['image']}
+                            />
+                            <Button variant="destructive" onClick={() => updateCompanyData(lang, 'logoUrl', '')}>حذف</Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
                 </TabsContent>
               ))}
             </Tabs>
@@ -745,7 +783,7 @@ export default function AdminContent() {
                   <div className="p-8 text-center text-gray-500 border rounded-lg">آیتمی در گالری نیست</div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {homeContent.gallery.sort((a,b) => a.order - b.order).map(item => (
+                    {[...homeContent.gallery].sort((a,b) => a.order - b.order).map(item => (
                       <div key={item.id} className="relative group">
                         {item.type === 'image' ? (
                           <img src={item.url} alt={item.alt} className="w-full h-40 object-cover rounded" />
@@ -835,6 +873,26 @@ export default function AdminContent() {
             if (introFileInput.type === 'video') setIntroMedia({ type: 'video', videoUrl: uploaded.url, autoplay: true, muted: true, loop: true });
           } catch {}
           finally { setIntroFileInput(null); (e.target as HTMLInputElement).value = ''; }
+        }} />
+
+        {/* Hidden file inputs for logo uploads (fa/en) */}
+        <input id={`logo-hidden-file-fa`} type="file" accept="image/*" className="hidden" onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          try {
+            const uploaded = await uploadFile(file, 'homepage');
+            updateCompanyData('fa', 'logoUrl', uploaded.url);
+          } catch {}
+          finally { (e.target as HTMLInputElement).value = ''; setLogoFileInput(false); }
+        }} />
+        <input id={`logo-hidden-file-en`} type="file" accept="image/*" className="hidden" onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          try {
+            const uploaded = await uploadFile(file, 'homepage');
+            updateCompanyData('en', 'logoUrl', uploaded.url);
+          } catch {}
+          finally { (e.target as HTMLInputElement).value = ''; setLogoFileInput(false); }
         }} />
 
         {/* Preview Modal */}
