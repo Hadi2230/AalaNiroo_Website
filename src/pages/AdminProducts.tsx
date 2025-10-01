@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -146,10 +146,26 @@ const AdminProducts = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form states
+  const toEnglishDigits = useCallback((value: string): string => {
+    // Convert Persian/Arabic digits to English
+    const fa = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+    const ar = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    return value
+      .split('')
+      .map(ch => {
+        const faIdx = fa.indexOf(ch);
+        if (faIdx > -1) return String(faIdx);
+        const arIdx = ar.indexOf(ch);
+        if (arIdx > -1) return String(arIdx);
+        return ch;
+      })
+      .join('');
+  }, []);
+
   const [newProduct, setNewProduct] = useState<Partial<Product>>({
     name: '',
     nameEn: '',
-    category: '',
+    category: 'diesel-generators',
     brand: '',
     model: '',
     description: '',
@@ -1008,7 +1024,10 @@ const AdminProducts = () => {
                     <Input
                       type="number"
                       value={newProduct.price || ''}
-                      onChange={(e) => setNewProduct(prev => ({ ...prev, price: parseInt(e.target.value) || 0 }))}
+                      onChange={(e) => {
+                        const val = parseInt(toEnglishDigits(e.target.value));
+                        setNewProduct(prev => ({ ...prev, price: Number.isFinite(val) ? val : 0 }));
+                      }}
                       placeholder="850000000"
                     />
                   </div>
@@ -1017,7 +1036,10 @@ const AdminProducts = () => {
                     <Input
                       type="number"
                       value={newProduct.stock || ''}
-                      onChange={(e) => setNewProduct(prev => ({ ...prev, stock: parseInt(e.target.value) || 0 }))}
+                      onChange={(e) => {
+                        const val = parseInt(toEnglishDigits(e.target.value));
+                        setNewProduct(prev => ({ ...prev, stock: Number.isFinite(val) ? val : 0 }));
+                      }}
                       placeholder="5"
                     />
                   </div>
@@ -1031,7 +1053,10 @@ const AdminProducts = () => {
                     <Input
                       type="number"
                       value={newProduct.weight || ''}
-                      onChange={(e) => setNewProduct(prev => ({ ...prev, weight: parseInt(e.target.value) || 0 }))}
+                      onChange={(e) => {
+                        const val = parseInt(toEnglishDigits(e.target.value));
+                        setNewProduct(prev => ({ ...prev, weight: Number.isFinite(val) ? val : 0 }));
+                      }}
                       placeholder="3500"
                     />
                   </div>
@@ -1040,7 +1065,10 @@ const AdminProducts = () => {
                     <Input
                       type="number"
                       value={newProduct.minStock || ''}
-                      onChange={(e) => setNewProduct(prev => ({ ...prev, minStock: parseInt(e.target.value) || 5 }))}
+                      onChange={(e) => {
+                        const val = parseInt(toEnglishDigits(e.target.value));
+                        setNewProduct(prev => ({ ...prev, minStock: Number.isFinite(val) ? val : 5 }));
+                      }}
                       placeholder="5"
                     />
                   </div>
@@ -1052,37 +1080,46 @@ const AdminProducts = () => {
                     <Input
                       type="number"
                       value={newProduct.dimensions?.length || ''}
-                      onChange={(e) => setNewProduct(prev => ({ 
-                        ...prev, 
-                        dimensions: { 
-                          ...prev.dimensions!, 
-                          length: parseInt(e.target.value) || 0 
-                        } 
-                      }))}
+                      onChange={(e) => {
+                        const val = parseInt(toEnglishDigits(e.target.value));
+                        setNewProduct(prev => ({
+                          ...prev,
+                          dimensions: {
+                            ...prev.dimensions!,
+                            length: Number.isFinite(val) ? val : 0,
+                          },
+                        }));
+                      }}
                       placeholder="طول"
                     />
                     <Input
                       type="number"
                       value={newProduct.dimensions?.width || ''}
-                      onChange={(e) => setNewProduct(prev => ({ 
-                        ...prev, 
-                        dimensions: { 
-                          ...prev.dimensions!, 
-                          width: parseInt(e.target.value) || 0 
-                        } 
-                      }))}
+                      onChange={(e) => {
+                        const val = parseInt(toEnglishDigits(e.target.value));
+                        setNewProduct(prev => ({
+                          ...prev,
+                          dimensions: {
+                            ...prev.dimensions!,
+                            width: Number.isFinite(val) ? val : 0,
+                          },
+                        }));
+                      }}
                       placeholder="عرض"
                     />
                     <Input
                       type="number"
                       value={newProduct.dimensions?.height || ''}
-                      onChange={(e) => setNewProduct(prev => ({ 
-                        ...prev, 
-                        dimensions: { 
-                          ...prev.dimensions!, 
-                          height: parseInt(e.target.value) || 0 
-                        } 
-                      }))}
+                      onChange={(e) => {
+                        const val = parseInt(toEnglishDigits(e.target.value));
+                        setNewProduct(prev => ({
+                          ...prev,
+                          dimensions: {
+                            ...prev.dimensions!,
+                            height: Number.isFinite(val) ? val : 0,
+                          },
+                        }));
+                      }}
                       placeholder="ارتفاع"
                     />
                   </div>
@@ -1302,7 +1339,7 @@ const AdminProducts = () => {
                 </Button>
                 <Button 
                   onClick={handleCreateProduct}
-                  disabled={isLoading}
+                  disabled={isLoading || !(newProduct.name && newProduct.name.trim()) || !(newProduct.brand && newProduct.brand.trim()) || !(newProduct.category) || !newProduct.price || (newProduct.price <= 0)}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
                   {isLoading ? (
