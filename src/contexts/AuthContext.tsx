@@ -49,7 +49,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const initialUser = (() => {
     try {
       const saved = localStorage.getItem('user');
-      return saved ? JSON.parse(saved) as User : null;
+      if (saved) return JSON.parse(saved) as User;
+      // fallback to cookie
+      const cookie = document.cookie.split('; ').find(r => r.startsWith('auth_user='));
+      if (cookie) {
+        const encoded = cookie.split('=')[1];
+        try { return JSON.parse(atob(encoded)) as User; } catch {}
+      }
+      // fallback to sessionStorage
+      const sess = sessionStorage.getItem('user');
+      if (sess) return JSON.parse(sess) as User;
+      return null;
     } catch {
       return null;
     }
@@ -82,7 +92,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (foundUser) {
       const { password: _, ...userWithoutPassword } = foundUser;
       setUser(userWithoutPassword);
-      localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+      try { localStorage.setItem('user', JSON.stringify(userWithoutPassword)); } catch {}
+      try { sessionStorage.setItem('user', JSON.stringify(userWithoutPassword)); } catch {}
+      try {
+        const encoded = btoa(JSON.stringify(userWithoutPassword));
+        const expDays = 7;
+        const d = new Date();
+        d.setTime(d.getTime() + (expDays*24*60*60*1000));
+        document.cookie = `auth_user=${encoded}; expires=${d.toUTCString()}; path=/`;
+      } catch {}
       setIsLoading(false);
       return true;
     }
@@ -94,6 +112,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    try { sessionStorage.removeItem('user'); } catch {}
+    try { document.cookie = 'auth_user=; Max-Age=0; path=/'; } catch {}
   };
 
   return (

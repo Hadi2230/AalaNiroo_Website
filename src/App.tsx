@@ -32,6 +32,7 @@ const RequireAuth = ({
   }
 
   if (!user) {
+    // Allow staying on /admin/login but block protected routes
     return <Navigate to="/admin/login" replace />;
   }
 
