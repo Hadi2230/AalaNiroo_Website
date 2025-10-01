@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useMediaUrl } from '@/hooks/useMediaUrl';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Phone, FileText, Calendar, Play, Award, Users, Clock } from 'lucide-react';
+import { ArrowRight, Phone, FileText, Calendar, Award, Users, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useHomeContent } from '@/contexts/HomeContentContext';
@@ -53,9 +53,9 @@ const ModernHero = () => {
       </div>
 
       <div className="container mx-auto px-4 relative z-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 gap-12 items-center justify-items-center">
           {/* Content */}
-          <div className={`space-y-8 ${dir === 'rtl' ? 'text-right' : 'text-left'}`}>
+          <div className="space-y-8 text-center max-w-4xl mx-auto">
             {/* Company Badge */}
             <div className="inline-flex items-center gap-2 bg-blue-600/20 backdrop-blur-sm border border-blue-400/30 rounded-full px-4 py-2">
               <Award className="w-5 h-5 text-blue-400" />
@@ -91,7 +91,7 @@ const ModernHero = () => {
             </div>
 
             {/* Key Features */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
               <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg p-4">
                 <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
                   <Award className="w-6 h-6" />
@@ -130,7 +130,7 @@ const ModernHero = () => {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4 group" onClick={() => { if (home.hero.ctaUrl) window.location.href = home.hero.ctaUrl; }}>
                 <FileText className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
                 {home.hero.ctaText || t('hero.cta.quote')}
@@ -168,56 +168,6 @@ const ModernHero = () => {
                   {language === 'fa' ? 'پشتیبانی' : 'Support'}
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Visual Content */}
-          <div className="relative">
-            {/* Main Image/Video Container */}
-            <div className="relative z-10 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 shadow-2xl">
-              <div className="relative">
-                {home.hero.type === 'video' && heroVideoUrl ? (
-                  <video className="w-full h-auto rounded-lg" controls playsInline preload="metadata" poster={home.hero.posterUrl || undefined}>
-                    <source src={heroVideoUrl} type={heroVideoUrl.startsWith('blob:') ? 'video/mp4' : (heroVideoUrl.startsWith('data:') ? heroVideoUrl.substring(5, heroVideoUrl.indexOf(';')) : (heroVideoUrl.endsWith('.webm') ? 'video/webm' : (heroVideoUrl.endsWith('.ogv') || heroVideoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4')))} />
-                  </video>
-                ) : home.hero.type === 'image' && home.hero.imageUrl ? (
-                  <img src={home.hero.imageUrl} alt={home.hero.title || ''} className="w-full h-auto rounded-lg" />
-                ) : (
-                  <>
-                    <img 
-                      src="/api/placeholder/600/400" 
-                      alt="Industrial Generator" 
-                      className="w-full h-auto rounded-lg"
-                    />
-                    {/* Play Button Overlay for Video */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <button className="w-20 h-20 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110">
-                        <Play className="w-8 h-8 text-white ml-1" />
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-              
-              {/* Quality Badge */}
-              <div className="absolute -top-4 -right-4 bg-green-600 text-white p-4 rounded-lg shadow-lg">
-                <div className="text-2xl font-bold">100%</div>
-                <div className="text-sm">
-                  {language === 'fa' ? 'تضمین کیفیت' : 'Quality Guarantee'}
-                </div>
-              </div>
-            </div>
-            
-            {/* Floating Elements */}
-            <div className="absolute top-10 -left-10 w-20 h-20 bg-blue-500 rounded-full opacity-20 animate-pulse"></div>
-            <div className="absolute bottom-10 -right-10 w-16 h-16 bg-gray-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
-            
-            {/* Technical Specs Card */}
-            <div className="absolute -bottom-6 -left-6 bg-white text-gray-900 p-6 rounded-lg shadow-xl">
-              <h4 className="font-bold mb-2">
-                {language === 'fa' ? 'محدوده قدرت' : 'Power Range'}
-              </h4>
-              <div className="text-2xl font-bold text-blue-600">1-2500 kW</div>
             </div>
           </div>
         </div>
