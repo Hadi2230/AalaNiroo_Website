@@ -20,7 +20,16 @@ const RequireAuth = ({
   children: JSX.Element;
   roles?: string[];
 }) => {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+
+  // Prevent redirect flicker on refresh while auth state is loading
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-gray-600">در حال بارگذاری پنل...</div>
+      </div>
+    );
+  }
 
   if (!user) {
     return <Navigate to="/admin/login" replace />;

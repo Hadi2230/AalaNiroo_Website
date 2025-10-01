@@ -56,6 +56,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(JSON.parse(savedUser));
     }
     setIsLoading(false);
+
+    // Keep user alive on storage changes from other tabs
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'user') {
+        try {
+          if (e.newValue) setUser(JSON.parse(e.newValue));
+          else setUser(null);
+        } catch {}
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {

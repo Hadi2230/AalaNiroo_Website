@@ -257,6 +257,8 @@ export function MediaProvider({ children }: MediaProviderProps) {
       throw error;
     } finally {
       setIsLoading(false);
+      // Nudge auth to prevent accidental logout due to heavy work (optional noop)
+      try { const u = localStorage.getItem('user'); if (u) localStorage.setItem('user', u); } catch {}
     }
   };
 

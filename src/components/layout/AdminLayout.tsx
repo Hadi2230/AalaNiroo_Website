@@ -39,7 +39,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const [unreadNotifications, setUnreadNotifications] = useState(3);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const { dir } = useLanguage();
 
   // داده‌های نمونه برای نوتیفیکیشن‌ها
@@ -188,6 +188,14 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         return <Badge variant="outline">{role}</Badge>;
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-gray-600">در حال بارگذاری پنل مدیریت...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
