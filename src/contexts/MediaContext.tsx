@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { idbPutBlob, idbDeleteBlob } from '@/utils/idb';
 import { toast } from 'sonner';
 
@@ -87,7 +87,7 @@ interface MediaProviderProps {
   children: ReactNode;
 }
 
-export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
+export function MediaProvider({ children }: MediaProviderProps) {
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [folders, setFolders] = useState<MediaFolder[]>([
     {
@@ -477,4 +477,4 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
       {children}
     </MediaContext.Provider>
   );
-};
+}
