@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import ModernHero from '@/components/sections/ModernHero';
 import ModernProductCard from '@/components/sections/ModernProductCard';
 import ModernHeader from '@/components/layout/ModernHeader';
@@ -29,7 +30,8 @@ import {
   TrendingUp,
   Phone,
   Mail,
-  Globe
+  Globe,
+  Play
 } from 'lucide-react';
 
 export default function ModernIndex() {
@@ -39,6 +41,10 @@ export default function ModernIndex() {
   const { content: home } = useHomeContent();
   const introVideoUrl = useMediaUrl(home.introMedia?.type === 'video' ? home.introMedia?.videoUrl : undefined);
   const introImageUrl = useMediaUrl(home.introMedia?.type === 'image' ? home.introMedia?.imageUrl : undefined);
+  const heroVideoUrl = useMediaUrl(home.hero.type === 'video' ? home.hero.videoUrl : undefined);
+  const playableVideoUrl = introVideoUrl || heroVideoUrl;
+  const posterUrl = home.introMedia?.posterUrl || home.hero.posterUrl || introImageUrl || '/api/placeholder/600/400';
+  const [isPlaying, setIsPlaying] = useState(false);
   const currentProducts = products[language];
   const currentServices = services[language];
   const currentProjects = projects[language];
@@ -170,10 +176,25 @@ export default function ModernIndex() {
 
             <div className={`relative ${dir === 'rtl' ? 'order-1' : 'order-2'}`}>
               <div className="relative z-10 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 shadow-2xl">
-                {home.introMedia?.type === 'video' && introVideoUrl ? (
-                  <video className="w-full h-auto rounded-lg" controls autoPlay={home.introMedia.autoplay} muted={home.introMedia.muted} loop={home.introMedia.loop} playsInline preload="metadata" poster={home.introMedia?.posterUrl || undefined}>
-                    <source src={introVideoUrl} type={introVideoUrl.startsWith('blob:') ? 'video/mp4' : (introVideoUrl.startsWith('data:') ? introVideoUrl.substring(5, introVideoUrl.indexOf(';')) : (introVideoUrl.endsWith('.webm') ? 'video/webm' : (introVideoUrl.endsWith('.ogv') || introVideoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4')))} />
-                  </video>
+                {playableVideoUrl ? (
+                  isPlaying ? (
+                    <video className="w-full h-auto rounded-lg" controls autoPlay playsInline preload="metadata" poster={posterUrl || undefined}>
+                      <source src={playableVideoUrl} type={playableVideoUrl.startsWith('blob:') ? 'video/mp4' : (playableVideoUrl.startsWith('data:') ? playableVideoUrl.substring(5, playableVideoUrl.indexOf(';')) : (playableVideoUrl.endsWith('.webm') ? 'video/webm' : (playableVideoUrl.endsWith('.ogv') || playableVideoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4')))} />
+                    </video>
+                  ) : (
+                    <div className="relative">
+                      <img 
+                        src={typeof posterUrl === 'string' ? posterUrl : '/api/placeholder/600/400'} 
+                        alt="Aalaniroo Company" 
+                        className="w-full h-auto rounded-lg"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <button onClick={() => setIsPlaying(true)} className="w-20 h-20 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110">
+                          <Play className="w-8 h-8 text-white ml-1" />
+                        </button>
+                      </div>
+                    </div>
+                  )
                 ) : (
                   <img 
                     src={introImageUrl || '/api/placeholder/600/400'} 
