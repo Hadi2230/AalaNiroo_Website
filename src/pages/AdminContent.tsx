@@ -151,8 +151,20 @@ export default function AdminContent() {
           user: user?.name || 'Unknown'
         }]);
 
+        // Persist SEO and Menus and Home Content snapshot as part of Save All
+        try {
+          localStorage.setItem('seoData', JSON.stringify(seoData));
+        } catch {}
+        try {
+          localStorage.setItem('menuStructure', JSON.stringify(menuStructure));
+        } catch {}
+        try {
+          // Snapshot current home content; its context already persists, this is an extra explicit save
+          localStorage.setItem('homeContent', JSON.stringify(homeContent));
+        } catch {}
+
         toast.success('محتوا با موفقیت ذخیره شد', {
-          description: 'تغییرات فوراً در وبسایت اعمال شد'
+          description: 'تمام بخش‌ها (شرکت، SEO، منوها، صفحه اصلی) ذخیره شدند'
         });
         setIsEditing(false);
         
@@ -161,6 +173,9 @@ export default function AdminContent() {
           window.dispatchEvent(new CustomEvent('companyDataUpdated', {
             detail: companyData
           }));
+          // Broadcast synthetic events for other sections (optional listeners)
+          window.dispatchEvent(new CustomEvent('seoDataUpdated', { detail: seoData }));
+          window.dispatchEvent(new CustomEvent('menuStructureUpdated', { detail: menuStructure }));
         }, 100);
       }
     } catch (error) {
@@ -189,6 +204,16 @@ export default function AdminContent() {
     localStorage.setItem('seoData', JSON.stringify(seoData));
     console.log('SEO data saved');
   };
+
+  // Auto-save for SEO when editing is enabled
+  useEffect(() => {
+    if (autoSave && isEditing) {
+      const timer = setTimeout(() => {
+        try { localStorage.setItem('seoData', JSON.stringify(seoData)); } catch {}
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [seoData, autoSave, isEditing]);
 
   const handleMenuUpdate = (menuType: 'header' | 'footer', items: any[]) => {
     setMenuStructure(prev => ({
