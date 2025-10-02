@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useMediaUrl } from '@/hooks/useMediaUrl';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Phone, FileText, Calendar, Award, Users, Clock } from 'lucide-react';
+import { ArrowRight, Phone, FileText, Calendar, Award } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useHomeContent } from '@/contexts/HomeContentContext';
@@ -90,44 +90,7 @@ const ModernHero = () => {
               </p>
             </div>
 
-            {/* Key Features */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
-              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <Award className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">FG Wilson</h3>
-                  <p className="text-sm text-gray-400">
-                    {language === 'fa' ? 'نماینده رسمی' : 'Official Partner'}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">Cummins</h3>
-                  <p className="text-sm text-gray-400">
-                    {language === 'fa' ? 'نماینده رسمی' : 'Official Partner'}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <Clock className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">24/7</h3>
-                  <p className="text-sm text-gray-400">
-                    {language === 'fa' ? 'پشتیبانی' : 'Support'}
-                  </p>
-                </div>
-              </div>
-            </div>
+            
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -148,27 +111,7 @@ const ModernHero = () => {
               </Button>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 pt-8 border-t border-gray-700">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-blue-400">500+</div>
-                <div className="text-sm text-gray-400">
-                  {language === 'fa' ? 'پروژه موفق' : 'Successful Projects'}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-blue-400">33+</div>
-                <div className="text-sm text-gray-400">
-                  {language === 'fa' ? 'سال تجربه' : 'Years Experience'}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-blue-400">24/7</div>
-                <div className="text-sm text-gray-400">
-                  {language === 'fa' ? 'پشتیبانی' : 'Support'}
-                </div>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>
