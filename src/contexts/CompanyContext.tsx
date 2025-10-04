@@ -16,6 +16,7 @@ interface CompanyData {
     address: string;
     email: string;
     logoUrl?: string;
+    quoteMessage?: string;
   };
   en: {
     name: string;
@@ -25,13 +26,14 @@ interface CompanyData {
     address: string;
     email: string;
     logoUrl?: string;
+    quoteMessage?: string;
   };
 }
 
 interface CompanyContextType {
   companyData: CompanyData;
   updateCompanyData: (lang: 'fa' | 'en', field: string, value: string) => void;
-  saveCompanyData: () => void;
+  saveCompanyData: () => Promise<boolean>;
   resetToDefault: () => void;
   isLoading: boolean;
   lastModified: string | null;

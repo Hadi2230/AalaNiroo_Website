@@ -201,7 +201,7 @@ export default function AdminContent() {
   };
 
   const handleSEOSave = () => {
-    localStorage.setItem('seoData', JSON.stringify(seoData));
+    try { localStorage.setItem('seoData', JSON.stringify(seoData)); } catch {}
     console.log('SEO data saved');
   };
 
@@ -327,12 +327,12 @@ export default function AdminContent() {
                 تاریخچه
               </Button>
 
-              <Button onClick={exportContent} variant="outline" size="lg">
+              <Button onClick={() => { exportContent(); }} variant="outline" size="lg">
                 <Download className="w-5 h-5 mr-2" />
                 پشتیبان‌گیری
               </Button>
 
-              <Button onClick={resetToDefault} variant="outline" size="lg" className="text-red-600 hover:text-red-700">
+              <Button onClick={() => { resetToDefault(); }} variant="outline" size="lg" className="text-red-600 hover:text-red-700">
                 <RefreshCw className="w-5 h-5 mr-2" />
                 بازنشانی
               </Button>
@@ -563,6 +563,22 @@ export default function AdminContent() {
                               </p>
                             )}
                           </div>
+                          <div className="space-y-2 md:col-span-3">
+                            <Label className="text-sm font-medium">پیام درخواست پیش‌فاکتور</Label>
+                            {isEditing ? (
+                              <Textarea
+                                value={companyData[lang].quoteMessage || ''}
+                                onChange={(e) => handleContentChange(lang, 'quoteMessage', e.target.value)}
+                                rows={3}
+                                className="resize-none"
+                                placeholder={lang === 'fa' ? 'متن پیام نمایش داده‌شونده پس از کلیک روی درخواست پیش‌فاکتور' : 'Message shown after clicking request a quote'}
+                              />
+                            ) : (
+                              <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                {companyData[lang].quoteMessage || (lang === 'fa' ? '—' : '—')}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -701,7 +717,7 @@ export default function AdminContent() {
                             )}
                           </div>
                           <div className="flex gap-2">
-                            <Button variant="outline" onClick={() => setLogoFileInput(true) || (document.getElementById(`logo-hidden-file-${lang}`) as HTMLInputElement)?.click()}>آپلود لوگو</Button>
+                            <Button variant="outline" onClick={() => { setLogoFileInput(true); (document.getElementById(`logo-hidden-file-${lang}`) as HTMLInputElement)?.click(); }}>آپلود لوگو</Button>
                             <Button variant="outline" onClick={() => setShowLogoPicker(true)}>انتخاب از رسانه‌ها</Button>
                             <Button variant="destructive" onClick={() => updateCompanyData(lang, 'logoUrl', '')}>حذف</Button>
                           </div>
@@ -826,9 +842,9 @@ export default function AdminContent() {
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold">مدیای سکشن معرفی شرکت</h3>
                   <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => setIntroFileInput({ type: 'image' }) || (document.getElementById('intro-hidden-file') as HTMLInputElement)?.click()}>آپلود تصویر</Button>
-                    <Button variant="outline" onClick={() => setIntroFileInput({ type: 'video' }) || (document.getElementById('intro-hidden-file') as HTMLInputElement)?.click()}>آپلود ویدیو</Button>
-                    <Button variant="outline" onClick={() => setIntroFileInput({ type: 'poster' }) || (document.getElementById('intro-hidden-file') as HTMLInputElement)?.click()}>آپلود پوستر</Button>
+                    <Button variant="outline" onClick={() => { setIntroFileInput({ type: 'image' }); (document.getElementById('intro-hidden-file') as HTMLInputElement)?.click(); }}>آپلود تصویر</Button>
+                    <Button variant="outline" onClick={() => { setIntroFileInput({ type: 'video' }); (document.getElementById('intro-hidden-file') as HTMLInputElement)?.click(); }}>آپلود ویدیو</Button>
+                    <Button variant="outline" onClick={() => { setIntroFileInput({ type: 'poster' }); (document.getElementById('intro-hidden-file') as HTMLInputElement)?.click(); }}>آپلود پوستر</Button>
                     <Button variant="outline" className="text-red-600" onClick={clearIntroMedia}>حذف</Button>
                   </div>
                 </div>

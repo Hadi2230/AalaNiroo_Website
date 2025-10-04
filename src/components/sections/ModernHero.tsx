@@ -34,7 +34,9 @@ const ModernHero = () => {
         <img src={home.hero.imageUrl} alt={home.hero.title || ''} className="absolute inset-0 w-full h-full object-cover opacity-60" />
       )}
       {/* Background Overlay */}
-      <div className="absolute inset-0 bg-black/40 z-10"></div>
+      {(home.hero.overlay ?? true) && (
+        <div className="absolute inset-0 bg-black/40 z-10"></div>
+      )}
       
       {/* Industrial Background Pattern */}
       <div className="absolute inset-0 opacity-10">
@@ -94,13 +96,27 @@ const ModernHero = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4 group" onClick={() => { if (home.hero.ctaUrl) window.location.href = home.hero.ctaUrl; }}>
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4 group" onClick={() => {
+                const msg = company.quoteMessage || (language === 'fa' ? 'درخواست پیش‌فاکتور ثبت شد.' : 'Quote request submitted.');
+                // inline toast fallback if toast not globally available
+                try {
+                  // @ts-ignore
+                  if (window?.sonner?.toast) {
+                    // @ts-ignore
+                    window.sonner.toast.success(msg);
+                  } else {
+                    alert(msg);
+                  }
+                } catch {
+                  alert(msg);
+                }
+              }}>
                 <FileText className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
                 {home.hero.ctaText || t('hero.cta.quote')}
                 <ArrowRight className={`w-5 h-5 ${dir === 'rtl' ? 'mr-2' : 'ml-2'} group-hover:translate-x-1 transition-transform`} />
               </Button>
               
-              <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-gray-400 text-white hover:bg-white hover:text-gray-900">
+              <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-gray-400 text-white hover:bg-white hover:text-gray-900" onClick={() => { if (company.phone) window.open(`tel:${company.phone}`, '_self'); }}>
                 <Phone className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
                 {t('hero.cta.call')}
               </Button>

@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useProducts } from '@/contexts/ProductsContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCompany } from '@/contexts/CompanyContext';
 import { toast } from 'sonner';
 import { 
   Search, 
@@ -59,6 +60,8 @@ export default function Products() {
   } = useProducts();
 
   const { language, t } = useLanguage();
+  const { companyData } = useCompany();
+  const company = companyData[language];
   
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
@@ -438,8 +441,7 @@ export default function Products() {
                                 <Button
                                   variant="outline"
                                   onClick={() => {
-                                    // Contact for quote
-                                    window.open(`tel:021-58635`, '_self');
+                                    if (company.phone) window.open(`tel:${company.phone}`, '_self');
                                   }}
                                 >
                                   <Phone className="w-4 h-4" />

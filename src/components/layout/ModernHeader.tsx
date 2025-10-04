@@ -43,37 +43,10 @@ const ModernHeader = () => {
 
   return (
     <>
-      {/* Top Bar */}
-      <div className="bg-gray-900 text-white py-2 px-4 text-sm">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4" />
-              <span>{company.phone}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4" />
-              <span>{company.email}</span>
-            </div>
-          </div>
-          
-          {/* Language Switcher */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4" />
-              <button
-                onClick={() => setLanguage(language === 'fa' ? 'en' : 'fa')}
-                className="hover:text-blue-400 transition-colors"
-              >
-                {language === 'fa' ? 'English' : 'فارسی'}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Top Bar removed for a clean text-only header */}
 
       {/* Main Header */}
-      <header className={`sticky top-0 z-50 transition-all duration-300 ${
+      <header className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ${
         isScrolled ? 'bg-black/40 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}>
         <div className="container mx-auto px-4">

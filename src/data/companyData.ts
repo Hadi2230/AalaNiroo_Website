@@ -6,7 +6,8 @@ export const companyInfo = {
     description: "با بیش از 33 سال تجربه در صنعت ژنراتور، نماینده رسمی برندهای معتبر جهانی",
     phone: "021-58635",
     address: "تهران، بزرگراه مدرس، نرسیده به میدان هفت تیر، مقابل خیابان زهره",
-    email: "info@aalaniroo.com"
+    email: "info@aalaniroo.com",
+    quoteMessage: "درخواست پیش‌فاکتور شما ثبت شد. همکاران ما به‌زودی با شما تماس می‌گیرند."
   },
   en: {
     name: "Aalaniroo Power Company",
@@ -14,7 +15,8 @@ export const companyInfo = {
     description: "Over 33 years of experience in generator industry, official representative of global trusted brands",
     phone: "+98-21-58635",
     address: "Tehran, Modarres Highway, Before Haft Tir Square, Opposite Zohreh Street",
-    email: "info@aalaniroo.com"
+    email: "info@aalaniroo.com",
+    quoteMessage: "Your quote request has been received. We will contact you shortly."
   }
 };
 
