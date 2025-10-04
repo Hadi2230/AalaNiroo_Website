@@ -249,16 +249,13 @@ export default function About() {
           <div className="text-center mb-16">
             <Badge className="bg-blue-100 text-blue-800 mb-4">
               <Image className="w-4 h-4 mr-2" />
-              {language === 'fa' ? 'گالری شرکت' : 'Company Gallery'}
+              {about[language].galleryTitle}
             </Badge>
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              {language === 'fa' ? 'نگاهی به شرکت ما' : 'A Look at Our Company'}
+              {about[language].galleryTitle}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              {language === 'fa' 
-                ? 'مجموعه‌ای از تصاویر شرکت، تیم ما، تجهیزات و فضای کاری' 
-                : 'A collection of company images, our team, equipment and workspace'
-              }
+              {about[language].gallerySubtitle}
             </p>
           </div>
 
@@ -304,19 +301,15 @@ export default function About() {
                 <h3 className="text-xl font-semibold text-gray-600 mb-2">
                   {language === 'fa' ? 'گالری خالی است' : 'Gallery is Empty'}
                 </h3>
-                <p className="text-gray-500 mb-6">
+                <p className="text-gray-500 mb-2">
                   {language === 'fa' 
-                    ? 'هنوز تصویری در گالری شرکت آپلود نشده است'
-                    : 'No images have been uploaded to the company gallery yet'
+                    ? 'هنوز تصویری در گالری شرکت ثبت نشده است.'
+                    : 'No images have been selected for the company gallery.'
                   }
                 </p>
-                <Button
-                  onClick={() => window.open('/admin/media', '_blank')}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  {language === 'fa' ? 'آپلود تصاویر' : 'Upload Images'}
-                </Button>
+                <p className="text-sm text-gray-400">
+                  {language === 'fa' ? 'برای افزودن تصاویر، از پنل مدیریت استفاده کنید.' : 'Use the admin panel to add images.'}
+                </p>
               </CardContent>
             </Card>
           )}
@@ -381,12 +374,8 @@ export default function About() {
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              {language === 'fa' ? 'تیم ما' : 'Our Team'}
-            </h2>
-            <p className="text-xl text-gray-600">
-              {language === 'fa' ? 'متخصصان مجرب و متعهد شرکت اعلا نیرو' : 'Experienced and dedicated specialists of Aalaniroo'}
-            </p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">{about[language].teamTitle}</h2>
+            <p className="text-xl text-gray-600">{about[language].teamSubtitle}</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">

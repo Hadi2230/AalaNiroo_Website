@@ -78,6 +78,12 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       badge: null
     },
     { 
+      path: '/admin/about', 
+      icon: Users, 
+      label: 'درباره ما',
+      badge: null
+    },
+    { 
       path: '/admin/products', 
       icon: Package, 
       label: 'محصولات',
