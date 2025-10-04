@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useMediaUrl } from '@/hooks/useMediaUrl';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Phone, FileText, Calendar, Award } from 'lucide-react';
+import { ArrowRight, Phone, FileText } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useHomeContent } from '@/contexts/HomeContentContext';
@@ -38,34 +38,12 @@ const ModernHero = () => {
         <div className="absolute inset-0 bg-black/40 z-10"></div>
       )}
       
-      {/* Industrial Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-20 left-20 w-96 h-96 bg-blue-500 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-20 w-80 h-80 bg-gray-400 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full">
-          <svg className="w-full h-full opacity-5" viewBox="0 0 100 100">
-            <defs>
-              <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-                <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" strokeWidth="0.5"/>
-              </pattern>
-            </defs>
-            <rect width="100" height="100" fill="url(#grid)" />
-          </svg>
-        </div>
-      </div>
+      
 
       <div className="container mx-auto px-4 relative z-20">
         <div className="grid grid-cols-1 gap-12 items-center justify-items-center">
           {/* Content */}
           <div className="space-y-8 text-center max-w-4xl mx-auto">
-            {/* Company Badge */}
-            <div className="inline-flex items-center gap-2 bg-blue-600/20 backdrop-blur-sm border border-blue-400/30 rounded-full px-4 py-2">
-              <Award className="w-5 h-5 text-blue-400" />
-              <span className="text-blue-200 text-sm font-medium">
-                {language === 'fa' ? '33+ سال تجربه' : '33+ Years Experience'}
-              </span>
-            </div>
-
             <div className="space-y-6">
               <h1 className="text-5xl lg:text-7xl font-bold leading-tight">
                 {home.hero.title ? (
@@ -120,24 +98,13 @@ const ModernHero = () => {
                 <Phone className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
                 {t('hero.cta.call')}
               </Button>
-              
-              <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-gray-400 text-white hover:bg-white hover:text-gray-900">
-                <Calendar className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-                {t('hero.cta.service')}
-              </Button>
             </div>
 
             
           </div>
         </div>
       </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce z-20">
-        <div className="w-6 h-10 border-2 border-gray-400 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-gray-400 rounded-full mt-2 animate-pulse"></div>
-        </div>
-      </div>
+      
     </section>
   );
 };
