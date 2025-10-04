@@ -14,9 +14,11 @@ export interface AboutContentLocale {
   heroTitle: string;
   heroSubtitle: string;
   companyText: string;
+  teamTitle: string;
+  teamSubtitle: string;
+  galleryTitle: string;
+  gallerySubtitle: string;
   valuesIntro?: string;
-  teamIntro?: string;
-  galleryIntro?: string;
 }
 
 export interface AboutContentState {
@@ -39,12 +41,20 @@ const DEFAULT_CONTENT: AboutContentState = {
   fa: {
     heroTitle: 'درباره شرکت اعلا نیرو',
     heroSubtitle: 'تولیدکننده و تامین‌کننده راهکارهای انرژی باکیفیت',
-    companyText: 'شرکت اعلا نیرو با سال‌ها تجربه، ارائه‌دهنده خدمات و محصولات حوزه انرژی است.'
+    companyText: 'شرکت اعلا نیرو با سال‌ها تجربه، ارائه‌دهنده خدمات و محصولات حوزه انرژی است.',
+    teamTitle: 'تیم ما',
+    teamSubtitle: 'متخصصان مجرب و متعهد شرکت اعلا نیرو',
+    galleryTitle: 'گالری شرکت',
+    gallerySubtitle: 'نگاهی به شرکت ما — مجموعه‌ای از تصاویر شرکت، تیم ما، تجهیزات و فضای کاری'
   },
   en: {
     heroTitle: 'About Aalaniroo Company',
     heroSubtitle: 'Provider of high-quality energy solutions',
-    companyText: 'Aalaniroo delivers products and services in the energy sector with years of experience.'
+    companyText: 'Aalaniroo delivers products and services in the energy sector with years of experience.',
+    teamTitle: 'Our Team',
+    teamSubtitle: 'Experienced and dedicated specialists of Aalaniroo',
+    galleryTitle: 'Company Gallery',
+    gallerySubtitle: 'A look at our company — images of our team, equipment, and workspace'
   },
   team: [],
   galleryImageIds: []
@@ -56,7 +66,15 @@ export function AboutContentProvider({ children }: { children: React.ReactNode }
   const [content, setContent] = useState<AboutContentState>(() => {
     try {
       const saved = localStorage.getItem('aboutContent');
-      return saved ? JSON.parse(saved) as AboutContentState : DEFAULT_CONTENT;
+      if (!saved) return DEFAULT_CONTENT;
+      const parsed = JSON.parse(saved) as Partial<AboutContentState>;
+      // Merge with defaults to migrate older saves
+      return {
+        fa: { ...DEFAULT_CONTENT.fa, ...(parsed.fa || {}) },
+        en: { ...DEFAULT_CONTENT.en, ...(parsed.en || {}) },
+        team: parsed.team || DEFAULT_CONTENT.team,
+        galleryImageIds: parsed.galleryImageIds || DEFAULT_CONTENT.galleryImageIds,
+      };
     } catch {
       return DEFAULT_CONTENT;
     }
