@@ -1,7 +1,7 @@
 import HeroSection from '@/components/sections/HeroSection';
 import ProductCard from '@/components/sections/ProductCard';
 import ServiceCard from '@/components/sections/ServiceCard';
-import Header from '@/components/layout/Header';
+import ModernHeader from '@/components/layout/ModernHeader';
 import Footer from '@/components/layout/Footer';
 import ChatWidget from '@/components/layout/ChatWidget';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import { ArrowRight, CheckCircle, Users, Award, Clock, Star } from 'lucide-react
 export default function Index() {
   return (
     <div className="min-h-screen">
-      <Header />
+      <ModernHeader />
       
       {/* Hero Section */}
       <HeroSection />

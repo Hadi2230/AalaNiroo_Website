@@ -1,4 +1,4 @@
-import Header from '@/components/layout/Header';
+import ModernHeader from '@/components/layout/ModernHeader';
 import Footer from '@/components/layout/Footer';
 import ChatWidget from '@/components/layout/ChatWidget';
 import ServiceCard from '@/components/sections/ServiceCard';
@@ -19,7 +19,7 @@ export default function Services() {
 
   return (
     <div className="min-h-screen">
-      <Header />
+      <ModernHeader />
       
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-blue-900 to-gray-900 text-white">

@@ -1,4 +1,4 @@
-import Header from '@/components/layout/Header';
+import ModernHeader from '@/components/layout/ModernHeader';
 import Footer from '@/components/layout/Footer';
 import ChatWidget from '@/components/layout/ChatWidget';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,7 +23,7 @@ export default function Blog() {
 
   return (
     <div className="min-h-screen">
-      <Header />
+      <ModernHeader />
       
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-blue-900 to-gray-900 text-white">
