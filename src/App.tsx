@@ -9,6 +9,7 @@ import { ChatProvider } from '@/contexts/ChatContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CompanyProvider } from '@/contexts/CompanyContext';
 import { MediaProvider } from '@/contexts/MediaContext';
+import { AboutContentProvider } from '@/contexts/AboutContentContext';
 import { HomeContentProvider } from '@/contexts/HomeContentContext';
 import { ProductsProvider } from '@/contexts/ProductsContext';
 
@@ -89,6 +90,7 @@ import AdminIntegrations from './pages/AdminIntegrations';
 import AdminChat from './pages/AdminChat';
 import AdminContent from './pages/AdminContent';
 import AdminMedia from './pages/AdminMedia';
+import AdminAbout from './pages/AdminAbout';
 import AdminPages from './pages/AdminPages';
 
 // ---------- React Query Client ----------
@@ -104,6 +106,7 @@ const App = () => (
             <MediaProvider>
               <HomeContentProvider>
               <ProductsProvider>
+              <AboutContentProvider>
                 <TooltipProvider>
             <Toaster position="top-right" richColors expand={true} />
 
@@ -195,6 +198,14 @@ const App = () => (
                     }
                   />
                   <Route
+                    path="/admin/about"
+                    element={
+                      <RequireAuth roles={['admin', 'manager']}>
+                        <AdminAbout />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
                     path="/admin/media"
                     element={
                       <RequireAuth roles={['admin', 'manager']}>
@@ -217,6 +228,7 @@ const App = () => (
               </BrowserRouter>
             </ErrorBoundary>
                 </TooltipProvider>
+              </AboutContentProvider>
               </ProductsProvider>
               </HomeContentProvider>
             </MediaProvider>

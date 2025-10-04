@@ -51,6 +51,7 @@ interface MediaContextType {
   mediaFiles: MediaFile[];
   folders: MediaFolder[];
   galleries: MediaGallery[];
+  getFileById: (id: string) => MediaFile | undefined;
   uploadFile: (file: File, folder?: string, metadata?: Partial<MediaFile>) => Promise<MediaFile>;
   deleteFile: (fileId: string) => Promise<boolean>;
   updateFile: (fileId: string, updates: Partial<MediaFile>) => Promise<boolean>;
@@ -347,6 +348,10 @@ export function MediaProvider({ children }: MediaProviderProps) {
     return mediaFiles.filter(file => file.folder === folderId);
   };
 
+  const getFileById = (id: string): MediaFile | undefined => {
+    return mediaFiles.find(f => f.id === id);
+  };
+
   const getFilesByType = (type: MediaFile['type']): MediaFile[] => {
     return mediaFiles.filter(file => file.type === type);
   };
@@ -453,6 +458,7 @@ export function MediaProvider({ children }: MediaProviderProps) {
     mediaFiles,
     folders,
     galleries,
+    getFileById,
     uploadFile,
     deleteFile,
     updateFile,

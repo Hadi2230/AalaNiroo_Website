@@ -9,14 +9,18 @@ import { Target, Eye, Award, Users, Calendar, MapPin, Building, Zap, Shield, Che
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useMedia } from '@/contexts/MediaContext';
+import { useAboutContent } from '@/contexts/AboutContentContext';
 import { useState } from 'react';
 
 export default function About() {
   const { language, t } = useLanguage();
   const { companyData } = useCompany();
   const { getGalleryImages } = useMedia();
+  const { content: about } = useAboutContent();
   const company = companyData[language];
-  const galleryImages = getGalleryImages();
+  const galleryImages = about.galleryImageIds
+    .map(id => getGalleryImages().find(f => f.id === id))
+    .filter(Boolean) as ReturnType<typeof getGalleryImages>;
   
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
@@ -186,12 +190,9 @@ export default function About() {
               <Badge className="bg-blue-100 text-blue-800 mb-6">
                 {language === 'fa' ? 'درباره ما' : 'About Us'}
               </Badge>
-              <h1 className="text-5xl font-bold mb-6">
-                {language === 'fa' ? 'درباره شرکت اعلا نیرو' : 'About Aalaniroo Company'}
-              </h1>
-              <p className="text-xl text-gray-300 leading-relaxed mb-8">
-                {company.description}
-              </p>
+              <h1 className="text-5xl font-bold mb-6">{about[language].heroTitle}</h1>
+              <p className="text-xl text-gray-300 leading-relaxed mb-8">{about[language].heroSubtitle}</p>
+              <p className="text-lg text-gray-200 leading-relaxed mb-8">{about[language].companyText}</p>
               <div className="grid grid-cols-2 gap-6">
                 <div className="text-center">
                   <div className="text-4xl font-bold text-blue-400 mb-2">33+</div>
@@ -389,21 +390,21 @@ export default function About() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {team.map((member, index) => (
+            {about.team.map((member, index) => (
               <Card key={index} className="text-center group hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
                 <CardContent className="p-6">
                   <div className="relative mb-6">
                     <img
-                      src={member.image}
+                      src={member.photoId ? (getGalleryImages().find(f => f.id === member.photoId)?.url || '/api/placeholder/200/200') : '/api/placeholder/200/200'}
                       alt={member.name}
                       className="w-32 h-32 rounded-full mx-auto object-cover shadow-lg group-hover:shadow-xl transition-shadow"
                     />
                     <div className="absolute inset-0 rounded-full border-4 border-blue-600/20 group-hover:border-blue-600/40 transition-colors"></div>
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{member.name}</h3>
-                  <div className="text-blue-600 font-medium mb-2">{member.position}</div>
-                  <div className="text-sm text-gray-500 mb-4">{member.experience}</div>
-                  <p className="text-sm text-gray-600 leading-relaxed">{member.description}</p>
+                  <div className="text-blue-600 font-medium mb-2">{member.role}</div>
+                  {member.experience && <div className="text-sm text-gray-500 mb-4">{member.experience}</div>}
+                  {member.bio && <p className="text-sm text-gray-600 leading-relaxed">{member.bio}</p>}
                 </CardContent>
               </Card>
             ))}
