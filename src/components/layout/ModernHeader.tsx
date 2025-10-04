@@ -74,7 +74,7 @@ const ModernHeader = () => {
 
       {/* Main Header */}
       <header className={`sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-white'
+        isScrolled ? 'bg-black/40 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}>
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-4">
@@ -83,13 +83,13 @@ const ModernHeader = () => {
               {company.logoUrl ? (
                 <img src={company.logoUrl} alt={company.name} className="w-12 h-12 object-contain" />
               ) : (
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-xl">A</span>
                 </div>
               )}
               <div className={dir === 'rtl' ? 'text-right' : 'text-left'}>
-                <h1 className="text-xl font-bold text-gray-900">{company.name}</h1>
-                <p className="text-sm text-gray-600 hidden lg:block">{company.tagline}</p>
+                <h1 className={`text-xl font-bold ${isScrolled ? 'text-white' : 'text-white'}`}>{company.name}</h1>
+                <p className={`text-sm hidden lg:block ${isScrolled ? 'text-gray-200' : 'text-gray-200'}`}>{company.tagline}</p>
               </div>
             </Link>
 
@@ -99,13 +99,13 @@ const ModernHeader = () => {
                 <Link
                   key={item.key}
                   to={item.href}
-                  className={`text-gray-700 hover:text-blue-600 font-medium transition-colors relative ${
-                    isActive(item.href) ? 'text-blue-600' : ''
+                  className={`font-medium transition-colors relative ${
+                    isActive(item.href) ? 'text-cyan-300' : (isScrolled ? 'text-white/90 hover:text-cyan-200' : 'text-white/90 hover:text-cyan-200')
                   }`}
                 >
                   {item.name}
                   {isActive(item.href) && (
-                    <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-blue-600"></div>
+                    <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-cyan-300"></div>
                   )}
                 </Link>
               ))}
@@ -114,14 +114,14 @@ const ModernHeader = () => {
             {/* CTA Buttons */}
             <div className="hidden lg:flex items-center gap-4">
               <Link to="/admin/login">
-                <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
+                <Button variant="outline" className="border-white/40 text-white hover:bg-white/10">
                   پنل فروش
                 </Button>
               </Link>
-              <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
+              <Button variant="outline" className="border-white/40 text-white hover:bg-white/10">
                 {t('hero.cta.quote')}
               </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button className="bg-cyan-500 hover:bg-cyan-600 text-white">
                 <Phone className="w-4 h-4 mr-2" />
                 {t('hero.cta.call')}
               </Button>
@@ -139,15 +139,15 @@ const ModernHeader = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden bg-white border-t shadow-lg">
+          <div className="lg:hidden bg-black/80 backdrop-blur-md border-t border-white/10 shadow-lg">
             <div className="container mx-auto px-4 py-4">
               <nav className="flex flex-col gap-4">
                 {navigation.map((item) => (
                   <Link
                     key={item.key}
                     to={item.href}
-                    className={`text-gray-700 hover:text-blue-600 font-medium py-2 ${
-                      isActive(item.href) ? 'text-blue-600' : ''
+                    className={`font-medium py-2 ${
+                      isActive(item.href) ? 'text-cyan-300' : 'text-white/90 hover:text-cyan-200'
                     }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -156,14 +156,14 @@ const ModernHeader = () => {
                 ))}
                 <div className="flex flex-col gap-2 mt-4">
                   <Link to="/admin/login">
-                    <Button variant="outline" className="border-blue-600 text-blue-600 w-full">
+                    <Button variant="outline" className="border-white/40 text-white w-full hover:bg-white/10">
                       پنل فروش
                     </Button>
                   </Link>
-                  <Button variant="outline" className="border-blue-600 text-blue-600 w-full">
+                  <Button variant="outline" className="border-white/40 text-white w-full hover:bg-white/10">
                     {t('hero.cta.quote')}
                   </Button>
-                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">
+                  <Button className="bg-cyan-500 hover:bg-cyan-600 text-white w-full">
                     <Phone className="w-4 h-4 mr-2" />
                     {t('hero.cta.call')}
                   </Button>
