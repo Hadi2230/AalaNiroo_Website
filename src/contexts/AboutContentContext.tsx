@@ -56,7 +56,36 @@ const DEFAULT_CONTENT: AboutContentState = {
     galleryTitle: 'Company Gallery',
     gallerySubtitle: 'A look at our company — images of our team, equipment, and workspace'
   },
-  team: [],
+  team: [
+    {
+      id: 'abtmem-1',
+      name: 'مهندس احمد محمدی',
+      role: 'مدیرعامل',
+      experience: '25 سال تجربه',
+      bio: 'متخصص ژنراتورهای صنعتی و مدیریت پروژه‌های بزرگ'
+    },
+    {
+      id: 'abtmem-2',
+      name: 'مهندس فاطمه کریمی',
+      role: 'مدیر فنی',
+      experience: '18 سال تجربه',
+      bio: 'کارشناس سیستم‌های برق و انرژی پایدار'
+    },
+    {
+      id: 'abtmem-3',
+      name: 'مهندس علی رضایی',
+      role: 'مدیر فروش',
+      experience: '15 سال تجربه',
+      bio: 'متخصص مشاوره فنی و فروش تجهیزات صنعتی'
+    },
+    {
+      id: 'abtmem-4',
+      name: 'مهندس مریم احمدی',
+      role: 'مدیر پروژه',
+      experience: '12 سال تجربه',
+      bio: 'کارشناس مدیریت پروژه و کنترل کیفیت'
+    }
+  ],
   galleryImageIds: []
 };
 

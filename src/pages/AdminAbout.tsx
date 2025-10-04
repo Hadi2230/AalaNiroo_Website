@@ -46,6 +46,30 @@ export default function AdminAbout() {
                   onChange={(e) => updateLocale(loc, { heroSubtitle: e.target.value })}
                   placeholder={loc === 'fa' ? 'زیرعنوان' : 'Subtitle'}
                 />
+                <div className="grid md:grid-cols-2 gap-3">
+                  <Input
+                    value={content[loc].teamTitle}
+                    onChange={(e) => updateLocale(loc, { teamTitle: e.target.value })}
+                    placeholder={loc === 'fa' ? 'عنوان بخش تیم' : 'Team section title'}
+                  />
+                  <Input
+                    value={content[loc].galleryTitle}
+                    onChange={(e) => updateLocale(loc, { galleryTitle: e.target.value })}
+                    placeholder={loc === 'fa' ? 'عنوان گالری' : 'Gallery title'}
+                  />
+                </div>
+                <div className="grid md:grid-cols-2 gap-3">
+                  <Input
+                    value={content[loc].teamSubtitle}
+                    onChange={(e) => updateLocale(loc, { teamSubtitle: e.target.value })}
+                    placeholder={loc === 'fa' ? 'زیرعنوان بخش تیم' : 'Team section subtitle'}
+                  />
+                  <Input
+                    value={content[loc].gallerySubtitle}
+                    onChange={(e) => updateLocale(loc, { gallerySubtitle: e.target.value })}
+                    placeholder={loc === 'fa' ? 'زیرعنوان گالری' : 'Gallery subtitle'}
+                  />
+                </div>
                 <Textarea
                   value={content[loc].companyText}
                   onChange={(e) => updateLocale(loc, { companyText: e.target.value })}
