@@ -181,27 +181,74 @@
     font-weight: 500;
   }
 
-  /* Tesla-style main content sections */
-  .main-content-section {
+  /* Tesla exact background pattern */
+  .tesla-section-white {
     background-color: #ffffff;
     color: #000000;
   }
   
-  .main-content-section .text-gray-600,
-  .main-content-section .text-gray-500 {
-    color: #393c41 !important;
+  .tesla-section-gray {
+    background-color: #f7f7f7;
+    color: #000000;
   }
   
-  /* Tesla-style clean cards */
-  .main-content-section .bg-white {
-    background-color: #ffffff !important;
-    border: 1px solid #e5e5e5;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  .tesla-section-dark {
+    background-color: #000000;
+    color: #ffffff;
   }
   
-  /* Tesla-style sections with subtle backgrounds */
-  .tesla-section-alt {
-    background-color: #f8fafc;
+  /* Tesla typography in sections */
+  .tesla-section-white .text-gray-600,
+  .tesla-section-white .text-gray-500,
+  .tesla-section-gray .text-gray-600,
+  .tesla-section-gray .text-gray-500 {
+    color: #5c5e62 !important;
+  }
+  
+  /* Tesla cards - ultra clean */
+  .tesla-card {
+    background-color: #ffffff;
+    border: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+  }
+  
+  .tesla-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Tesla buttons */
+  .tesla-btn-primary {
+    background-color: #000000;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 24px;
+    font-weight: 500;
+    font-size: 14px;
+    text-transform: none;
+    transition: all 0.2s ease;
+  }
+  
+  .tesla-btn-primary:hover {
+    background-color: #1a1a1a;
+  }
+  
+  .tesla-btn-secondary {
+    background-color: transparent;
+    color: #000000;
+    border: 2px solid #000000;
+    border-radius: 4px;
+    padding: 10px 22px;
+    font-weight: 500;
+    font-size: 14px;
+    text-transform: none;
+    transition: all 0.2s ease;
+  }
+  
+  .tesla-btn-secondary:hover {
+    background-color: #000000;
+    color: #ffffff;
   }
 
   /* Header and Footer preservation */

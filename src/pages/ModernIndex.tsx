@@ -93,21 +93,19 @@ export default function ModernIndex() {
       <ModernHero />
 
       {/* Stats Section */}
-      <section className="py-20 main-content-section">
+      <section className="py-24 tesla-section-white">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <Card key={index} className="text-center p-8 hover:shadow-lg transition-all duration-300 group bg-white border border-gray-200">
-                <CardContent className="p-0">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-50 transition-colors">
-                    <stat.icon className="w-8 h-8 text-gray-700 group-hover:text-blue-600 transition-colors" />
-                  </div>
-                  <div className="text-4xl font-bold text-black mb-2">
-                    {stat.value}
-                  </div>
-                  <div className="text-gray-600 font-medium">{stat.label}</div>
-                </CardContent>
-              </Card>
+              <div key={index} className="text-center group">
+                <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mx-auto mb-6">
+                  <stat.icon className="w-6 h-6 text-white" />
+                </div>
+                <div className="text-5xl font-bold text-black mb-2 tracking-tight">
+                  {stat.value}
+                </div>
+                <div className="text-gray-600 font-medium text-sm uppercase tracking-wider">{stat.label}</div>
+              </div>
             ))}
           </div>
         </div>
@@ -115,7 +113,7 @@ export default function ModernIndex() {
 
       {/* Homepage Gallery (from Admin Content) */}
       {home.gallery.length > 0 && (
-        <section className="py-12 main-content-section">
+        <section className="py-16 tesla-section-gray">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {[...home.gallery].sort((a,b) => a.order - b.order).slice(0, 8).map(item => (
@@ -133,45 +131,41 @@ export default function ModernIndex() {
       )}
 
       {/* Company Introduction */}
-      <section className="py-20 tesla-section-alt">
+      <section className="py-24 tesla-section-white">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className={dir === 'rtl' ? 'order-2' : 'order-1'}>
               <div className="space-y-6">
                 <div>
-                  <div className="text-sm font-medium text-blue-600 mb-4 uppercase tracking-wider">
-                    {language === 'fa' ? 'درباره شرکت' : 'About Company'}
-                  </div>
-                  <h2 className="text-5xl font-bold text-black mb-6 leading-tight">
-                    {language === 'fa' ? 'چرا اعلا نیرو را انتخاب کنیم؟' : 'Why Choose Aalaniroo?'}
+                  <h2 className="text-6xl font-bold text-black mb-8 leading-none tracking-tight">
+                    {language === 'fa' ? 'چرا اعلا نیرو؟' : 'Why Aalaniroo?'}
                   </h2>
-                  <p className="text-xl text-gray-600 leading-relaxed mb-8">
+                  <p className="text-xl text-gray-600 leading-relaxed mb-12 max-w-lg">
                     {company.description}
                   </p>
                 </div>
 
-                <div className="space-y-4">
-                  {whyChooseUs.map((item, index) => (
-                    <div key={index} className="flex items-start gap-4">
-                      <div className="w-2 h-2 bg-black rounded-full mt-3 flex-shrink-0"></div>
-                      <span className="text-lg text-gray-800 leading-relaxed">{item}</span>
+                <div className="space-y-6 mb-12">
+                  {whyChooseUs.slice(0, 4).map((item, index) => (
+                    <div key={index} className="text-lg text-gray-800 leading-relaxed">
+                      {item}
                     </div>
                   ))}
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                  <Button size="lg" className="bg-black text-white hover:bg-gray-800 rounded-none px-8 py-4 font-medium">
+                <div className="flex gap-4">
+                  <button className="tesla-btn-primary">
                     {t('common.contactUs')}
-                  </Button>
-                  <Button size="lg" variant="outline" className="border-black text-black hover:bg-black hover:text-white rounded-none px-8 py-4 font-medium">
+                  </button>
+                  <button className="tesla-btn-secondary">
                     {t('common.learnMore')}
-                  </Button>
+                  </button>
                 </div>
               </div>
             </div>
 
             <div className={`relative ${dir === 'rtl' ? 'order-1' : 'order-2'}`}>
-              <div className="relative z-10 bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
+              <div className="relative overflow-hidden rounded-lg">
                 {playableVideoUrl ? (
                   isPlaying ? (
                     <video className="w-full h-auto rounded-lg" controls autoPlay playsInline preload="metadata" poster={posterUrl || undefined}>
@@ -185,8 +179,8 @@ export default function ModernIndex() {
                         className="w-full h-auto rounded-lg"
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <button onClick={() => setIsPlaying(true)} className="w-16 h-16 bg-black hover:bg-gray-800 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-105">
-                          <Play className="w-6 h-6 text-white ml-1" />
+                        <button onClick={() => setIsPlaying(true)} className="w-20 h-20 bg-white hover:bg-gray-50 rounded-full flex items-center justify-center shadow-xl transition-all hover:scale-105 border-4 border-white">
+                          <Play className="w-8 h-8 text-black ml-1" />
                         </button>
                       </div>
                     </div>
@@ -199,13 +193,6 @@ export default function ModernIndex() {
                   />
                 )}
                 
-                {/* Experience Badge */}
-                <div className="absolute -top-4 -right-4 bg-black text-white p-4 rounded shadow-lg">
-                  <div className="text-2xl font-bold">33+</div>
-                  <div className="text-xs font-medium">
-                    {language === 'fa' ? 'سال تجربه' : 'Years'}
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -213,16 +200,13 @@ export default function ModernIndex() {
       </section>
 
       {/* Featured Products */}
-      <section className="py-20 main-content-section">
+      <section className="py-24 tesla-section-gray">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <Badge className="bg-blue-100 text-blue-800 mb-4">
-              {t('products.title')}
-            </Badge>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              {language === 'fa' ? 'محصولات پیشنهادی' : 'Featured Products'}
+          <div className="text-center mb-20">
+            <h2 className="text-6xl font-bold text-black mb-6 leading-none tracking-tight">
+              {language === 'fa' ? 'محصولات' : 'Products'}
             </h2>
-            <p className="text-xl text-gray-700 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               {t('products.subtitle')}
             </p>
           </div>
@@ -233,79 +217,62 @@ export default function ModernIndex() {
             ))}
           </div>
 
-          <div className="text-center mt-12">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 group">
+          <div className="text-center mt-16">
+            <button className="tesla-btn-primary">
               {t('common.viewAll')}
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
+            </button>
           </div>
         </div>
       </section>
 
       {/* Services */}
-      <section className="py-20 main-content-section">
+      <section className="py-24 tesla-section-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <Badge className="bg-blue-100 text-blue-800 mb-4">
-              {t('services.title')}
-            </Badge>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              {language === 'fa' ? 'خدمات جامع ما' : 'Our Comprehensive Services'}
+          <div className="text-center mb-20">
+            <h2 className="text-6xl font-bold text-black mb-6 leading-none tracking-tight">
+              {language === 'fa' ? 'خدمات' : 'Services'}
             </h2>
-            <p className="text-xl text-gray-700">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               {t('services.subtitle')}
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-12">
             {currentServices.map((service) => (
-              <Card key={service.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-white/30 backdrop-blur-sm border-gray-300">
-                <CardContent className="p-8 text-center">
-                  <div className="text-6xl mb-6 group-hover:scale-110 transition-transform">
-                    {service.icon}
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors">
-                    {service.title}
-                  </h3>
-                  <p className="text-gray-700 mb-6 leading-relaxed">
-                    {service.description}
-                  </p>
-                  <ul className="space-y-2 mb-6">
-                    {service.features.map((feature, index) => (
-                      <li key={index} className="flex items-center gap-2 text-gray-700">
-                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                    {t('common.learnMore')}
-                  </Button>
-                </CardContent>
-              </Card>
+              <div key={service.id} className="group text-center">
+                <div className="text-5xl mb-8">
+                  {service.icon}
+                </div>
+                <h3 className="text-2xl font-bold text-black mb-6">
+                  {service.title}
+                </h3>
+                <p className="text-gray-600 mb-8 leading-relaxed">
+                  {service.description}
+                </p>
+                <button className="tesla-btn-secondary">
+                  {t('common.learnMore')}
+                </button>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Projects Showcase */}
-      <section className="py-20 main-content-section">
+      <section className="py-24 tesla-section-gray">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <Badge className="bg-blue-100 text-blue-800 mb-4">
-              {t('projects.title')}
-            </Badge>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              {language === 'fa' ? 'پروژه‌های شاخص' : 'Featured Projects'}
+          <div className="text-center mb-20">
+            <h2 className="text-6xl font-bold text-black mb-6 leading-none tracking-tight">
+              {language === 'fa' ? 'پروژه‌ها' : 'Projects'}
             </h2>
-            <p className="text-xl text-gray-700">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               {t('projects.subtitle')}
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-12">
             {currentProjects.slice(0, 2).map((project) => (
-              <Card key={project.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden bg-white/30 backdrop-blur-sm border-gray-300">
+              <div key={project.id} className="tesla-card group hover:shadow-lg transition-all duration-300 overflow-hidden">
                 <div className="relative overflow-hidden">
                   <img 
                     src={project.image} 
@@ -313,49 +280,28 @@ export default function ModernIndex() {
                     className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 right-4 text-white">
-                    <Badge className="bg-blue-600 text-white mb-2">
-                      <Zap className="w-3 h-3 mr-1" />
-                      {project.capacity}
-                    </Badge>
-                    <h3 className="text-xl font-bold mb-1">
-                      {project.title}
-                    </h3>
-                  </div>
                 </div>
 
-                <CardContent className="p-6">
-                  <p className="text-gray-700 mb-4">
+                <div className="p-8">
+                  <h3 className="text-2xl font-bold text-black mb-4">
+                    {project.title}
+                  </h3>
+                  <p className="text-gray-600 mb-6 leading-relaxed">
                     {project.description}
                   </p>
-
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-blue-600" />
-                      <span className="text-gray-700">{t('projects.location')}:</span>
-                      <span className="font-medium text-gray-900">{project.location}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-blue-600" />
-                      <span className="text-gray-700">{t('projects.year')}:</span>
-                      <span className="font-medium text-gray-900">{project.year}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Building className="w-4 h-4 text-blue-600" />
-                      <span className="text-gray-700">{t('projects.client')}:</span>
-                      <span className="font-medium text-gray-900">{project.client}</span>
-                    </div>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div>{project.location} • {project.year}</div>
+                    <div>{project.capacity}</div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
 
-          <div className="text-center mt-12">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+          <div className="text-center mt-16">
+            <button className="tesla-btn-primary">
               {t('common.viewAll')}
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
+            </button>
           </div>
         </div>
       </section>
