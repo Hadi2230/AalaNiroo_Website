@@ -216,26 +216,26 @@ export default function About() {
       </section>
 
       {/* Company Values */}
-      <section className="py-20 bg-white">
+      <section className="py-20 main-content-section">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
               {language === 'fa' ? 'ارزش‌های ما' : 'Our Values'}
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-700">
               {language === 'fa' ? 'اصول و ارزش‌هایی که ما را هدایت می‌کنند' : 'Principles and values that guide us'}
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
-              <Card key={index} className="text-center group hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+              <Card key={index} className="text-center group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-white/10 backdrop-blur-sm border-white/20">
                 <CardContent className="p-8">
                   <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
                     <value.icon className="w-10 h-10 text-blue-600" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">{value.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{value.description}</p>
+                  <h3 className="text-xl font-bold text-white mb-4">{value.title}</h3>
+                  <p className="text-gray-200 leading-relaxed">{value.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -244,17 +244,17 @@ export default function About() {
       </section>
 
       {/* Company Gallery */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 main-content-section">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="bg-blue-100 text-blue-800 mb-4">
               <Image className="w-4 h-4 mr-2" />
               {about[language].galleryTitle}
             </Badge>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-white mb-4">
               {about[language].galleryTitle}
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-200 max-w-2xl mx-auto">
               {about[language].gallerySubtitle}
             </p>
           </div>
@@ -330,13 +330,13 @@ export default function About() {
       </section>
 
       {/* Timeline */}
-      <section className="py-20 bg-white">
+      <section className="py-20 main-content-section">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-white mb-4">
               {language === 'fa' ? 'تاریخچه شرکت' : 'Company History'}
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-200">
               {language === 'fa' ? 'سیر تکامل و رشد شرکت اعلا نیرو' : 'Evolution and growth of Aalaniroo Company'}
             </p>
           </div>
@@ -371,16 +371,16 @@ export default function About() {
       </section>
 
       {/* Team Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 main-content-section">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">{about[language].teamTitle}</h2>
-            <p className="text-xl text-gray-600">{about[language].teamSubtitle}</p>
+            <h2 className="text-4xl font-bold text-white mb-4">{about[language].teamTitle}</h2>
+            <p className="text-xl text-gray-200">{about[language].teamSubtitle}</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {about.team.map((member, index) => (
-              <Card key={index} className="text-center group hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+              <Card key={index} className="text-center group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-white/10 backdrop-blur-sm border-white/20">
                 <CardContent className="p-6">
                   <div className="relative mb-6">
                     <img
@@ -390,10 +390,10 @@ export default function About() {
                     />
                     <div className="absolute inset-0 rounded-full border-4 border-blue-600/20 group-hover:border-blue-600/40 transition-colors"></div>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{member.name}</h3>
-                  <div className="text-blue-600 font-medium mb-2">{member.role}</div>
-                  {member.experience && <div className="text-sm text-gray-500 mb-4">{member.experience}</div>}
-                  {member.bio && <p className="text-sm text-gray-600 leading-relaxed">{member.bio}</p>}
+                  <h3 className="text-xl font-bold text-white mb-2">{member.name}</h3>
+                  <div className="text-blue-400 font-medium mb-2">{member.role}</div>
+                  {member.experience && <div className="text-sm text-gray-300 mb-4">{member.experience}</div>}
+                  {member.bio && <p className="text-sm text-gray-200 leading-relaxed">{member.bio}</p>}
                 </CardContent>
               </Card>
             ))}
