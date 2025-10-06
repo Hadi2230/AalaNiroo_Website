@@ -111,35 +111,41 @@
     background-color: #ffffff !important;
   }
   
-  /* Override ALL background classes */
-  .bg-white, 
-  .bg-gray-50, 
-  .bg-gray-100, 
-  .bg-gray-200, 
-  .bg-gray-300,
-  .bg-blue-50, 
-  .bg-blue-100,
-  .bg-purple-50, 
-  .bg-green-50,
-  .bg-yellow-50,
-  .bg-red-50,
-  .bg-indigo-50,
-  .bg-pink-50,
-  .bg-slate-50,
-  .bg-slate-100,
-  .bg-slate-200,
-  .bg-neutral-50,
-  .bg-neutral-100,
-  .bg-stone-50,
-  .bg-zinc-50,
-  .bg-gradient-to-r,
-  .bg-gradient-to-l,
-  .bg-gradient-to-t,
-  .bg-gradient-to-b,
-  .bg-gradient-to-br,
-  .bg-gradient-to-bl,
-  .bg-gradient-to-tr,
-  .bg-gradient-to-tl {
+  /* Override background classes EXCEPT header/footer */
+  .bg-white:not(.header-section *):not(.footer-section *), 
+  .bg-gray-50:not(.header-section *):not(.footer-section *), 
+  .bg-gray-100:not(.header-section *):not(.footer-section *), 
+  .bg-gray-200:not(.header-section *):not(.footer-section *), 
+  .bg-gray-300:not(.header-section *):not(.footer-section *),
+  .bg-blue-50:not(.header-section *):not(.footer-section *), 
+  .bg-blue-100:not(.header-section *):not(.footer-section *),
+  .bg-purple-50:not(.header-section *):not(.footer-section *), 
+  .bg-green-50:not(.header-section *):not(.footer-section *),
+  .bg-yellow-50:not(.header-section *):not(.footer-section *),
+  .bg-red-50:not(.header-section *):not(.footer-section *),
+  .bg-indigo-50:not(.header-section *):not(.footer-section *),
+  .bg-pink-50:not(.header-section *):not(.footer-section *),
+  .bg-slate-50:not(.header-section *):not(.footer-section *),
+  .bg-slate-100:not(.header-section *):not(.footer-section *),
+  .bg-slate-200:not(.header-section *):not(.footer-section *),
+  .bg-neutral-50:not(.header-section *):not(.footer-section *),
+  .bg-neutral-100:not(.header-section *):not(.footer-section *),
+  .bg-stone-50:not(.header-section *):not(.footer-section *),
+  .bg-zinc-50:not(.header-section *):not(.footer-section *) {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+  }
+  
+  /* Keep gradients ONLY for header/footer */
+  .bg-gradient-to-r:not(.header-section *):not(.footer-section *),
+  .bg-gradient-to-l:not(.header-section *):not(.footer-section *),
+  .bg-gradient-to-t:not(.header-section *):not(.footer-section *),
+  .bg-gradient-to-b:not(.header-section *):not(.footer-section *),
+  .bg-gradient-to-br:not(.header-section *):not(.footer-section *),
+  .bg-gradient-to-bl:not(.header-section *):not(.footer-section *),
+  .bg-gradient-to-tr:not(.header-section *):not(.footer-section *),
+  .bg-gradient-to-tl:not(.header-section *):not(.footer-section *) {
     background: #ffffff !important;
     background-color: #ffffff !important;
     background-image: none !important;

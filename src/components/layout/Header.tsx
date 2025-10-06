@@ -25,7 +25,7 @@ const Header = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <>
+    <div className="header-section">
       {/* Top Bar */}
       <div className="bg-gray-900 text-white py-2 px-4">
         <div className="container mx-auto flex justify-between items-center text-sm">
@@ -117,7 +117,7 @@ const Header = () => {
           </div>
         )}
       </header>
-    </>
+    </div>
   );
 };
 
