@@ -200,17 +200,13 @@ export default function ModernIndex() {
                 )}
                 
                 {/* Experience Badge */}
-                <div className="absolute -top-4 -right-4 bg-blue-600 text-white p-6 rounded-lg shadow-lg">
-                  <div className="text-3xl font-bold">33+</div>
-                  <div className="text-sm">
+                <div className="absolute -top-4 -right-4 bg-black text-white p-4 rounded shadow-lg">
+                  <div className="text-2xl font-bold">33+</div>
+                  <div className="text-xs font-medium">
                     {language === 'fa' ? 'سال تجربه' : 'Years'}
                   </div>
                 </div>
               </div>
-              
-              {/* Floating Elements */}
-              <div className="absolute top-10 -left-10 w-20 h-20 bg-blue-500 rounded-full opacity-20 animate-pulse"></div>
-              <div className="absolute bottom-10 -right-10 w-16 h-16 bg-gray-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
             </div>
           </div>
         </div>
