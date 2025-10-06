@@ -4,28 +4,28 @@
 
 @layer base {
   :root {
-    /* Tesla-inspired Clean Design */
-    /* Base backgrounds */
-    --background: 0 0% 100%; /* Pure white like Tesla */
+    /* FORCE WHITE EVERYTHING */
+    /* Base backgrounds - ALL WHITE */
+    --background: 0 0% 100%; /* Pure white */
     --foreground: 0 0% 0%; /* Pure black text */
 
-    --card: 0 0% 100%; /* White cards */
+    --card: 0 0% 100%; /* Force white cards */
     --card-foreground: 0 0% 0%; /* Black text on cards */
 
-    --popover: 0 0% 100%; /* White popover */
+    --popover: 0 0% 100%; /* Force white popover */
     --popover-foreground: 0 0% 0%; /* Black text */
 
     /* Accents */
     --primary: 217 91% 60%; /* Tesla blue #3c69e7 */
     --primary-foreground: 0 0% 100%; /* White text on blue */
 
-    --secondary: 0 0% 96%; /* Very light gray */
+    --secondary: 0 0% 100%; /* Force white */
     --secondary-foreground: 0 0% 0%; /* Black text */
 
-    --muted: 0 0% 96%; /* Light gray background */
-    --muted-foreground: 0 0% 22%; /* Tesla gray text #393c41 */
+    --muted: 0 0% 100%; /* Force white background */
+    --muted-foreground: 0 0% 0%; /* Black text */
 
-    --accent: 0 0% 96%; /* Light accent */
+    --accent: 0 0% 100%; /* Force white accent */
     --accent-foreground: 0 0% 0%; /* Black text */
 
     --destructive: 0 84% 60%;
@@ -33,7 +33,7 @@
 
     /* UI chrome */
     --border: 0 0% 90%; /* Light gray borders */
-    --input: 0 0% 100%; /* White input backgrounds */
+    --input: 0 0% 100%; /* Force white input backgrounds */
     --ring: 186 100% 37%;
 
     --radius: 0.5rem;
@@ -94,54 +94,105 @@
     @apply border-border;
   }
 
+  html {
+    background-color: #ffffff !important;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: #ffffff !important;
+    color: #000000 !important;
   }
 }
 
-/* Pure White Professional Design */
+/* FORCE PURE WHITE - OVERRIDE EVERYTHING */
 @layer utilities {
-  /* Pure white background for all main content */
-  .bg-main-content { 
-    background-color: #ffffff !important; 
+  /* Force ALL backgrounds to pure white except header/footer */
+  body:not(.header-section):not(.footer-section) {
+    background-color: #ffffff !important;
   }
   
-  /* Force all backgrounds to pure white except preserved ones */
-  .bg-white:not(.preserve-white) { 
-    background-color: #ffffff !important; 
+  /* Override ALL background classes */
+  .bg-white, 
+  .bg-gray-50, 
+  .bg-gray-100, 
+  .bg-gray-200, 
+  .bg-gray-300,
+  .bg-blue-50, 
+  .bg-blue-100,
+  .bg-purple-50, 
+  .bg-green-50,
+  .bg-yellow-50,
+  .bg-red-50,
+  .bg-indigo-50,
+  .bg-pink-50,
+  .bg-slate-50,
+  .bg-slate-100,
+  .bg-slate-200,
+  .bg-neutral-50,
+  .bg-neutral-100,
+  .bg-stone-50,
+  .bg-zinc-50,
+  .bg-gradient-to-r,
+  .bg-gradient-to-l,
+  .bg-gradient-to-t,
+  .bg-gradient-to-b,
+  .bg-gradient-to-br,
+  .bg-gradient-to-bl,
+  .bg-gradient-to-tr,
+  .bg-gradient-to-tl {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
   }
-  .bg-white\/90:not(.preserve-white) { 
-    background-color: #ffffff !important; 
+  
+  /* Override transparency backgrounds */
+  .bg-white\/90,
+  .bg-white\/80, 
+  .bg-white\/70,
+  .bg-white\/60,
+  .bg-white\/50,
+  .bg-white\/40,
+  .bg-white\/30,
+  .bg-white\/20,
+  .bg-white\/10 {
+    background-color: #ffffff !important;
   }
-  .bg-white\/80:not(.preserve-white) { 
-    background-color: #ffffff !important; 
+  
+  /* Override ALL section backgrounds */
+  section:not(.header-section):not(.footer-section) {
+    background-color: #ffffff !important;
+    background-image: none !important;
   }
-  .bg-white\/70:not(.preserve-white) { 
-    background-color: #ffffff !important; 
+  
+  /* Override ALL div backgrounds */
+  div:not(.header-section *):not(.footer-section *) {
+    background-color: transparent !important;
   }
-  .bg-gray-50:not(.preserve-bg) { 
-    background-color: #ffffff !important; 
+  
+  /* Force main content areas */
+  .main-content-section,
+  .tesla-section-white,
+  .tesla-section-gray,
+  .tesla-section-alt {
+    background-color: #ffffff !important;
+    background-image: none !important;
   }
-  .bg-gray-100:not(.preserve-bg) { 
-    background-color: #ffffff !important; 
+  
+  /* Force ALL possible background variations */
+  [class*="bg-"]:not(.preserve-bg):not(.header-section *):not(.footer-section *) {
+    background-color: #ffffff !important;
+    background-image: none !important;
   }
-  .bg-gray-200:not(.preserve-bg) { 
-    background-color: #ffffff !important; 
+  
+  /* Force container backgrounds */
+  .container {
+    background-color: transparent !important;
   }
-  .bg-blue-50:not(.preserve-bg) { 
-    background-color: #ffffff !important; 
-  }
-  .bg-purple-50:not(.preserve-bg) { 
-    background-color: #ffffff !important; 
-  }
-  .bg-green-50:not(.preserve-bg) { 
-    background-color: #ffffff !important; 
-  }
-  .bg-gray-50\/50:not(.preserve-bg) { 
-    background-color: #ffffff !important; 
-  }
-  .bg-gray-50\/60:not(.preserve-bg) { 
-    background-color: #ffffff !important; 
+  
+  /* Force card backgrounds */
+  .tesla-card,
+  [class*="card"] {
+    background-color: #ffffff !important;
   }
 
   /* Preserve original backgrounds for header/footer */
