@@ -4,94 +4,88 @@
 
 @layer base {
   :root {
-    /* New brand palette */
-    /* Base backgrounds */
-    --background: 208 52% 23%; /* #1c3d5a */
-    --foreground: 205 14% 54%; /* #7a8d9b */
+    /* FORCE WHITE EVERYTHING */
+    /* Base backgrounds - ALL WHITE */
+    --background: 0 0% 100%; /* Pure white */
+    --foreground: 0 0% 0%; /* Pure black text */
 
-    --card: 210 24% 48%; /* #5e7b99 */
-    --card-foreground: 205 14% 54%; /* #7a8d9b */
+    --card: 0 0% 100%; /* Force white cards */
+    --card-foreground: 0 0% 0%; /* Black text on cards */
 
-    --popover: 210 24% 48%;
-    --popover-foreground: 205 14% 54%;
+    --popover: 0 0% 100%; /* Force white popover */
+    --popover-foreground: 0 0% 0%; /* Black text */
 
     /* Accents */
-    --primary: 186 100% 37%; /* #00a7bb */
-    --primary-foreground: 210 40% 98%; /* near white */
+    --primary: 217 91% 60%; /* Tesla blue #3c69e7 */
+    --primary-foreground: 0 0% 100%; /* White text on blue */
 
-    --secondary: 210 24% 48%; /* #5e7b99 */
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 100%; /* Force white */
+    --secondary-foreground: 0 0% 0%; /* Black text */
 
-    --muted: 210 24% 40%;
-    --muted-foreground: 205 14% 70%;
+    --muted: 0 0% 100%; /* Force white background */
+    --muted-foreground: 0 0% 0%; /* Black text */
 
-    --accent: 210 24% 48%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 0 0% 100%; /* Force white accent */
+    --accent-foreground: 0 0% 0%; /* Black text */
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
     /* UI chrome */
-    --border: 210 24% 40%;
-    --input: 210 24% 40%;
+    --border: 0 0% 90%; /* Light gray borders */
+    --input: 0 0% 100%; /* Force white input backgrounds */
     --ring: 186 100% 37%;
 
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    /* Slightly lighter foreground on dark */
-    --background: 208 52% 18%;
-    --foreground: 210 40% 94%;
+    /* Tesla dark mode */
+    --background: 0 0% 7%; /* Very dark background */
+    --foreground: 0 0% 100%; /* White text */
 
-    --card: 208 52% 23%;
-    --card-foreground: 210 40% 94%;
+    --card: 0 0% 10%; /* Dark cards */
+    --card-foreground: 0 0% 100%; /* White text on dark cards */
 
-    --popover: 208 52% 23%;
-    --popover-foreground: 210 40% 94%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 100%;
 
     --primary: 186 100% 45%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 24% 35%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 15%; /* Dark secondary */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 24% 28%;
-    --muted-foreground: 210 20% 80%;
+    --muted: 0 0% 15%; /* Dark muted */
+    --muted-foreground: 0 0% 70%;
 
-    --accent: 210 24% 35%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 35%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 210 24% 28%;
-    --input: 210 24% 28%;
-    --ring: 186 100% 45%;
-    --sidebar-background: 208 52% 18%;
-    --sidebar-foreground: 210 40% 94%;
-    --sidebar-primary: 186 100% 45%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 210 24% 28%;
-    --sidebar-accent-foreground: 210 40% 94%;
-    --sidebar-border: 210 24% 28%;
-    --sidebar-ring: 186 100% 45%;
+    --border: 0 0% 20%;
+    --input: 0 0% 15%;
+    --ring: 217 91% 60%;
+    
+    --sidebar-background: 0 0% 10%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 
@@ -100,34 +94,227 @@
     @apply border-border;
   }
 
+  html {
+    background-color: #ffffff !important;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: #ffffff !important;
+    color: #000000 !important;
   }
 }
 
-/* Global palette overrides for light colors and text tones */
+/* FORCE PURE WHITE - OVERRIDE EVERYTHING */
 @layer utilities {
-  /* Light backgrounds -> #5e7b99 */
-  .bg-white { background-color: #5e7b99 !important; }
-  .bg-white\/90 { background-color: #5e7b99e6 !important; }
-  .bg-white\/80 { background-color: #5e7b99cc !important; }
-  .bg-white\/70 { background-color: #5e7b99b3 !important; }
-  .bg-gray-50 { background-color: #5e7b99 !important; }
-  .bg-gray-100 { background-color: #5e7b99 !important; }
-  .bg-gray-200 { background-color: #5e7b99 !important; }
-  .bg-blue-50 { background-color: #5e7b99 !important; }
-  .bg-purple-50 { background-color: #5e7b99 !important; }
-  .bg-green-50 { background-color: #5e7b99 !important; }
-  .bg-gray-50\/50 { background-color: #5e7b9980 !important; }
-  .bg-gray-50\/60 { background-color: #5e7b9999 !important; }
+  /* Force ALL backgrounds to pure white except header/footer */
+  body:not(.header-section):not(.footer-section) {
+    background-color: #ffffff !important;
+  }
+  
+  /* Override ALL background classes */
+  .bg-white, 
+  .bg-gray-50, 
+  .bg-gray-100, 
+  .bg-gray-200, 
+  .bg-gray-300,
+  .bg-blue-50, 
+  .bg-blue-100,
+  .bg-purple-50, 
+  .bg-green-50,
+  .bg-yellow-50,
+  .bg-red-50,
+  .bg-indigo-50,
+  .bg-pink-50,
+  .bg-slate-50,
+  .bg-slate-100,
+  .bg-slate-200,
+  .bg-neutral-50,
+  .bg-neutral-100,
+  .bg-stone-50,
+  .bg-zinc-50,
+  .bg-gradient-to-r,
+  .bg-gradient-to-l,
+  .bg-gradient-to-t,
+  .bg-gradient-to-b,
+  .bg-gradient-to-br,
+  .bg-gradient-to-bl,
+  .bg-gradient-to-tr,
+  .bg-gradient-to-tl {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+  }
+  
+  /* Override transparency backgrounds */
+  .bg-white\/90,
+  .bg-white\/80, 
+  .bg-white\/70,
+  .bg-white\/60,
+  .bg-white\/50,
+  .bg-white\/40,
+  .bg-white\/30,
+  .bg-white\/20,
+  .bg-white\/10 {
+    background-color: #ffffff !important;
+  }
+  
+  /* Override ALL section backgrounds */
+  section:not(.header-section):not(.footer-section) {
+    background-color: #ffffff !important;
+    background-image: none !important;
+  }
+  
+  /* Override ALL div backgrounds */
+  div:not(.header-section *):not(.footer-section *) {
+    background-color: transparent !important;
+  }
+  
+  /* Force main content areas */
+  .main-content-section,
+  .tesla-section-white,
+  .tesla-section-gray,
+  .tesla-section-alt {
+    background-color: #ffffff !important;
+    background-image: none !important;
+  }
+  
+  /* Force ALL possible background variations */
+  [class*="bg-"]:not(.preserve-bg):not(.header-section *):not(.footer-section *) {
+    background-color: #ffffff !important;
+    background-image: none !important;
+  }
+  
+  /* Force container backgrounds */
+  .container {
+    background-color: transparent !important;
+  }
+  
+  /* Force card backgrounds */
+  .tesla-card,
+  [class*="card"] {
+    background-color: #ffffff !important;
+  }
 
-  /* Borders (light) -> #5e7b99 */
-  .border-white { border-color: #5e7b99 !important; }
-  .border-gray-100 { border-color: #5e7b99 !important; }
-  .border-gray-200 { border-color: #5e7b99 !important; }
-  .border-gray-300 { border-color: #5e7b99 !important; }
+  /* Preserve original backgrounds for header/footer */
+  .preserve-white { 
+    background-color: white !important; 
+  }
+  .preserve-bg { 
+    /* Keeps original background */ 
+  }
+  
+  /* Tesla-style minimal borders */
+  .border-white:not(.preserve-border) { 
+    border-color: #e5e5e5 !important; 
+  }
+  .border-gray-100:not(.preserve-border) { 
+    border-color: #e5e5e5 !important; 
+  }
+  .border-gray-200:not(.preserve-border) { 
+    border-color: #e5e5e5 !important; 
+  }
+  .border-gray-300:not(.preserve-border) { 
+    border-color: #d1d5db !important; 
+  }
 
-  /* Typography primary -> #f8f8f8, accent -> #00a7bb */
-  .text-white, .text-black, .text-gray-900, .text-gray-800, .text-gray-700 { color: #f8f8f8 !important; }
-  .text-gray-600, .text-gray-500, .text-gray-400, .text-blue-600, .text-blue-500, .text-blue-400 { color: #00a7bb !important; }
+  /* Professional black typography for all text */
+  .text-white, .text-black, .text-gray-900, .text-gray-800, .text-gray-700 { 
+    color: #000000 !important; 
+    text-shadow: none;
+    font-weight: 600;
+  }
+  .text-gray-600, .text-gray-500, .text-gray-400 { 
+    color: #000000 !important; 
+    font-weight: 400;
+  }
+  .text-blue-600, .text-blue-500, .text-blue-400 { 
+    color: #000000 !important; 
+    font-weight: 500;
+  }
+
+  /* Pure white background for all main content */
+  .tesla-section-white,
+  .tesla-section-gray,
+  .main-content-section {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  .tesla-section-dark {
+    background-color: #000000;
+    color: #ffffff;
+  }
+  
+  /* Professional black typography for all main content */
+  .tesla-section-white .text-gray-600,
+  .tesla-section-white .text-gray-500,
+  .tesla-section-gray .text-gray-600,
+  .tesla-section-gray .text-gray-500,
+  .main-content-section .text-gray-600,
+  .main-content-section .text-gray-500 {
+    color: #000000 !important;
+    font-weight: 400;
+  }
+  
+  /* Tesla cards - ultra clean */
+  .tesla-card {
+    background-color: #ffffff;
+    border: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+  }
+  
+  .tesla-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Tesla buttons */
+  .tesla-btn-primary {
+    background-color: #000000;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 24px;
+    font-weight: 500;
+    font-size: 14px;
+    text-transform: none;
+    transition: all 0.2s ease;
+  }
+  
+  .tesla-btn-primary:hover {
+    background-color: #1a1a1a;
+  }
+  
+  .tesla-btn-secondary {
+    background-color: transparent;
+    color: #000000;
+    border: 2px solid #000000;
+    border-radius: 4px;
+    padding: 10px 22px;
+    font-weight: 500;
+    font-size: 14px;
+    text-transform: none;
+    transition: all 0.2s ease;
+  }
+  
+  .tesla-btn-secondary:hover {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  /* Header and Footer preservation */
+  .header-section,
+  .footer-section {
+    /* These sections will maintain their original styling */
+  }
+  
+  .header-section .bg-white,
+  .footer-section .bg-white {
+    background-color: white !important;
+  }
+  
+  .header-section .bg-gray-900,
+  .footer-section .bg-gray-900 {
+    background-color: #111827 !important;
+  }
 }

@@ -93,21 +93,19 @@ export default function ModernIndex() {
       <ModernHero />
 
       {/* Stats Section */}
-      <section className="py-20 bg-white">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <Card key={index} className="text-center p-8 hover:shadow-xl transition-all duration-300 group border-0 bg-gradient-to-br from-gray-50 to-white">
-                <CardContent className="p-0">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                    <stat.icon className="w-8 h-8 text-blue-600" />
-                  </div>
-                  <div className="text-4xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                    {stat.value}
-                  </div>
-                  <div className="text-gray-600 font-medium">{stat.label}</div>
-                </CardContent>
-              </Card>
+              <div key={index} className="text-center group">
+                <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mx-auto mb-6">
+                  <stat.icon className="w-6 h-6 text-white" />
+                </div>
+                <div className="text-5xl font-bold text-black mb-2 tracking-tight">
+                  {stat.value}
+                </div>
+                <div className="text-black font-medium text-sm uppercase tracking-wider">{stat.label}</div>
+              </div>
             ))}
           </div>
         </div>
@@ -115,7 +113,7 @@ export default function ModernIndex() {
 
       {/* Homepage Gallery (from Admin Content) */}
       {home.gallery.length > 0 && (
-        <section className="py-12 bg-white">
+        <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {[...home.gallery].sort((a,b) => a.order - b.order).slice(0, 8).map(item => (
@@ -133,49 +131,41 @@ export default function ModernIndex() {
       )}
 
       {/* Company Introduction */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className={dir === 'rtl' ? 'order-2' : 'order-1'}>
               <div className="space-y-6">
                 <div>
-                  <Badge className="bg-blue-100 text-blue-800 mb-4">
-                    {language === 'fa' ? 'درباره شرکت' : 'About Company'}
-                  </Badge>
-                  <h2 className="text-4xl font-bold text-gray-900 mb-4">
-                    {language === 'fa' ? 'چرا اعلا نیرو را انتخاب کنیم؟' : 'Why Choose Aalaniroo?'}
+                  <h2 className="text-6xl font-bold text-black mb-8 leading-none tracking-tight">
+                    {language === 'fa' ? 'چرا اعلا نیرو؟' : 'Why Aalaniroo?'}
                   </h2>
-                  <p className="text-xl text-gray-600 leading-relaxed">
+                  <p className="text-xl text-black leading-relaxed mb-12 max-w-lg">
                     {company.description}
                   </p>
                 </div>
 
-                <div className="space-y-4">
-                  {whyChooseUs.map((item, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <CheckCircle className="w-4 h-4 text-green-600" />
-                      </div>
-                      <span className="text-gray-700">{item}</span>
+                <div className="space-y-6 mb-12">
+                  {whyChooseUs.slice(0, 4).map((item, index) => (
+                    <div key={index} className="text-lg text-black leading-relaxed">
+                      {item}
                     </div>
                   ))}
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-                    <Phone className="w-5 h-5 mr-2" />
+                <div className="flex gap-4">
+                  <button className="tesla-btn-primary">
                     {t('common.contactUs')}
-                  </Button>
-                  <Button size="lg" variant="outline">
+                  </button>
+                  <button className="tesla-btn-secondary">
                     {t('common.learnMore')}
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
+                  </button>
                 </div>
               </div>
             </div>
 
             <div className={`relative ${dir === 'rtl' ? 'order-1' : 'order-2'}`}>
-              <div className="relative z-10 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 shadow-2xl">
+              <div className="relative overflow-hidden rounded-lg">
                 {playableVideoUrl ? (
                   isPlaying ? (
                     <video className="w-full h-auto rounded-lg" controls autoPlay playsInline preload="metadata" poster={posterUrl || undefined}>
@@ -189,8 +179,8 @@ export default function ModernIndex() {
                         className="w-full h-auto rounded-lg"
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <button onClick={() => setIsPlaying(true)} className="w-20 h-20 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110">
-                          <Play className="w-8 h-8 text-white ml-1" />
+                        <button onClick={() => setIsPlaying(true)} className="w-20 h-20 bg-white hover:bg-gray-50 rounded-full flex items-center justify-center shadow-xl transition-all hover:scale-105 border-4 border-white">
+                          <Play className="w-8 h-8 text-black ml-1" />
                         </button>
                       </div>
                     </div>
@@ -203,34 +193,20 @@ export default function ModernIndex() {
                   />
                 )}
                 
-                {/* Experience Badge */}
-                <div className="absolute -top-4 -right-4 bg-blue-600 text-white p-6 rounded-lg shadow-lg">
-                  <div className="text-3xl font-bold">33+</div>
-                  <div className="text-sm">
-                    {language === 'fa' ? 'سال تجربه' : 'Years'}
-                  </div>
-                </div>
               </div>
-              
-              {/* Floating Elements */}
-              <div className="absolute top-10 -left-10 w-20 h-20 bg-blue-500 rounded-full opacity-20 animate-pulse"></div>
-              <div className="absolute bottom-10 -right-10 w-16 h-16 bg-gray-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Featured Products */}
-      <section className="py-20 bg-white">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <Badge className="bg-blue-100 text-blue-800 mb-4">
-              {t('products.title')}
-            </Badge>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              {language === 'fa' ? 'محصولات پیشنهادی' : 'Featured Products'}
+          <div className="text-center mb-20">
+            <h2 className="text-6xl font-bold text-black mb-6 leading-none tracking-tight">
+              {language === 'fa' ? 'محصولات' : 'Products'}
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-black max-w-2xl mx-auto">
               {t('products.subtitle')}
             </p>
           </div>
@@ -241,79 +217,62 @@ export default function ModernIndex() {
             ))}
           </div>
 
-          <div className="text-center mt-12">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 group">
+          <div className="text-center mt-16">
+            <button className="tesla-btn-primary">
               {t('common.viewAll')}
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
+            </button>
           </div>
         </div>
       </section>
 
       {/* Services */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <Badge className="bg-blue-100 text-blue-800 mb-4">
-              {t('services.title')}
-            </Badge>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              {language === 'fa' ? 'خدمات جامع ما' : 'Our Comprehensive Services'}
+          <div className="text-center mb-20">
+            <h2 className="text-6xl font-bold text-black mb-6 leading-none tracking-tight">
+              {language === 'fa' ? 'خدمات' : 'Services'}
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-black max-w-2xl mx-auto">
               {t('services.subtitle')}
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-12">
             {currentServices.map((service) => (
-              <Card key={service.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-white border-0">
-                <CardContent className="p-8 text-center">
-                  <div className="text-6xl mb-6 group-hover:scale-110 transition-transform">
-                    {service.icon}
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors">
-                    {service.title}
-                  </h3>
-                  <p className="text-gray-600 mb-6 leading-relaxed">
-                    {service.description}
-                  </p>
-                  <ul className="space-y-2 mb-6">
-                    {service.features.map((feature, index) => (
-                      <li key={index} className="flex items-center gap-2 text-gray-600">
-                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                    {t('common.learnMore')}
-                  </Button>
-                </CardContent>
-              </Card>
+              <div key={service.id} className="group text-center">
+                <div className="text-5xl mb-8">
+                  {service.icon}
+                </div>
+                <h3 className="text-2xl font-bold text-black mb-6">
+                  {service.title}
+                </h3>
+                <p className="text-black mb-8 leading-relaxed">
+                  {service.description}
+                </p>
+                <button className="tesla-btn-secondary">
+                  {t('common.learnMore')}
+                </button>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Projects Showcase */}
-      <section className="py-20 bg-white">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <Badge className="bg-blue-100 text-blue-800 mb-4">
-              {t('projects.title')}
-            </Badge>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              {language === 'fa' ? 'پروژه‌های شاخص' : 'Featured Projects'}
+          <div className="text-center mb-20">
+            <h2 className="text-6xl font-bold text-black mb-6 leading-none tracking-tight">
+              {language === 'fa' ? 'پروژه‌ها' : 'Projects'}
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-black max-w-2xl mx-auto">
               {t('projects.subtitle')}
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-12">
             {currentProjects.slice(0, 2).map((project) => (
-              <Card key={project.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden">
+              <div key={project.id} className="tesla-card group hover:shadow-lg transition-all duration-300 overflow-hidden">
                 <div className="relative overflow-hidden">
                   <img 
                     src={project.image} 
@@ -321,49 +280,28 @@ export default function ModernIndex() {
                     className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 right-4 text-white">
-                    <Badge className="bg-blue-600 text-white mb-2">
-                      <Zap className="w-3 h-3 mr-1" />
-                      {project.capacity}
-                    </Badge>
-                    <h3 className="text-xl font-bold mb-1">
-                      {project.title}
-                    </h3>
-                  </div>
                 </div>
 
-                <CardContent className="p-6">
-                  <p className="text-gray-600 mb-4">
+                <div className="p-8">
+                  <h3 className="text-2xl font-bold text-black mb-4">
+                    {project.title}
+                  </h3>
+                  <p className="text-black mb-6 leading-relaxed">
                     {project.description}
                   </p>
-
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-blue-600" />
-                      <span className="text-gray-600">{t('projects.location')}:</span>
-                      <span className="font-medium">{project.location}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-blue-600" />
-                      <span className="text-gray-600">{t('projects.year')}:</span>
-                      <span className="font-medium">{project.year}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Building className="w-4 h-4 text-blue-600" />
-                      <span className="text-gray-600">{t('projects.client')}:</span>
-                      <span className="font-medium">{project.client}</span>
-                    </div>
+                  <div className="space-y-2 text-sm text-black">
+                    <div>{project.location} • {project.year}</div>
+                    <div>{project.capacity}</div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
 
-          <div className="text-center mt-12">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+          <div className="text-center mt-16">
+            <button className="tesla-btn-primary">
               {t('common.viewAll')}
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
+            </button>
           </div>
         </div>
       </section>
@@ -394,7 +332,7 @@ export default function ModernIndex() {
       })()}
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-800 text-white preserve-bg">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-4">
             {language === 'fa' ? 'آماده شروع پروژه هستید؟' : 'Ready to Start Your Project?'}
