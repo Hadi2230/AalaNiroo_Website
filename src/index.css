@@ -6,8 +6,9 @@
   :root {
     /* New brand palette */
     /* Base backgrounds */
-    --background: 208 52% 23%; /* #1c3d5a */
-    --foreground: 205 14% 54%; /* #7a8d9b */
+    /* Set main content background to #7a8d9b and ensure contrasting foreground */
+    --background: 205 14% 54%; /* #7a8d9b */
+    --foreground: 210 40% 98%; /* near white for contrast */
 
     --card: 210 24% 48%; /* #5e7b99 */
     --card-foreground: 205 14% 54%; /* #7a8d9b */
@@ -108,26 +109,35 @@
 /* Global palette overrides for light colors and text tones */
 @layer utilities {
   /* Light backgrounds -> #5e7b99 */
-  .bg-white { background-color: #5e7b99 !important; }
-  .bg-white\/90 { background-color: #5e7b99e6 !important; }
-  .bg-white\/80 { background-color: #5e7b99cc !important; }
-  .bg-white\/70 { background-color: #5e7b99b3 !important; }
-  .bg-gray-50 { background-color: #5e7b99 !important; }
-  .bg-gray-100 { background-color: #5e7b99 !important; }
-  .bg-gray-200 { background-color: #5e7b99 !important; }
-  .bg-blue-50 { background-color: #5e7b99 !important; }
-  .bg-purple-50 { background-color: #5e7b99 !important; }
-  .bg-green-50 { background-color: #5e7b99 !important; }
-  .bg-gray-50\/50 { background-color: #5e7b9980 !important; }
-  .bg-gray-50\/60 { background-color: #5e7b9999 !important; }
+  /* Apply #7a8d9b across light utility backgrounds */
+  .bg-white { background-color: #7a8d9b !important; }
+  .bg-white\/90 { background-color: #7a8d9be6 !important; }
+  .bg-white\/80 { background-color: #7a8d9bcc !important; }
+  .bg-white\/70 { background-color: #7a8d9bb3 !important; }
+  .bg-gray-50 { background-color: #7a8d9b !important; }
+  .bg-gray-100 { background-color: #7a8d9b !important; }
+  .bg-gray-200 { background-color: #7a8d9b !important; }
+  .bg-blue-50 { background-color: #7a8d9b !important; }
+  .bg-purple-50 { background-color: #7a8d9b !important; }
+  .bg-green-50 { background-color: #7a8d9b !important; }
+  .bg-gray-50\/50 { background-color: #7a8d9b80 !important; }
+  .bg-gray-50\/60 { background-color: #7a8d9b99 !important; }
 
   /* Borders (light) -> #5e7b99 */
-  .border-white { border-color: #5e7b99 !important; }
-  .border-gray-100 { border-color: #5e7b99 !important; }
-  .border-gray-200 { border-color: #5e7b99 !important; }
-  .border-gray-300 { border-color: #5e7b99 !important; }
+  /* Align light borders with the new content background */
+  .border-white { border-color: #7a8d9b !important; }
+  .border-gray-100 { border-color: #7a8d9b !important; }
+  .border-gray-200 { border-color: #7a8d9b !important; }
+  .border-gray-300 { border-color: #7a8d9b !important; }
 
   /* Typography primary -> #f8f8f8, accent -> #00a7bb */
   .text-white, .text-black, .text-gray-900, .text-gray-800, .text-gray-700 { color: #f8f8f8 !important; }
   .text-gray-600, .text-gray-500, .text-gray-400, .text-blue-600, .text-blue-500, .text-blue-400 { color: #00a7bb !important; }
+
+  /* Keep header areas white even if they use bg-white utilities */
+  header.bg-white { background-color: #ffffff !important; }
+  header .bg-white { background-color: #ffffff !important; }
+  header .bg-white\/90 { background-color: rgba(255, 255, 255, 0.9) !important; }
+  header .bg-white\/80 { background-color: rgba(255, 255, 255, 0.8) !important; }
+  header .bg-white\/70 { background-color: rgba(255, 255, 255, 0.7) !important; }
 }
