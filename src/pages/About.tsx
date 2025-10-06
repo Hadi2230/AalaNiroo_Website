@@ -219,10 +219,10 @@ export default function About() {
       <section className="py-20 main-content-section">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
               {language === 'fa' ? 'ارزش‌های ما' : 'Our Values'}
             </h2>
-            <p className="text-xl text-gray-200">
+            <p className="text-xl text-gray-700">
               {language === 'fa' ? 'اصول و ارزش‌هایی که ما را هدایت می‌کنند' : 'Principles and values that guide us'}
             </p>
           </div>
