@@ -42,7 +42,7 @@ const ModernHeader = () => {
   const company = companyData[language];
 
   return (
-    <>
+    <div className="header-section">
       {/* Top Bar removed for a clean text-only header */}
 
       {/* Main Header */}
@@ -146,7 +146,7 @@ const ModernHeader = () => {
           </div>
         )}
       </header>
-    </>
+    </div>
   );
 };
 

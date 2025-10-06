@@ -25,9 +25,9 @@ const Header = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <>
+    <div className="header-section">
       {/* Top Bar */}
-      <div className="bg-gray-900 text-white py-2 px-4">
+      <div className="bg-gray-900 preserve-bg text-white py-2 px-4">
         <div className="container mx-auto flex justify-between items-center text-sm">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
@@ -46,7 +46,7 @@ const Header = () => {
       </div>
 
       {/* Main Header */}
-      <header className="bg-white shadow-lg sticky top-0 z-50">
+      <header className="bg-white preserve-white shadow-lg sticky top-0 z-50">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-4">
             {/* Logo */}
@@ -94,7 +94,7 @@ const Header = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden bg-white border-t">
+          <div className="lg:hidden bg-white preserve-white border-t">
             <div className="container mx-auto px-4 py-4">
               <nav className="flex flex-col gap-4">
                 {navigation.map((item) => (
@@ -117,7 +117,7 @@ const Header = () => {
           </div>
         )}
       </header>
-    </>
+    </div>
   );
 };
 
