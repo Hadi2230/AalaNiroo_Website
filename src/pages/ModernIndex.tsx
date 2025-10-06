@@ -232,7 +232,7 @@ export default function ModernIndex() {
             <h2 className="text-6xl font-bold text-black mb-6 leading-none tracking-tight">
               {language === 'fa' ? 'خدمات' : 'Services'}
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-black max-w-2xl mx-auto">
               {t('services.subtitle')}
             </p>
           </div>
@@ -246,7 +246,7 @@ export default function ModernIndex() {
                 <h3 className="text-2xl font-bold text-black mb-6">
                   {service.title}
                 </h3>
-                <p className="text-gray-600 mb-8 leading-relaxed">
+                <p className="text-black mb-8 leading-relaxed">
                   {service.description}
                 </p>
                 <button className="tesla-btn-secondary">
@@ -265,7 +265,7 @@ export default function ModernIndex() {
             <h2 className="text-6xl font-bold text-black mb-6 leading-none tracking-tight">
               {language === 'fa' ? 'پروژه‌ها' : 'Projects'}
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-black max-w-2xl mx-auto">
               {t('projects.subtitle')}
             </p>
           </div>
@@ -286,10 +286,10 @@ export default function ModernIndex() {
                   <h3 className="text-2xl font-bold text-black mb-4">
                     {project.title}
                   </h3>
-                  <p className="text-gray-600 mb-6 leading-relaxed">
+                  <p className="text-black mb-6 leading-relaxed">
                     {project.description}
                   </p>
-                  <div className="space-y-2 text-sm text-gray-600">
+                  <div className="space-y-2 text-sm text-black">
                     <div>{project.location} • {project.year}</div>
                     <div>{project.capacity}</div>
                   </div>
