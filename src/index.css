@@ -6,8 +6,10 @@
   :root {
     /* New brand palette */
     /* Base backgrounds */
-    --background: 208 52% 23%; /* #1c3d5a */
-    --foreground: 205 14% 54%; /* #7a8d9b */
+    /* Page background set to #7a8d9b */
+    --background: 205 14% 54%; /* #7a8d9b */
+    /* Default text set to near-white for contrast on background */
+    --foreground: 210 40% 98%; /* near white */
 
     --card: 210 24% 48%; /* #5e7b99 */
     --card-foreground: 205 14% 54%; /* #7a8d9b */
@@ -57,8 +59,9 @@
 
   .dark {
     /* Slightly lighter foreground on dark */
-    --background: 208 52% 18%;
-    --foreground: 210 40% 94%;
+    /* Keep the same content background in dark mode to match request */
+    --background: 205 14% 54%; /* #7a8d9b */
+    --foreground: 210 40% 98%;
 
     --card: 208 52% 23%;
     --card-foreground: 210 40% 94%;
@@ -105,29 +108,4 @@
   }
 }
 
-/* Global palette overrides for light colors and text tones */
-@layer utilities {
-  /* Light backgrounds -> #5e7b99 */
-  .bg-white { background-color: #5e7b99 !important; }
-  .bg-white\/90 { background-color: #5e7b99e6 !important; }
-  .bg-white\/80 { background-color: #5e7b99cc !important; }
-  .bg-white\/70 { background-color: #5e7b99b3 !important; }
-  .bg-gray-50 { background-color: #5e7b99 !important; }
-  .bg-gray-100 { background-color: #5e7b99 !important; }
-  .bg-gray-200 { background-color: #5e7b99 !important; }
-  .bg-blue-50 { background-color: #5e7b99 !important; }
-  .bg-purple-50 { background-color: #5e7b99 !important; }
-  .bg-green-50 { background-color: #5e7b99 !important; }
-  .bg-gray-50\/50 { background-color: #5e7b9980 !important; }
-  .bg-gray-50\/60 { background-color: #5e7b9999 !important; }
-
-  /* Borders (light) -> #5e7b99 */
-  .border-white { border-color: #5e7b99 !important; }
-  .border-gray-100 { border-color: #5e7b99 !important; }
-  .border-gray-200 { border-color: #5e7b99 !important; }
-  .border-gray-300 { border-color: #5e7b99 !important; }
-
-  /* Typography primary -> #f8f8f8, accent -> #00a7bb */
-  .text-white, .text-black, .text-gray-900, .text-gray-800, .text-gray-700 { color: #f8f8f8 !important; }
-  .text-gray-600, .text-gray-500, .text-gray-400, .text-blue-600, .text-blue-500, .text-blue-400 { color: #00a7bb !important; }
-}
+/* Removed unsafe global overrides for Tailwind utilities to respect component styles */
