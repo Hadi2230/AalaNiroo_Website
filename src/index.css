@@ -4,36 +4,36 @@
 
 @layer base {
   :root {
-    /* Professional #7a8d9b Background Palette */
+    /* Professional #D3D3D3 Background Palette */
     /* Base backgrounds */
-    --background: 205 14% 54%; /* #7a8d9b - Main content background */
-    --foreground: 210 40% 98%; /* Light text for better contrast */
+    --background: 0 0% 83%; /* #D3D3D3 - Main content background */
+    --foreground: 0 0% 13%; /* Dark text for better contrast */
 
-    --card: 205 14% 54%; /* #7a8d9b - Cards match main background */
-    --card-foreground: 210 40% 98%; /* Light text for cards */
+    --card: 0 0% 83%; /* #D3D3D3 - Cards match main background */
+    --card-foreground: 0 0% 13%; /* Dark text for cards */
 
-    --popover: 205 14% 54%; /* #7a8d9b */
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 83%; /* #D3D3D3 */
+    --popover-foreground: 0 0% 13%;
 
     /* Accents */
     --primary: 186 100% 37%; /* #00a7bb */
     --primary-foreground: 210 40% 98%; /* near white */
 
-    --secondary: 208 52% 23%; /* #1c3d5a - Darker for contrast */
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 75%; /* Lighter gray for contrast */
+    --secondary-foreground: 0 0% 13%;
 
-    --muted: 205 14% 48%; /* Slightly darker #7a8d9b */
-    --muted-foreground: 210 40% 90%; /* Light muted text */
+    --muted: 0 0% 78%; /* Slightly darker #D3D3D3 */
+    --muted-foreground: 0 0% 25%; /* Dark muted text */
 
-    --accent: 205 14% 54%; /* #7a8d9b */
-    --accent-foreground: 210 40% 98%;
+    --accent: 0 0% 83%; /* #D3D3D3 */
+    --accent-foreground: 0 0% 13%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
     /* UI chrome */
-    --border: 205 14% 48%; /* Slightly darker for borders */
-    --input: 205 14% 48%; /* Input backgrounds */
+    --border: 0 0% 70%; /* Darker gray for borders */
+    --input: 0 0% 78%; /* Input backgrounds */
     --ring: 186 100% 37%;
 
     --radius: 0.5rem;
@@ -49,42 +49,42 @@
   }
 
   .dark {
-    /* Dark mode with #7a8d9b base */
-    --background: 205 14% 45%; /* Darker #7a8d9b for dark mode */
-    --foreground: 210 40% 94%;
+    /* Dark mode with #D3D3D3 base */
+    --background: 0 0% 75%; /* Darker #D3D3D3 for dark mode */
+    --foreground: 0 0% 13%;
 
-    --card: 205 14% 45%; /* Dark mode cards */
-    --card-foreground: 210 40% 94%;
+    --card: 0 0% 75%; /* Dark mode cards */
+    --card-foreground: 0 0% 13%;
 
-    --popover: 205 14% 45%;
-    --popover-foreground: 210 40% 94%;
+    --popover: 0 0% 75%;
+    --popover-foreground: 0 0% 13%;
 
     --primary: 186 100% 45%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 208 52% 18%; /* Very dark for contrast in dark mode */
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 65%; /* Darker gray for contrast in dark mode */
+    --secondary-foreground: 0 0% 13%;
 
-    --muted: 205 14% 40%; /* Darker muted in dark mode */
-    --muted-foreground: 210 20% 80%;
+    --muted: 0 0% 70%; /* Darker muted in dark mode */
+    --muted-foreground: 0 0% 25%;
 
-    --accent: 205 14% 45%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 0 0% 75%;
+    --accent-foreground: 0 0% 13%;
 
     --destructive: 0 62.8% 35%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 205 14% 40%;
-    --input: 205 14% 40%;
+    --border: 0 0% 65%;
+    --input: 0 0% 70%;
     --ring: 186 100% 45%;
     
-    --sidebar-background: 205 14% 45%;
-    --sidebar-foreground: 210 40% 94%;
+    --sidebar-background: 0 0% 75%;
+    --sidebar-foreground: 0 0% 13%;
     --sidebar-primary: 186 100% 45%;
     --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 205 14% 40%;
-    --sidebar-accent-foreground: 210 40% 94%;
-    --sidebar-border: 205 14% 40%;
+    --sidebar-accent: 0 0% 70%;
+    --sidebar-accent-foreground: 0 0% 13%;
+    --sidebar-border: 0 0% 65%;
     --sidebar-ring: 186 100% 45%;
   }
 }
@@ -99,49 +99,49 @@
   }
 }
 
-/* Professional #7a8d9b Background Implementation */
+/* Professional #D3D3D3 Background Implementation */
 @layer utilities {
-  /* Main content background - #7a8d9b */
+  /* Main content background - #D3D3D3 */
   .bg-main-content { 
-    background-color: #7a8d9b !important; 
+    background-color: #D3D3D3 !important; 
   }
   
-  /* Light backgrounds -> #7a8d9b for main content areas */
+  /* Light backgrounds -> #D3D3D3 for main content areas */
   .bg-white:not(.preserve-white) { 
-    background-color: #7a8d9b !important; 
+    background-color: #D3D3D3 !important; 
   }
   .bg-white\/90:not(.preserve-white) { 
-    background-color: #7a8d9be6 !important; 
+    background-color: #D3D3D3e6 !important; 
   }
   .bg-white\/80:not(.preserve-white) { 
-    background-color: #7a8d9bcc !important; 
+    background-color: #D3D3D3cc !important; 
   }
   .bg-white\/70:not(.preserve-white) { 
-    background-color: #7a8d9bb3 !important; 
+    background-color: #D3D3D3b3 !important; 
   }
   .bg-gray-50:not(.preserve-bg) { 
-    background-color: #7a8d9b !important; 
+    background-color: #D3D3D3 !important; 
   }
   .bg-gray-100:not(.preserve-bg) { 
-    background-color: #7a8d9b !important; 
+    background-color: #D3D3D3 !important; 
   }
   .bg-gray-200:not(.preserve-bg) { 
-    background-color: #7a8d9b !important; 
+    background-color: #D3D3D3 !important; 
   }
   .bg-blue-50:not(.preserve-bg) { 
-    background-color: #7a8d9b !important; 
+    background-color: #D3D3D3 !important; 
   }
   .bg-purple-50:not(.preserve-bg) { 
-    background-color: #7a8d9b !important; 
+    background-color: #D3D3D3 !important; 
   }
   .bg-green-50:not(.preserve-bg) { 
-    background-color: #7a8d9b !important; 
+    background-color: #D3D3D3 !important; 
   }
   .bg-gray-50\/50:not(.preserve-bg) { 
-    background-color: #7a8d9b80 !important; 
+    background-color: #D3D3D380 !important; 
   }
   .bg-gray-50\/60:not(.preserve-bg) { 
-    background-color: #7a8d9b99 !important; 
+    background-color: #D3D3D399 !important; 
   }
 
   /* Preserve original backgrounds for header/footer */
@@ -154,47 +154,47 @@
   
   /* Enhanced borders for better contrast */
   .border-white:not(.preserve-border) { 
-    border-color: #6b7d8a !important; 
+    border-color: #b0b0b0 !important; 
   }
   .border-gray-100:not(.preserve-border) { 
-    border-color: #6b7d8a !important; 
+    border-color: #b0b0b0 !important; 
   }
   .border-gray-200:not(.preserve-border) { 
-    border-color: #6b7d8a !important; 
+    border-color: #b0b0b0 !important; 
   }
   .border-gray-300:not(.preserve-border) { 
-    border-color: #6b7d8a !important; 
+    border-color: #b0b0b0 !important; 
   }
 
-  /* Optimized typography for #7a8d9b background */
+  /* Optimized typography for #D3D3D3 background */
   .text-white, .text-black, .text-gray-900, .text-gray-800, .text-gray-700 { 
-    color: #ffffff !important; 
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    color: #333333 !important; 
+    text-shadow: none;
   }
   .text-gray-600, .text-gray-500, .text-gray-400 { 
-    color: #e8f4f8 !important; 
+    color: #555555 !important; 
   }
   .text-blue-600, .text-blue-500, .text-blue-400 { 
-    color: #00a7bb !important; 
+    color: #0066cc !important; 
     font-weight: 500;
   }
 
   /* Special classes for main content sections */
   .main-content-section {
-    background-color: #7a8d9b;
-    color: #ffffff;
+    background-color: #D3D3D3;
+    color: #333333;
   }
   
   .main-content-section .text-gray-600,
   .main-content-section .text-gray-500 {
-    color: #e8f4f8 !important;
+    color: #555555 !important;
   }
   
   /* Card styling on main background */
   .main-content-section .bg-white {
-    background-color: rgba(255, 255, 255, 0.1) !important;
+    background-color: rgba(255, 255, 255, 0.3) !important;
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.1);
   }
 
   /* Header and Footer preservation */

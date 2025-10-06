@@ -102,10 +102,10 @@ export default function ModernIndex() {
                   <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                     <stat.icon className="w-8 h-8 text-blue-600" />
                   </div>
-                  <div className="text-4xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">
+                  <div className="text-4xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
                     {stat.value}
                   </div>
-                  <div className="text-gray-200 font-medium">{stat.label}</div>
+                  <div className="text-gray-700 font-medium">{stat.label}</div>
                 </CardContent>
               </Card>
             ))}
@@ -142,10 +142,10 @@ export default function ModernIndex() {
                   <Badge className="bg-blue-100 text-blue-800 mb-4">
                     {language === 'fa' ? 'درباره شرکت' : 'About Company'}
                   </Badge>
-                  <h2 className="text-4xl font-bold text-white mb-4">
+                  <h2 className="text-4xl font-bold text-gray-900 mb-4">
                     {language === 'fa' ? 'چرا اعلا نیرو را انتخاب کنیم؟' : 'Why Choose Aalaniroo?'}
                   </h2>
-                  <p className="text-xl text-gray-200 leading-relaxed">
+                  <p className="text-xl text-gray-700 leading-relaxed">
                     {company.description}
                   </p>
                 </div>
@@ -156,7 +156,7 @@ export default function ModernIndex() {
                       <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                         <CheckCircle className="w-4 h-4 text-green-600" />
                       </div>
-                      <span className="text-gray-200">{item}</span>
+                      <span className="text-gray-700">{item}</span>
                     </div>
                   ))}
                 </div>
@@ -166,7 +166,7 @@ export default function ModernIndex() {
                     <Phone className="w-5 h-5 mr-2" />
                     {t('common.contactUs')}
                   </Button>
-                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-gray-900">
+                  <Button size="lg" variant="outline" className="border-gray-600 text-gray-900 hover:bg-gray-600 hover:text-white">
                     {t('common.learnMore')}
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
@@ -227,10 +227,10 @@ export default function ModernIndex() {
             <Badge className="bg-blue-100 text-blue-800 mb-4">
               {t('products.title')}
             </Badge>
-            <h2 className="text-4xl font-bold text-white mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
               {language === 'fa' ? 'محصولات پیشنهادی' : 'Featured Products'}
             </h2>
-            <p className="text-xl text-gray-200 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-700 max-w-2xl mx-auto">
               {t('products.subtitle')}
             </p>
           </div>
@@ -257,30 +257,30 @@ export default function ModernIndex() {
             <Badge className="bg-blue-100 text-blue-800 mb-4">
               {t('services.title')}
             </Badge>
-            <h2 className="text-4xl font-bold text-white mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
               {language === 'fa' ? 'خدمات جامع ما' : 'Our Comprehensive Services'}
             </h2>
-            <p className="text-xl text-gray-200">
+            <p className="text-xl text-gray-700">
               {t('services.subtitle')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {currentServices.map((service) => (
-              <Card key={service.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-white/10 backdrop-blur-sm border-white/20">
+              <Card key={service.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-white/30 backdrop-blur-sm border-gray-300">
                 <CardContent className="p-8 text-center">
                   <div className="text-6xl mb-6 group-hover:scale-110 transition-transform">
                     {service.icon}
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-blue-400 transition-colors">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors">
                     {service.title}
                   </h3>
-                  <p className="text-gray-200 mb-6 leading-relaxed">
+                  <p className="text-gray-700 mb-6 leading-relaxed">
                     {service.description}
                   </p>
                   <ul className="space-y-2 mb-6">
                     {service.features.map((feature, index) => (
-                      <li key={index} className="flex items-center gap-2 text-gray-200">
+                      <li key={index} className="flex items-center gap-2 text-gray-700">
                         <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                         <span className="text-sm">{feature}</span>
                       </li>
@@ -303,17 +303,17 @@ export default function ModernIndex() {
             <Badge className="bg-blue-100 text-blue-800 mb-4">
               {t('projects.title')}
             </Badge>
-            <h2 className="text-4xl font-bold text-white mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
               {language === 'fa' ? 'پروژه‌های شاخص' : 'Featured Projects'}
             </h2>
-            <p className="text-xl text-gray-200">
+            <p className="text-xl text-gray-700">
               {t('projects.subtitle')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
             {currentProjects.slice(0, 2).map((project) => (
-              <Card key={project.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden bg-white/10 backdrop-blur-sm border-white/20">
+              <Card key={project.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden bg-white/30 backdrop-blur-sm border-gray-300">
                 <div className="relative overflow-hidden">
                   <img 
                     src={project.image} 
@@ -333,25 +333,25 @@ export default function ModernIndex() {
                 </div>
 
                 <CardContent className="p-6">
-                  <p className="text-gray-200 mb-4">
+                  <p className="text-gray-700 mb-4">
                     {project.description}
                   </p>
 
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-blue-400" />
-                      <span className="text-gray-200">{t('projects.location')}:</span>
-                      <span className="font-medium text-white">{project.location}</span>
+                      <MapPin className="w-4 h-4 text-blue-600" />
+                      <span className="text-gray-700">{t('projects.location')}:</span>
+                      <span className="font-medium text-gray-900">{project.location}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-blue-400" />
-                      <span className="text-gray-200">{t('projects.year')}:</span>
-                      <span className="font-medium text-white">{project.year}</span>
+                      <Calendar className="w-4 h-4 text-blue-600" />
+                      <span className="text-gray-700">{t('projects.year')}:</span>
+                      <span className="font-medium text-gray-900">{project.year}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Building className="w-4 h-4 text-blue-400" />
-                      <span className="text-gray-200">{t('projects.client')}:</span>
-                      <span className="font-medium text-white">{project.client}</span>
+                      <Building className="w-4 h-4 text-blue-600" />
+                      <span className="text-gray-700">{t('projects.client')}:</span>
+                      <span className="font-medium text-gray-900">{project.client}</span>
                     </div>
                   </div>
                 </CardContent>
