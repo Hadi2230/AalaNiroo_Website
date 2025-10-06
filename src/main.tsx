@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
+import './styles/background.css';
 
 // Suppress React DevTools warning in development
 if (import.meta.env.DEV) {

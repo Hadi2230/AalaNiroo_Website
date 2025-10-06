@@ -1,0 +1,121 @@
+/* Global background styling for main content areas */
+/* Professional implementation of background color #7a8d9b */
+
+/* Apply background color to main content areas, excluding header and footer */
+body {
+  background-color: #7a8d9b !important;
+}
+
+/* Ensure header maintains its own background */
+header,
+.header,
+[class*="Header"] {
+  background-color: #ffffff !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 50;
+}
+
+/* Ensure footer maintains its dark background */
+footer,
+.footer,
+[class*="Footer"] {
+  background-color: #1f2937 !important;
+  position: relative;
+  z-index: 40;
+}
+
+/* Main content wrapper */
+main,
+.main-content {
+  background-color: transparent;
+  min-height: calc(100vh - 200px);
+}
+
+/* Sections with white backgrounds */
+section.bg-white,
+.bg-white {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Gradient sections maintain their gradients */
+[class*="bg-gradient"] {
+  position: relative;
+  z-index: 1;
+}
+
+/* Gray backgrounds with slight transparency */
+.bg-gray-50 {
+  background-color: rgba(249, 250, 251, 0.95) !important;
+}
+
+.bg-gray-100 {
+  background-color: rgba(243, 244, 246, 0.98) !important;
+}
+
+/* Cards and panels */
+.card,
+[class*="Card"] {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure text contrast */
+body {
+  color: #1a1a1a;
+}
+
+/* Admin pages should not be affected */
+[class*="admin"],
+[class*="Admin"] {
+  background-color: inherit !important;
+}
+
+/* Login page maintains its own gradient */
+.min-h-screen.bg-gradient-to-br {
+  background-color: inherit !important;
+}
+
+/* 404 page maintains its own style */
+.min-h-screen.flex.flex-col.items-center.justify-center {
+  background-color: inherit !important;
+}
+
+/* Top bar of header */
+.bg-gray-900 {
+  background-color: #1f2937 !important;
+}
+
+/* Ensure modals and overlays work properly */
+[role="dialog"],
+.modal,
+.dialog {
+  background-color: #ffffff !important;
+  z-index: 100;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  body {
+    background-color: #7a8d9b !important;
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #5a6d7b !important;
+  }
+  
+  .card,
+  [class*="Card"] {
+    background-color: #1f2937 !important;
+    color: #f9fafb;
+  }
+}
+
+/* Ensure smooth transitions */
+* {
+  transition: background-color 0.2s ease;
+}
