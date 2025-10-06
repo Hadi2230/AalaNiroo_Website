@@ -93,7 +93,7 @@ export default function ModernIndex() {
       <ModernHero />
 
       {/* Stats Section */}
-      <section className="py-24 tesla-section-white">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
@@ -104,7 +104,7 @@ export default function ModernIndex() {
                 <div className="text-5xl font-bold text-black mb-2 tracking-tight">
                   {stat.value}
                 </div>
-                <div className="text-gray-600 font-medium text-sm uppercase tracking-wider">{stat.label}</div>
+                <div className="text-black font-medium text-sm uppercase tracking-wider">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -113,7 +113,7 @@ export default function ModernIndex() {
 
       {/* Homepage Gallery (from Admin Content) */}
       {home.gallery.length > 0 && (
-        <section className="py-16 tesla-section-gray">
+        <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {[...home.gallery].sort((a,b) => a.order - b.order).slice(0, 8).map(item => (
@@ -131,7 +131,7 @@ export default function ModernIndex() {
       )}
 
       {/* Company Introduction */}
-      <section className="py-24 tesla-section-white">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className={dir === 'rtl' ? 'order-2' : 'order-1'}>
@@ -140,14 +140,14 @@ export default function ModernIndex() {
                   <h2 className="text-6xl font-bold text-black mb-8 leading-none tracking-tight">
                     {language === 'fa' ? 'چرا اعلا نیرو؟' : 'Why Aalaniroo?'}
                   </h2>
-                  <p className="text-xl text-gray-600 leading-relaxed mb-12 max-w-lg">
+                  <p className="text-xl text-black leading-relaxed mb-12 max-w-lg">
                     {company.description}
                   </p>
                 </div>
 
                 <div className="space-y-6 mb-12">
                   {whyChooseUs.slice(0, 4).map((item, index) => (
-                    <div key={index} className="text-lg text-gray-800 leading-relaxed">
+                    <div key={index} className="text-lg text-black leading-relaxed">
                       {item}
                     </div>
                   ))}
@@ -200,13 +200,13 @@ export default function ModernIndex() {
       </section>
 
       {/* Featured Products */}
-      <section className="py-24 tesla-section-gray">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
             <h2 className="text-6xl font-bold text-black mb-6 leading-none tracking-tight">
               {language === 'fa' ? 'محصولات' : 'Products'}
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-black max-w-2xl mx-auto">
               {t('products.subtitle')}
             </p>
           </div>
@@ -226,7 +226,7 @@ export default function ModernIndex() {
       </section>
 
       {/* Services */}
-      <section className="py-24 tesla-section-white">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
             <h2 className="text-6xl font-bold text-black mb-6 leading-none tracking-tight">
@@ -259,7 +259,7 @@ export default function ModernIndex() {
       </section>
 
       {/* Projects Showcase */}
-      <section className="py-24 tesla-section-gray">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
             <h2 className="text-6xl font-bold text-black mb-6 leading-none tracking-tight">
