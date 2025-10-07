@@ -15,6 +15,7 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { useHomeContent } from '@/contexts/HomeContentContext';
 import MediaPicker from '@/components/media/MediaPicker';
 import { useMedia } from '@/contexts/MediaContext';
+import { useProducts } from '@/contexts/ProductsContext';
 import { toast } from 'sonner';
 
 // Extend window type for autoSaveTimer
@@ -68,6 +69,7 @@ import {
 import { companyInfo } from '@/data/companyData';
 
 export default function AdminContent() {
+  const { allProducts } = useProducts();
   const { user } = useAuth();
   const {
     companyData,
@@ -848,7 +850,7 @@ export default function AdminContent() {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {products.map((p) => {
+                  {allProducts.map((p) => {
                     const selected = (homeContent.featuredProductIds || []).includes(p.id);
                     const primaryImage = p.images.find(i => i.isPrimary) || p.images[0];
                     return (
