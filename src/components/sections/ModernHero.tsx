@@ -32,6 +32,54 @@ const ModernHero = () => {
 
   return (
     <section className="relative min-h-[70vh] md:min-h-screen flex items-center bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800 text-white overflow-hidden">
+      {/* Dynamic Media Background (video/image) */}
+      {home.hero.type === 'video' && heroVideoUrl && !videoError && (
+        <video
+          ref={bgVideoRef}
+          className="absolute inset-0 w-full h-full object-cover opacity-50"
+          autoPlay={home.hero.autoplay ?? true}
+          muted={home.hero.muted ?? true}
+          loop={home.hero.loop ?? true}
+          playsInline
+          preload="metadata"
+          poster={home.hero.posterUrl || undefined}
+          onCanPlay={() => {
+            if (home.hero.autoplay ?? true) {
+              bgVideoRef.current?.play?.().catch(() => {});
+            }
+          }}
+          onLoadedMetadata={() => {
+            if (home.hero.autoplay ?? true) {
+              bgVideoRef.current?.play?.().catch(() => {});
+            }
+          }}
+          onError={() => setVideoError(true)}
+        >
+          <source
+            src={heroVideoUrl}
+            type={heroVideoUrl.startsWith('blob:')
+              ? 'video/mp4'
+              : (heroVideoUrl.startsWith('data:')
+                  ? heroVideoUrl.substring(5, heroVideoUrl.indexOf(';'))
+                  : (heroVideoUrl.endsWith('.webm')
+                      ? 'video/webm'
+                      : (heroVideoUrl.endsWith('.ogv') || heroVideoUrl.endsWith('.ogg')
+                          ? 'video/ogg'
+                          : 'video/mp4')))}
+          />
+        </video>
+      )}
+      {home.hero.type === 'video' && videoError && (home.hero.posterUrl || home.hero.imageUrl) && (
+        <img src={home.hero.posterUrl || home.hero.imageUrl!} alt={home.hero.title || ''} className="absolute inset-0 w-full h-full object-cover opacity-60" />
+      )}
+      {home.hero.type === 'image' && home.hero.imageUrl && (
+        <img src={home.hero.imageUrl} alt={home.hero.title || ''} className="absolute inset-0 w-full h-full object-cover opacity-60" />
+      )}
+
+      {/* Overlay for readability */}
+      {(home.hero.overlay ?? true) && (
+        <div className="absolute inset-0 bg-black/40 z-10" />
+      )}
       <div className="container mx-auto px-4 relative z-20 flex items-center justify-center">
         {/* Content */}
         <div className="text-center max-w-4xl mx-auto space-y-6">
