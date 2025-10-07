@@ -5,6 +5,7 @@ import ModernHeader from '@/components/layout/ModernHeader';
 import Footer from '@/components/layout/Footer';
 import ChatWidget from '@/components/layout/ChatWidget';
 import GallerySection from '@/components/sections/GallerySection';
+import { useHomeContent } from '@/contexts/HomeContentContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
