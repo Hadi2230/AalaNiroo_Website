@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Plus, Trash2, Image as ImageIcon, Info } from 'lucide-react';
 import { useAboutContent } from '@/contexts/AboutContentContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMedia } from '@/contexts/MediaContext';
@@ -25,14 +25,21 @@ export default function AdminAbout() {
       <div className="space-y-8 p-6 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-950 min-h-screen">
         {/* Header Card */}
         <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              مدیریت صفحه درباره ما
-            </CardTitle>
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Info className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    مدیریت صفحه درباره ما
+                  </CardTitle>
+                  <p className="text-gray-600 dark:text-gray-300 mt-1">ویرایش متن‌ها، تیم و گالری شرکت</p>
+                </div>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent>
-            <p className="text-gray-600 dark:text-gray-300">ویرایش متن‌ها، تیم و گالری شرکت</p>
-          </CardContent>
         </Card>
         
         {/* Content Cards */}
@@ -102,7 +109,7 @@ export default function AdminAbout() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex justify-end">
-            <Button onClick={() => addTeamMember({ name: '', role: '', bio: '' })}>
+            <Button onClick={() => addTeamMember({ name: '', role: '', bio: '' })} className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 shadow-md">
               <Plus className="w-4 h-4 mr-2" /> عضو جدید
             </Button>
           </div>
@@ -110,12 +117,12 @@ export default function AdminAbout() {
             {content.team.map((m) => {
               const photo = m.photoId ? getFileById(m.photoId) : undefined;
               return (
-                <Card key={m.id}>
+                <Card key={m.id} className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-0 shadow-md hover:shadow-lg transition-all">
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-center gap-4">
                       <button
                         onClick={() => setOpenTeamMedia(m.id)}
-                        className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center"
+                        className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100/80 border border-white/20 ring-1 ring-black/5 dark:ring-white/5 flex items-center justify-center shadow-sm"
                         aria-label="انتخاب تصویر"
                       >
                         {photo ? (
@@ -148,7 +155,7 @@ export default function AdminAbout() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex justify-end">
-            <Button variant="outline" onClick={() => setOpenGalleryPicker(true)}>انتخاب تصاویر گالری</Button>
+            <Button variant="outline" className="border-2 hover:border-cyan-500 hover:bg-cyan-50 dark:hover:bg-cyan-950 transition-all" onClick={() => setOpenGalleryPicker(true)}>انتخاب تصاویر گالری</Button>
           </div>
           {content.galleryImageIds.length === 0 ? (
             <div className="text-gray-500 text-sm">هنوز تصویری انتخاب نشده است.</div>
@@ -158,7 +165,7 @@ export default function AdminAbout() {
                 const f = getFileById(id);
                 if (!f) return null;
                 return (
-                  <div key={id} className="aspect-square overflow-hidden rounded-lg">
+                  <div key={id} className="aspect-square overflow-hidden rounded-xl ring-1 ring-black/5 dark:ring-white/5 shadow-sm">
                     <img src={f.thumbnailUrl || f.url} alt={f.alt} className="w-full h-full object-cover" />
                   </div>
                 );
