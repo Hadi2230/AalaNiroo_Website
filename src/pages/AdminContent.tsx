@@ -90,7 +90,7 @@ export default function AdminContent() {
   const [editorMode, setEditorMode] = useState<'wysiwyg' | 'html' | 'text'>('wysiwyg');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const { content: homeContent, setHero, clearHero, setIntroMedia, clearIntroMedia, addGalleryItem, removeGalleryItem, updateGalleryItem } = useHomeContent();
+  const { content: homeContent, setHero, clearHero, setIntroMedia, clearIntroMedia, addGalleryItem, removeGalleryItem, updateGalleryItem, setFeaturedProducts, toggleFeaturedProduct } = useHomeContent();
   const hero = (homeContent && homeContent.hero) ? homeContent.hero : { type: 'none', title: '', subtitle: '', ctaText: '', ctaUrl: '', overlay: true, autoplay: true, muted: true, loop: true, posterUrl: '', imageUrl: '', videoUrl: '' };
   const gallery = Array.isArray(homeContent?.gallery) ? homeContent!.gallery : [];
   const { uploadFile } = useMedia();
@@ -837,6 +837,42 @@ export default function AdminContent() {
                     ))}
                   </div>
                 )}
+              </div>
+
+              {/* Featured Products Picker */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">محصولات ویژه صفحه اصلی</h3>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setFeaturedProducts([])}>حذف همه</Button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {products.map((p) => {
+                    const selected = (homeContent.featuredProductIds || []).includes(p.id);
+                    const primaryImage = p.images.find(i => i.isPrimary) || p.images[0];
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => toggleFeaturedProduct(p.id)}
+                        className={`relative text-left border rounded-lg overflow-hidden hover:shadow ${selected ? 'ring-2 ring-blue-500' : ''}`}
+                      >
+                        {primaryImage ? (
+                          <img src={primaryImage.url} alt={p.name} className="w-full h-28 object-cover" />
+                        ) : (
+                          <div className="w-full h-28 bg-gray-100 flex items-center justify-center text-gray-400">بدون تصویر</div>
+                        )}
+                        <div className="p-2">
+                          <div className="font-medium line-clamp-1">{p.name}</div>
+                          <div className="text-xs text-gray-500">{p.brand}</div>
+                        </div>
+                        {selected && (
+                          <Badge className="absolute top-2 right-2 bg-blue-600">انتخاب شد</Badge>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Intro Media (Company Intro Section) */}

@@ -41,6 +41,7 @@ export interface HomeContentState {
   hero: HomeHero;
   gallery: HomeGalleryItem[];
   introMedia: IntroMedia;
+  featuredProductIds: string[];
   updatedAt: string;
   updatedBy?: string;
 }
@@ -56,6 +57,8 @@ interface HomeContentContextType {
   updateGalleryItem: (id: string, updates: Partial<HomeGalleryItem>) => void;
   reorderGallery: (idsInOrder: string[]) => void;
   setGallery: (items: HomeGalleryItem[]) => void;
+  setFeaturedProducts: (ids: string[]) => void;
+  toggleFeaturedProduct: (id: string) => void;
 }
 
 const initialState: HomeContentState = {
@@ -77,6 +80,7 @@ const initialState: HomeContentState = {
     muted: true,
     loop: false,
   },
+  featuredProductIds: [],
   updatedAt: new Date().toISOString(),
 };
 
@@ -224,6 +228,18 @@ export const HomeContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setContent(prev => ({ ...prev, gallery: items, updatedAt: new Date().toISOString() }));
   }, []);
 
+  const setFeaturedProducts = useCallback((ids: string[]) => {
+    setContent(prev => ({ ...prev, featuredProductIds: ids, updatedAt: new Date().toISOString() }));
+  }, []);
+
+  const toggleFeaturedProduct = useCallback((id: string) => {
+    setContent(prev => {
+      const current = new Set(prev.featuredProductIds || []);
+      if (current.has(id)) current.delete(id); else current.add(id);
+      return { ...prev, featuredProductIds: Array.from(current), updatedAt: new Date().toISOString() };
+    });
+  }, []);
+
   const value: HomeContentContextType = {
     content,
     setHero,
@@ -235,6 +251,8 @@ export const HomeContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     updateGalleryItem,
     reorderGallery,
     setGallery,
+    setFeaturedProducts,
+    toggleFeaturedProduct,
   };
 
   return (

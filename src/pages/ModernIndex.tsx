@@ -13,6 +13,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useMedia } from '@/contexts/MediaContext';
 import { products, services, projects } from '@/data/companyData';
+import { useProducts } from '@/contexts/ProductsContext';
+import { useHomeContent } from '@/contexts/HomeContentContext';
 import { useMediaUrl } from '@/hooks/useMediaUrl';
 import { 
   ArrowRight, 
@@ -35,6 +37,8 @@ import {
 } from 'lucide-react';
 
 export default function ModernIndex() {
+  const { allProducts } = useProducts();
+  const { content: homeContent } = useHomeContent();
   const { language, t, dir } = useLanguage();
   const { companyData, isLoading } = useCompany();
   const { listGalleries, mediaFiles } = useMedia();
@@ -237,8 +241,22 @@ export default function ModernIndex() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {currentProducts.slice(0, 3).map((product) => (
-              <ModernProductCard key={product.id} product={product} />
+            {(homeContent.featuredProductIds?.length ? allProducts.filter(p => homeContent.featuredProductIds.includes(p.id)) : allProducts.slice(0, 3)).map((p: any) => (
+              <ModernProductCard key={p.id} product={{
+                id: 0,
+                name: p.name,
+                category: p.category,
+                power: p.specifications.find((s:any)=>s.name.includes('قدرت'))?.value || '',
+                cylinders: p.specifications.find((s:any)=>s.name.includes('سیلندر'))?.value || '-',
+                fuel: p.tags.find((t:string)=>t.includes('دیزل')||t.includes('گاز')) || '',
+                brand: p.brand,
+                image: (p.images.find((i:any)=>i.isPrimary) || p.images[0])?.url || '/api/placeholder/600/400',
+                description: p.shortDescription || p.description,
+                features: p.features.map((f:any)=>f.title),
+                applications: p.applications || [],
+                warranty: p.warranty || '',
+                pdf: (p.downloadableFiles.find((f:any)=>f.type==='catalog')?.url) || ''
+              }} />
             ))}
           </div>
 
