@@ -21,8 +21,14 @@ export default function AdminAbout() {
   const [openGalleryPicker, setOpenGalleryPicker] = useState(false);
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
-      <h1 className="text-2xl font-bold">مدیریت صفحه درباره ما</h1>
+    <div className="min-h-screen">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white mb-6">
+        <div className="container mx-auto px-4 py-6">
+          <h1 className="text-2xl font-bold">مدیریت صفحه درباره ما</h1>
+          <p className="text-blue-100 mt-1">ویرایش متن‌ها، تیم و گالری شرکت</p>
+        </div>
+      </div>
+      <div className="container mx-auto px-4 pb-10 space-y-8">
 
       <Card>
         <CardHeader>
@@ -162,14 +168,10 @@ export default function AdminAbout() {
           </DialogHeader>
           {openTeamMedia && (
             <MediaPicker
-              onSelect={(files) => {
-                const first = files[0];
-                if (first) updateTeamMember(openTeamMedia, { photoId: first.id });
-                setOpenTeamMedia(null);
-              }}
-              acceptTypes={['image']}
-              multiSelect={false}
-              defaultFolder="gallery"
+              open={true}
+              onOpenChange={() => setOpenTeamMedia(null)}
+              onSelect={(f) => { updateTeamMember(openTeamMedia, { photoId: f.id }); }}
+              accept={['image']}
             />
           )}
         </DialogContent>
@@ -181,16 +183,14 @@ export default function AdminAbout() {
             <DialogTitle>انتخاب تصاویر گالری</DialogTitle>
           </DialogHeader>
           <MediaPicker
-            onSelect={(files) => {
-              setGalleryImages(files.map(f => f.id));
-              setOpenGalleryPicker(false);
-            }}
-            acceptTypes={['image']}
-            multiSelect
-            defaultFolder="gallery"
+            open={openGalleryPicker}
+            onOpenChange={setOpenGalleryPicker}
+            onSelect={(f) => { setGalleryImages([f.id]); setOpenGalleryPicker(false); }}
+            accept={['image']}
           />
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }
