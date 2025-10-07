@@ -91,6 +91,8 @@ export default function AdminContent() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { content: homeContent, setHero, clearHero, setIntroMedia, clearIntroMedia, addGalleryItem, removeGalleryItem, updateGalleryItem } = useHomeContent();
+  const hero = (homeContent && homeContent.hero) ? homeContent.hero : { type: 'none', title: '', subtitle: '', ctaText: '', ctaUrl: '', overlay: true, autoplay: true, muted: true, loop: true, posterUrl: '', imageUrl: '', videoUrl: '' };
+  const gallery = Array.isArray(homeContent?.gallery) ? homeContent!.gallery : [];
   const { uploadFile } = useMedia();
   const [showHeroMediaPicker, setShowHeroMediaPicker] = useState(false);
   const [showGalleryPicker, setShowGalleryPicker] = useState(false);
@@ -761,47 +763,47 @@ export default function AdminContent() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>عنوان</Label>
-                    <Input value={homeContent.hero.title || ''} onChange={(e) => setHero({ title: e.target.value })} />
+                    <Input value={hero.title || ''} onChange={(e) => setHero({ title: e.target.value })} />
                   </div>
                   <div className="space-y-2">
                     <Label>زیرعنوان</Label>
-                    <Input value={homeContent.hero.subtitle || ''} onChange={(e) => setHero({ subtitle: e.target.value })} />
+                    <Input value={hero.subtitle || ''} onChange={(e) => setHero({ subtitle: e.target.value })} />
                   </div>
                   <div className="space-y-2">
                     <Label>CTA متن</Label>
-                    <Input value={homeContent.hero.ctaText || ''} onChange={(e) => setHero({ ctaText: e.target.value })} />
+                    <Input value={hero.ctaText || ''} onChange={(e) => setHero({ ctaText: e.target.value })} />
                   </div>
                   <div className="space-y-2">
                     <Label>CTA لینک</Label>
-                    <Input value={homeContent.hero.ctaUrl || ''} onChange={(e) => setHero({ ctaUrl: e.target.value })} />
+                    <Input value={hero.ctaUrl || ''} onChange={(e) => setHero({ ctaUrl: e.target.value })} />
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                      <Switch checked={homeContent.hero.overlay ?? true} onCheckedChange={(v) => setHero({ overlay: !!v })} />
+                      <Switch checked={hero.overlay ?? true} onCheckedChange={(v) => setHero({ overlay: !!v })} />
                       <Label>اورلی</Label>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Switch checked={homeContent.hero.autoplay ?? true} onCheckedChange={(v) => setHero({ autoplay: !!v })} />
+                      <Switch checked={hero.autoplay ?? true} onCheckedChange={(v) => setHero({ autoplay: !!v })} />
                       <Label>AutoPlay</Label>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Switch checked={homeContent.hero.muted ?? true} onCheckedChange={(v) => setHero({ muted: !!v })} />
+                      <Switch checked={hero.muted ?? true} onCheckedChange={(v) => setHero({ muted: !!v })} />
                       <Label>Mute</Label>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Switch checked={homeContent.hero.loop ?? true} onCheckedChange={(v) => setHero({ loop: !!v })} />
+                      <Switch checked={hero.loop ?? true} onCheckedChange={(v) => setHero({ loop: !!v })} />
                       <Label>Loop</Label>
                     </div>
                   </div>
                 </div>
                 {/* Preview */}
                 <div className="rounded-lg overflow-hidden border">
-                  {homeContent.hero.videoUrl ? (
-                    <video className="w-full" controls poster={homeContent.hero.posterUrl || undefined} autoPlay={homeContent.hero.autoplay} muted={homeContent.hero.muted} loop={homeContent.hero.loop} playsInline preload="metadata">
-                      <source src={homeContent.hero.videoUrl.startsWith('idb:') ? '' : homeContent.hero.videoUrl} type={homeContent.hero.videoUrl.startsWith('data:') ? homeContent.hero.videoUrl.substring(5, homeContent.hero.videoUrl.indexOf(';')) : (homeContent.hero.videoUrl.endsWith('.webm') ? 'video/webm' : (homeContent.hero.videoUrl.endsWith('.ogv') || homeContent.hero.videoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4'))} />
+                  {hero.videoUrl ? (
+                    <video className="w-full" controls poster={hero.posterUrl || undefined} autoPlay={hero.autoplay} muted={hero.muted} loop={hero.loop} playsInline preload="metadata">
+                      <source src={hero.videoUrl.startsWith('idb:') ? '' : hero.videoUrl} type={hero.videoUrl.startsWith('data:') ? hero.videoUrl.substring(5, hero.videoUrl.indexOf(';')) : (hero.videoUrl.endsWith('.webm') ? 'video/webm' : (hero.videoUrl.endsWith('.ogv') || hero.videoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4'))} />
                     </video>
-                  ) : homeContent.hero.imageUrl ? (
-                    <img src={homeContent.hero.imageUrl} alt={homeContent.hero.title || ''} className="w-full" />
+                  ) : hero.imageUrl ? (
+                    <img src={hero.imageUrl} alt={hero.title || ''} className="w-full" />
                   ) : (
                     <div className="p-8 text-center text-gray-500">مدیایی انتخاب نشده است</div>
                   )}
@@ -816,11 +818,11 @@ export default function AdminContent() {
                     <Button variant="outline" onClick={() => setShowGalleryPicker(true)}>افزودن از رسانه‌ها</Button>
                   </div>
                 </div>
-                {homeContent.gallery.length === 0 ? (
+                {gallery.length === 0 ? (
                   <div className="p-8 text-center text-gray-500 border rounded-lg">آیتمی در گالری نیست</div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {[...homeContent.gallery].sort((a,b) => a.order - b.order).map(item => (
+                    {[...gallery].sort((a,b) => a.order - b.order).map(item => (
                       <div key={item.id} className="relative group">
                         {item.type === 'image' ? (
                           <img src={item.url} alt={item.alt} className="w-full h-40 object-cover rounded" />
