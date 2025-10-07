@@ -8,6 +8,7 @@ export interface HomeHero {
   subtitle?: string;
   ctaText?: string;
   ctaUrl?: string;
+  callText?: string;
   overlay?: boolean;
   autoplay?: boolean;
   muted?: boolean;
@@ -60,6 +61,10 @@ interface HomeContentContextType {
 const initialState: HomeContentState = {
   hero: {
     type: 'none',
+    title: 'پیشرو در تولید ژنراتورهای صنعتی',
+    subtitle: 'با بیش از 33 سال تجربه در صنعت ژنراتور، نماینده رسمی برندهای معتبر جهانی',
+    ctaText: 'درخواست پیش‌فاکتور',
+    callText: 'تماس فوری',
     overlay: true,
     autoplay: true,
     muted: true,

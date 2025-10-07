@@ -133,13 +133,13 @@ const ModernHero = () => {
                 }
               }}>
                 <FileText className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-                {home.hero.ctaText || t('hero.cta.quote')}
+                {home.hero.ctaText || (language === 'fa' ? 'درخواست پیش‌فاکتور' : t('hero.cta.quote'))}
                 <ArrowRight className={`w-5 h-5 ${dir === 'rtl' ? 'mr-2' : 'ml-2'} group-hover:translate-x-1 transition-transform`} />
               </Button>
               
               <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-gray-400 text-white hover:bg-white hover:text-gray-900" onClick={() => { if (company.phone) window.open(`tel:${company.phone}`, '_self'); }}>
                 <Phone className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-                {t('hero.cta.call')}
+                {home.hero.callText || t('hero.cta.call')}
               </Button>
             </div>
 
