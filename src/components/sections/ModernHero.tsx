@@ -80,15 +80,10 @@ const ModernHero = () => {
       {(home.hero.overlay ?? true) && (
         <div className="absolute inset-0 bg-black/40 z-10"></div>
       )}
-      
-      
-
-      <div className="container mx-auto px-4 relative z-20">
-        <div className="grid grid-cols-1 gap-12 items-center justify-items-center">
-          {/* Content */}
-          <div className="space-y-8 text-center max-w-4xl mx-auto">
-            <div className="space-y-6">
-              <h1 className="text-5xl lg:text-7xl font-bold leading-tight">
+      <div className="container mx-auto px-4 relative z-20 flex items-center justify-center">
+        {/* Content */}
+        <div className="text-center max-w-4xl mx-auto space-y-6">
+          <h1 className="text-5xl lg:text-7xl font-bold leading-tight">
                 {home.hero.title ? (
                   home.hero.title
                 ) : language === 'fa' ? (
@@ -106,45 +101,11 @@ const ModernHero = () => {
                     </span>
                   </>
                 )}
-              </h1>
-              
-              <p className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-2xl">
-                {home.hero.subtitle || company.description}
-              </p>
-            </div>
+          </h1>
 
-            
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4 group" onClick={() => {
-                const msg = company.quoteMessage || (language === 'fa' ? 'درخواست پیش‌فاکتور ثبت شد.' : 'Quote request submitted.');
-                // inline toast fallback if toast not globally available
-                try {
-                  // @ts-ignore
-                  if (window?.sonner?.toast) {
-                    // @ts-ignore
-                    window.sonner.toast.success(msg);
-                  } else {
-                    alert(msg);
-                  }
-                } catch {
-                  alert(msg);
-                }
-              }}>
-                <FileText className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-                {home.hero.ctaText || (language === 'fa' ? 'درخواست پیش‌فاکتور' : t('hero.cta.quote'))}
-                <ArrowRight className={`w-5 h-5 ${dir === 'rtl' ? 'mr-2' : 'ml-2'} group-hover:translate-x-1 transition-transform`} />
-              </Button>
-              
-              <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-gray-400 text-white hover:bg-white hover:text-gray-900" onClick={() => { if (company.phone) window.open(`tel:${company.phone}`, '_self'); }}>
-                <Phone className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-                {home.hero.callText || t('hero.cta.call')}
-              </Button>
-            </div>
-
-            
-          </div>
+          <p className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-2xl mx-auto">
+            {home.hero.subtitle || company.description}
+          </p>
         </div>
       </div>
       
