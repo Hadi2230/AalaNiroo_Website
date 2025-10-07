@@ -15,7 +15,9 @@ export default function GalleryDetail() {
     return (
       <div className="min-h-screen flex flex-col">
         <ModernHeader />
-        <div className="container mx-auto py-10 flex-1">گالری یافت نشد.</div>
+        <main className="page-bg flex-1">
+          <div className="container mx-auto py-10">گالری یافت نشد.</div>
+        </main>
         <Footer />
         <ChatWidget />
       </div>
@@ -29,7 +31,8 @@ export default function GalleryDetail() {
   return (
     <div className="min-h-screen flex flex-col">
       <ModernHeader />
-      <div className="container mx-auto py-10 space-y-6 flex-1">
+      <main className="page-bg flex-1">
+      <div className="container mx-auto py-10 space-y-6">
         <div>
           <h1 className="text-3xl font-bold">{gallery.title}</h1>
           {gallery.description && <p className="text-gray-600 mt-2">{gallery.description}</p>}
@@ -46,6 +49,7 @@ export default function GalleryDetail() {
           ))}
         </div>
       </div>
+      </main>
       <Footer />
       <ChatWidget />
     </div>

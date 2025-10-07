@@ -7,6 +7,7 @@ export default function Contact() {
   return (
     <div className="min-h-screen">
       <ModernHeader />
+      <main className="page-bg">
       
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-blue-900 to-gray-900 text-white">
@@ -27,6 +28,7 @@ export default function Contact() {
         </div>
       </section>
 
+      </main>
       <Footer />
       <ChatWidget />
     </div>

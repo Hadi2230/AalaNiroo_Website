@@ -24,6 +24,7 @@ export default function Blog() {
   return (
     <div className="min-h-screen">
       <ModernHeader />
+      <main className="page-bg">
       
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-blue-900 to-gray-900 text-white">
@@ -200,6 +201,7 @@ export default function Blog() {
         </div>
       </section>
 
+      </main>
       <Footer />
       <ChatWidget />
     </div>

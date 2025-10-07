@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -324,3 +325,124 @@
     background-color: #111827 !important;
   }
 }
+=======
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* New brand palette */
+    /* Base backgrounds */
+    --background: 208 52% 23%; /* #1c3d5a */
+    --foreground: 205 14% 54%; /* #7a8d9b */
+
+    /* Modern surfaces */
+    --card: 0 0% 100%;       /* white */
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    /* Accents */
+    --primary: 186 100% 37%; /* #00a7bb */
+    --primary-foreground: 210 40% 98%; /* near white */
+
+    --secondary: 210 24% 48%; /* #5e7b99 */
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 210 24% 40%;
+    --muted-foreground: 205 14% 70%;
+
+    --accent: 210 24% 48%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* UI chrome */
+    --border: 210 24% 40%;
+    --input: 210 24% 40%;
+    --ring: 186 100% 37%;
+
+    --radius: 0.75rem; /* slightly rounder like modern SaaS */
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Slightly lighter foreground on dark */
+    --background: 208 52% 18%;
+    --foreground: 210 40% 94%;
+
+    --card: 208 52% 23%;
+    --card-foreground: 210 40% 94%;
+
+    --popover: 208 52% 23%;
+    --popover-foreground: 210 40% 94%;
+
+    --primary: 186 100% 45%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 24% 35%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 210 24% 28%;
+    --muted-foreground: 210 20% 80%;
+
+    --accent: 210 24% 35%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 35%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 210 24% 28%;
+    --input: 210 24% 28%;
+    --ring: 186 100% 45%;
+    --sidebar-background: 208 52% 18%;
+    --sidebar-foreground: 210 40% 94%;
+    --sidebar-primary: 186 100% 45%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 210 24% 28%;
+    --sidebar-accent-foreground: 210 40% 94%;
+    --sidebar-border: 210 24% 28%;
+    --sidebar-ring: 186 100% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+/* Utilities */
+@layer utilities {
+  /* Dedicated content background (excludes header/footer) */
+  .page-bg { background-color: #7a8d9b; color: #0f172a; }
+  .page-bg .bg-white { background-color: rgba(255, 255, 255, 0.88) !important; }
+  .page-bg .bg-gray-50 { background-color: rgba(255, 255, 255, 0.78) !important; }
+  .container { @apply max-w-[1200px]; }
+  .section { @apply py-16 md:py-20; }
+  .section-title { @apply text-3xl md:text-4xl font-extrabold tracking-tight mb-6; }
+  .section-subtitle { @apply text-base md:text-lg text-slate-700; }
+}
+>>>>>>> cursor/set-page-background-color-except-header-and-footer-c85a
