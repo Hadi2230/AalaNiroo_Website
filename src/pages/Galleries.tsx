@@ -14,7 +14,8 @@ export default function Galleries() {
   return (
     <div className="min-h-screen flex flex-col">
       <ModernHeader />
-      <div className="container mx-auto py-10 space-y-8 flex-1">
+      <main className="page-bg flex-1">
+      <div className="container mx-auto py-10 space-y-8">
         <div>
           <h1 className="text-3xl font-bold">گالری پروژه‌ها</h1>
           <p className="text-gray-600 mt-2">مجموعه تصاویر پروژه‌های انجام‌شده</p>
@@ -54,6 +55,7 @@ export default function Galleries() {
           </div>
         )}
       </div>
+      </main>
       <Footer />
       <ChatWidget />
     </div>

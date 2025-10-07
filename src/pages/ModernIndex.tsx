@@ -88,6 +88,7 @@ export default function ModernIndex() {
   return (
     <div className="min-h-screen">
       <ModernHeader />
+      <main className="page-bg">
       
       {/* Hero Section */}
       <ModernHero />
@@ -418,6 +419,7 @@ export default function ModernIndex() {
         </div>
       </section>
 
+      </main>
       <Footer />
       <ChatWidget />
     </div>

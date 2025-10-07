@@ -136,6 +136,7 @@ export default function Products() {
   return (
     <div className="min-h-screen">
       <ModernHeader />
+      <main className="page-bg">
       
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800 text-white">
@@ -831,6 +832,7 @@ export default function Products() {
         </DialogContent>
       </Dialog>
 
+      </main>
       <Footer />
       <ChatWidget />
     </div>
