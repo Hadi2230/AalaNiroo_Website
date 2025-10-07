@@ -4,12 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Plus, Trash2, Image as ImageIcon } from 'lucide-react';
 import { useAboutContent } from '@/contexts/AboutContentContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMedia } from '@/contexts/MediaContext';
 import MediaPicker from '@/components/media/MediaPicker';
+import AdminLayout from '@/components/layout/AdminLayout';
 
 export default function AdminAbout() {
   const { content, updateLocale, addTeamMember, updateTeamMember, removeTeamMember, setGalleryImages } = useAboutContent();
@@ -21,16 +21,24 @@ export default function AdminAbout() {
   const [openGalleryPicker, setOpenGalleryPicker] = useState(false);
 
   return (
-    <div className="min-h-screen">
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white mb-6">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold">مدیریت صفحه درباره ما</h1>
-          <p className="text-blue-100 mt-1">ویرایش متن‌ها، تیم و گالری شرکت</p>
-        </div>
-      </div>
-      <div className="container mx-auto px-4 pb-10 space-y-8">
+    <AdminLayout>
+      <div className="space-y-8 p-6 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-950 min-h-screen">
+        {/* Header Card */}
+        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              مدیریت صفحه درباره ما
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600 dark:text-gray-300">ویرایش متن‌ها، تیم و گالری شرکت</p>
+          </CardContent>
+        </Card>
+        
+        {/* Content Cards */}
+        <div className="space-y-8">
 
-      <Card>
+      <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
         <CardHeader>
           <CardTitle>متن‌های اصلی</CardTitle>
         </CardHeader>
@@ -88,7 +96,7 @@ export default function AdminAbout() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
         <CardHeader>
           <CardTitle>تیم ما</CardTitle>
         </CardHeader>
@@ -134,7 +142,7 @@ export default function AdminAbout() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
         <CardHeader>
           <CardTitle>گالری شرکت</CardTitle>
         </CardHeader>
@@ -160,38 +168,23 @@ export default function AdminAbout() {
         </CardContent>
       </Card>
 
-      {/* Media pickers */}
-      <Dialog open={openTeamMedia !== null} onOpenChange={(v) => !v && setOpenTeamMedia(null)}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>انتخاب تصویر عضو تیم</DialogTitle>
-          </DialogHeader>
-          {openTeamMedia && (
-            <MediaPicker
-              open={true}
-              onOpenChange={() => setOpenTeamMedia(null)}
-              onSelect={(f) => { updateTeamMember(openTeamMedia, { photoId: f.id }); }}
-              accept={['image']}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+        {/* Media pickers */}
+        <MediaPicker
+          open={openTeamMedia !== null}
+          onOpenChange={(v) => !v && setOpenTeamMedia(null)}
+          onSelect={(f) => { if (openTeamMedia) updateTeamMember(openTeamMedia, { photoId: f.id }); setOpenTeamMedia(null); }}
+          accept={['image']}
+        />
 
-      <Dialog open={openGalleryPicker} onOpenChange={setOpenGalleryPicker}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>انتخاب تصاویر گالری</DialogTitle>
-          </DialogHeader>
-          <MediaPicker
-            open={openGalleryPicker}
-            onOpenChange={setOpenGalleryPicker}
-            onSelect={(f) => { setGalleryImages([f.id]); setOpenGalleryPicker(false); }}
-            accept={['image']}
-          />
-        </DialogContent>
-      </Dialog>
+        <MediaPicker
+          open={openGalleryPicker}
+          onOpenChange={setOpenGalleryPicker}
+          onSelect={(f) => { setGalleryImages([f.id]); setOpenGalleryPicker(false); }}
+          accept={['image']}
+        />
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
 
