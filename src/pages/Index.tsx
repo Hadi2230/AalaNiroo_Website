@@ -13,6 +13,7 @@ export default function Index() {
   return (
     <div className="min-h-screen">
       <ModernHeader />
+      <main className="page-bg">
       
       {/* Hero Section */}
       <HeroSection />
@@ -187,6 +188,7 @@ export default function Index() {
         </div>
       </section>
 
+      </main>
       <Footer />
       <ChatWidget />
     </div>
