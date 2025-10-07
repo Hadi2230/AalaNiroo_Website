@@ -52,12 +52,12 @@ const ModernHeader = () => {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-4">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-4">
               {company.logoUrl ? (
-                <img src={company.logoUrl} alt={company.name} className="w-12 h-12 object-contain" />
+                <img src={company.logoUrl} alt={company.name} className="w-16 h-16 md:w-20 md:h-20 object-contain" />
               ) : (
-                <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">A</span>
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-white/10 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-2xl">A</span>
                 </div>
               )}
               <div className={dir === 'rtl' ? 'text-right' : 'text-left'}>

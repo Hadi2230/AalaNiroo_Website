@@ -339,8 +339,28 @@ const defaultProducts: Product[] = [
 ];
 
 export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<ProductCategory[]>(defaultCategories);
+  const [products, setProducts] = useState<Product[]>(() => {
+    try {
+      const raw = localStorage.getItem('products');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    try { localStorage.setItem('products', JSON.stringify(defaultProducts)); } catch {}
+    return defaultProducts;
+  });
+  const [categories, setCategories] = useState<ProductCategory[]>(() => {
+    try {
+      const raw = localStorage.getItem('productCategories');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    try { localStorage.setItem('productCategories', JSON.stringify(defaultCategories)); } catch {}
+    return defaultCategories;
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTermState] = useState('');
@@ -364,55 +384,8 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const skipBroadcastNextRef = useRef<boolean>(false);
   const tabIdRef = useRef<string>(`tab-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
 
-  // Load data from localStorage with robust fallback to defaults
+  // Setup sync listeners (no initial load here; state already initialized lazily)
   useEffect(() => {
-    const savedProducts = localStorage.getItem('products');
-    const savedCategories = localStorage.getItem('productCategories');
-
-    const seedDefaults = () => {
-      console.log('📦 Seeding default products');
-      setProducts(defaultProducts);
-      try { localStorage.setItem('products', JSON.stringify(defaultProducts)); } catch {}
-    };
-
-    if (savedProducts) {
-      try {
-        const loadedProducts = JSON.parse(savedProducts);
-        const isValidArray = Array.isArray(loadedProducts);
-        const length = isValidArray ? loadedProducts.length : 0;
-        console.log('📂 Loading products from localStorage:', length);
-        if (!isValidArray || length === 0) {
-          seedDefaults();
-        } else {
-          setProducts(loadedProducts);
-        }
-      } catch (error) {
-        console.error('Error loading products:', error);
-        seedDefaults();
-      }
-    } else {
-      seedDefaults();
-    }
-
-    if (savedCategories) {
-      try {
-        const loadedCats = JSON.parse(savedCategories);
-        if (Array.isArray(loadedCats) && loadedCats.length > 0) {
-          setCategories(loadedCats);
-        } else {
-          setCategories(defaultCategories);
-          try { localStorage.setItem('productCategories', JSON.stringify(defaultCategories)); } catch {}
-        }
-      } catch (error) {
-        console.error('Error loading categories:', error);
-        setCategories(defaultCategories);
-        try { localStorage.setItem('productCategories', JSON.stringify(defaultCategories)); } catch {}
-      }
-    } else {
-      setCategories(defaultCategories);
-      try { localStorage.setItem('productCategories', JSON.stringify(defaultCategories)); } catch {}
-    }
-
     // Listen for products updates from other components/tabs
     const handleProductsUpdate = (event: CustomEvent) => {
       if (event.detail && Array.isArray(event.detail)) {
