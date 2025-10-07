@@ -36,7 +36,7 @@
     --input: 210 24% 40%;
     --ring: 186 100% 37%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* slightly rounder like modern SaaS */
 
     --sidebar-background: 0 0% 98%;
 
@@ -101,7 +101,7 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
   }
 }
 
@@ -111,4 +111,8 @@
   .page-bg { background-color: #7a8d9b; color: #0f172a; }
   .page-bg .bg-white { background-color: rgba(255, 255, 255, 0.88) !important; }
   .page-bg .bg-gray-50 { background-color: rgba(255, 255, 255, 0.78) !important; }
+  .container { @apply max-w-[1200px]; }
+  .section { @apply py-16 md:py-20; }
+  .section-title { @apply text-3xl md:text-4xl font-extrabold tracking-tight mb-6; }
+  .section-subtitle { @apply text-base md:text-lg text-slate-700; }
 }
