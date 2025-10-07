@@ -26,6 +26,7 @@ export interface AboutContentState {
   en: AboutContentLocale;
   team: AboutTeamMember[];
   galleryImageIds: string[]; // ordered
+  heroImageId?: string | null;
 }
 
 interface AboutContentContextType {
@@ -35,6 +36,7 @@ interface AboutContentContextType {
   updateTeamMember: (id: string, updates: Partial<AboutTeamMember>) => void;
   removeTeamMember: (id: string) => void;
   setGalleryImages: (imageIds: string[]) => void;
+  setHeroImage: (imageId: string | null) => void;
 }
 
 const DEFAULT_CONTENT: AboutContentState = {
@@ -86,7 +88,8 @@ const DEFAULT_CONTENT: AboutContentState = {
       bio: 'کارشناس مدیریت پروژه و کنترل کیفیت'
     }
   ],
-  galleryImageIds: []
+  galleryImageIds: [],
+  heroImageId: null
 };
 
 const AboutContentContext = createContext<AboutContentContextType | undefined>(undefined);
@@ -103,6 +106,7 @@ export function AboutContentProvider({ children }: { children: React.ReactNode }
         en: { ...DEFAULT_CONTENT.en, ...(parsed.en || {}) },
         team: parsed.team || DEFAULT_CONTENT.team,
         galleryImageIds: parsed.galleryImageIds || DEFAULT_CONTENT.galleryImageIds,
+        heroImageId: (parsed as any).heroImageId ?? DEFAULT_CONTENT.heroImageId,
       };
     } catch {
       return DEFAULT_CONTENT;
@@ -134,6 +138,10 @@ export function AboutContentProvider({ children }: { children: React.ReactNode }
     setContent(prev => ({ ...prev, galleryImageIds: [...imageIds] }));
   };
 
+  const setHeroImage = (imageId: string | null) => {
+    setContent(prev => ({ ...prev, heroImageId: imageId }));
+  };
+
   const value = useMemo<AboutContentContextType>(() => ({
     content,
     updateLocale,
@@ -141,6 +149,7 @@ export function AboutContentProvider({ children }: { children: React.ReactNode }
     updateTeamMember,
     removeTeamMember,
     setGalleryImages,
+    setHeroImage,
   }), [content]);
 
   return (
