@@ -12,13 +12,14 @@ import MediaPicker from '@/components/media/MediaPicker';
 import AdminLayout from '@/components/layout/AdminLayout';
 
 export default function AdminAbout() {
-  const { content, updateLocale, addTeamMember, updateTeamMember, removeTeamMember, setGalleryImages } = useAboutContent();
+  const { content, updateLocale, addTeamMember, updateTeamMember, removeTeamMember, setGalleryImages, setHeroImage } = useAboutContent();
   const { language } = useLanguage();
   const { getFileById } = useMedia();
 
   const [langTab, setLangTab] = useState<'fa' | 'en'>(language);
   const [openTeamMedia, setOpenTeamMedia] = useState<string | null>(null);
   const [openGalleryPicker, setOpenGalleryPicker] = useState(false);
+  const [openHeroPicker, setOpenHeroPicker] = useState(false);
 
   return (
     <AdminLayout>
@@ -50,6 +51,29 @@ export default function AdminAbout() {
           <CardTitle>متن‌های اصلی</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Hero Image Picker */}
+          <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-900/40 border border-white/20">
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center">
+                {content.heroImageId ? (
+                  (() => { const f = getFileById(content.heroImageId!); return f ? <img src={f.thumbnailUrl || f.url} alt={f.alt} className="w-full h-full object-cover" /> : <ImageIcon className="w-8 h-8 text-gray-400" />; })()
+                ) : (
+                  <ImageIcon className="w-8 h-8 text-gray-400" />
+                )}
+              </div>
+              <div>
+                <div className="font-semibold mb-1">تصویر هدر صفحه درباره ما</div>
+                <div className="text-sm text-gray-500">این تصویر در بخش هدر صفحه /about نمایش داده می‌شود.</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {content.heroImageId && (
+                <Button variant="outline" onClick={() => setHeroImage(null)}>حذف تصویر</Button>
+              )}
+              <Button onClick={() => setOpenHeroPicker(true)}>انتخاب/تغییر تصویر</Button>
+            </div>
+          </div>
+
           <Tabs value={langTab} onValueChange={(v) => setLangTab(v as 'fa' | 'en')}>
             <TabsList>
               <TabsTrigger value="fa">فارسی</TabsTrigger>
@@ -187,6 +211,13 @@ export default function AdminAbout() {
           open={openGalleryPicker}
           onOpenChange={setOpenGalleryPicker}
           onSelect={(f) => { setGalleryImages([f.id]); setOpenGalleryPicker(false); }}
+          accept={['image']}
+        />
+
+        <MediaPicker
+          open={openHeroPicker}
+          onOpenChange={setOpenHeroPicker}
+          onSelect={(f) => { setHeroImage(f.id); setOpenHeroPicker(false); }}
           accept={['image']}
         />
         </div>

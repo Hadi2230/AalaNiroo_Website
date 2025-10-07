@@ -15,7 +15,7 @@ import { useState } from 'react';
 export default function About() {
   const { language, t } = useLanguage();
   const { companyData } = useCompany();
-  const { getGalleryImages } = useMedia();
+  const { getGalleryImages, getFileById } = useMedia();
   const { content: about } = useAboutContent();
   const company = companyData[language];
   const galleryImages = about.galleryImageIds
@@ -206,11 +206,27 @@ export default function About() {
               </div>
             </div>
             <div className="relative">
-              <img 
-                src="/api/placeholder/600/400" 
-                alt={language === 'fa' ? 'شرکت اعلا نیرو' : 'Aalaniroo Company'} 
-                className="rounded-2xl shadow-2xl"
-              />
+              {about.heroImageId ? (
+                (() => { const f = getFileById(about.heroImageId!); return f ? (
+                  <img
+                    src={f.url}
+                    alt={f.alt || (language === 'fa' ? 'شرکت اعلا نیرو' : 'Aalaniroo Company')}
+                    className="rounded-2xl shadow-2xl"
+                  />
+                ) : (
+                  <img
+                    src="/api/placeholder/600/400"
+                    alt={language === 'fa' ? 'شرکت اعلا نیرو' : 'Aalaniroo Company'}
+                    className="rounded-2xl shadow-2xl"
+                  />
+                ); })()
+              ) : (
+                <img 
+                  src="/api/placeholder/600/400" 
+                  alt={language === 'fa' ? 'شرکت اعلا نیرو' : 'Aalaniroo Company'} 
+                  className="rounded-2xl shadow-2xl"
+                />
+              )}
             </div>
           </div>
         </div>
