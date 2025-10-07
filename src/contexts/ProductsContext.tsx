@@ -364,32 +364,53 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const skipBroadcastNextRef = useRef<boolean>(false);
   const tabIdRef = useRef<string>(`tab-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
 
-  // Load data from localStorage
+  // Load data from localStorage with robust fallback to defaults
   useEffect(() => {
     const savedProducts = localStorage.getItem('products');
     const savedCategories = localStorage.getItem('productCategories');
-    
+
+    const seedDefaults = () => {
+      console.log('📦 Seeding default products');
+      setProducts(defaultProducts);
+      try { localStorage.setItem('products', JSON.stringify(defaultProducts)); } catch {}
+    };
+
     if (savedProducts) {
       try {
         const loadedProducts = JSON.parse(savedProducts);
-        console.log('📂 Loading products from localStorage:', loadedProducts.length);
-        setProducts(loadedProducts);
+        const isValidArray = Array.isArray(loadedProducts);
+        const length = isValidArray ? loadedProducts.length : 0;
+        console.log('📂 Loading products from localStorage:', length);
+        if (!isValidArray || length === 0) {
+          seedDefaults();
+        } else {
+          setProducts(loadedProducts);
+        }
       } catch (error) {
         console.error('Error loading products:', error);
-        // Fallback to default products
-        setProducts(defaultProducts);
+        seedDefaults();
       }
     } else {
-      console.log('📦 No saved products, using defaults');
-      setProducts(defaultProducts);
+      seedDefaults();
     }
-    
+
     if (savedCategories) {
       try {
-        setCategories(JSON.parse(savedCategories));
+        const loadedCats = JSON.parse(savedCategories);
+        if (Array.isArray(loadedCats) && loadedCats.length > 0) {
+          setCategories(loadedCats);
+        } else {
+          setCategories(defaultCategories);
+          try { localStorage.setItem('productCategories', JSON.stringify(defaultCategories)); } catch {}
+        }
       } catch (error) {
         console.error('Error loading categories:', error);
+        setCategories(defaultCategories);
+        try { localStorage.setItem('productCategories', JSON.stringify(defaultCategories)); } catch {}
       }
+    } else {
+      setCategories(defaultCategories);
+      try { localStorage.setItem('productCategories', JSON.stringify(defaultCategories)); } catch {}
     }
 
     // Listen for products updates from other components/tabs
