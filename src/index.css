@@ -9,11 +9,12 @@
     --background: 208 52% 23%; /* #1c3d5a */
     --foreground: 205 14% 54%; /* #7a8d9b */
 
-    --card: 210 24% 48%; /* #5e7b99 */
-    --card-foreground: 205 14% 54%; /* #7a8d9b */
+    /* Modern surfaces */
+    --card: 0 0% 100%;       /* white */
+    --card-foreground: 222.2 84% 4.9%;
 
-    --popover: 210 24% 48%;
-    --popover-foreground: 205 14% 54%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
 
     /* Accents */
     --primary: 186 100% 37%; /* #00a7bb */
