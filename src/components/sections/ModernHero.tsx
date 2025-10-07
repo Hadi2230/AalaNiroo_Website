@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useMediaUrl } from '@/hooks/useMediaUrl';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Phone, FileText } from 'lucide-react';
@@ -12,23 +12,66 @@ const ModernHero = () => {
   const { content: home } = useHomeContent();
   const company = companyData[language];
   const bgVideoRef = useRef<HTMLVideoElement | null>(null);
+  const [videoError, setVideoError] = useState(false);
   const heroVideoUrl = useMediaUrl(home.hero.type === 'video' ? home.hero.videoUrl : undefined);
 
   useEffect(() => {
-    if (home.hero.type === 'video' && home.hero.videoUrl && (home.hero.autoplay ?? true)) {
-      try {
-        bgVideoRef.current?.play?.();
-      } catch {}
+    // Ensure autoplay tries to start when allowed (muted inline)
+    if (home.hero.type === 'video' && heroVideoUrl && (home.hero.autoplay ?? true)) {
+      const el = bgVideoRef.current;
+      if (el) {
+        // Force muted for autoplay compliance if not explicitly false
+        if (home.hero.muted !== false) {
+          el.muted = true;
+        }
+        el.play().catch(() => {
+          // Autoplay might be blocked; we'll try again on canplay
+        });
+      }
     }
-  }, [home.hero.type, home.hero.videoUrl, home.hero.autoplay]);
+  }, [home.hero.type, heroVideoUrl, home.hero.autoplay, home.hero.muted]);
 
   return (
     <section className="relative min-h-screen flex items-center bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800 text-white overflow-hidden">
       {/* Dynamic Media Background */}
-      {home.hero.type === 'video' && heroVideoUrl && (
-        <video ref={bgVideoRef} className="absolute inset-0 w-full h-full object-cover opacity-50" autoPlay={home.hero.autoplay} muted={home.hero.muted} loop={home.hero.loop} playsInline preload="metadata" poster={home.hero.posterUrl || undefined}>
-          <source src={heroVideoUrl} type={heroVideoUrl.startsWith('blob:') ? 'video/mp4' : (heroVideoUrl.startsWith('data:') ? heroVideoUrl.substring(5, heroVideoUrl.indexOf(';')) : (heroVideoUrl.endsWith('.webm') ? 'video/webm' : (heroVideoUrl.endsWith('.ogv') || heroVideoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4')))} />
+      {home.hero.type === 'video' && heroVideoUrl && !videoError && (
+        <video
+          ref={bgVideoRef}
+          className="absolute inset-0 w-full h-full object-cover opacity-50"
+          autoPlay={home.hero.autoplay ?? true}
+          muted={home.hero.muted ?? true}
+          loop={home.hero.loop ?? true}
+          playsInline
+          preload="metadata"
+          poster={home.hero.posterUrl || undefined}
+          onCanPlay={() => {
+            if (home.hero.autoplay ?? true) {
+              bgVideoRef.current?.play?.().catch(() => {});
+            }
+          }}
+          onLoadedMetadata={() => {
+            if (home.hero.autoplay ?? true) {
+              bgVideoRef.current?.play?.().catch(() => {});
+            }
+          }}
+          onError={() => setVideoError(true)}
+        >
+          <source
+            src={heroVideoUrl}
+            type={heroVideoUrl.startsWith('blob:')
+              ? 'video/mp4'
+              : (heroVideoUrl.startsWith('data:')
+                  ? heroVideoUrl.substring(5, heroVideoUrl.indexOf(';'))
+                  : (heroVideoUrl.endsWith('.webm')
+                      ? 'video/webm'
+                      : (heroVideoUrl.endsWith('.ogv') || heroVideoUrl.endsWith('.ogg')
+                          ? 'video/ogg'
+                          : 'video/mp4')))}
+          />
         </video>
+      )}
+      {home.hero.type === 'video' && videoError && (home.hero.posterUrl || home.hero.imageUrl) && (
+        <img src={home.hero.posterUrl || home.hero.imageUrl!} alt={home.hero.title || ''} className="absolute inset-0 w-full h-full object-cover opacity-60" />
       )}
       {home.hero.type === 'image' && home.hero.imageUrl && (
         <img src={home.hero.imageUrl} alt={home.hero.title || ''} className="absolute inset-0 w-full h-full object-cover opacity-60" />
