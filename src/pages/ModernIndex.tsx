@@ -5,7 +5,6 @@ import ModernHeader from '@/components/layout/ModernHeader';
 import Footer from '@/components/layout/Footer';
 import ChatWidget from '@/components/layout/ChatWidget';
 import GallerySection from '@/components/sections/GallerySection';
-import { useHomeContent } from '@/contexts/HomeContentContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +13,6 @@ import { useCompany } from '@/contexts/CompanyContext';
 import { useMedia } from '@/contexts/MediaContext';
 import { products, services, projects } from '@/data/companyData';
 import { useProducts } from '@/contexts/ProductsContext';
-import { useHomeContent } from '@/contexts/HomeContentContext';
 import { useMediaUrl } from '@/hooks/useMediaUrl';
 import { 
   ArrowRight, 
