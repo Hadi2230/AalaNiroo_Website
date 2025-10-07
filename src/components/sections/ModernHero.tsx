@@ -31,26 +31,20 @@ const ModernHero = () => {
   }, [home.hero.type, heroVideoUrl, home.hero.autoplay, home.hero.muted]);
 
   return (
-    <section className="hero-white relative min-h-[70vh] md:min-h-screen flex items-center bg-white text-gray-900 overflow-hidden">
+    <section className="relative min-h-[70vh] md:min-h-screen flex items-center bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800 text-white overflow-hidden">
       <div className="container mx-auto px-4 relative z-20 flex items-center justify-center">
         {/* Content */}
         <div className="text-center max-w-4xl mx-auto space-y-6">
-          <h1 className="text-5xl lg:text-7xl font-bold leading-tight">
+          <h1 className="text-5xl lg:text-7xl font-bold leading-tight text-white">
                 {home.hero.title ? (
                   home.hero.title
                 ) : language === 'fa' ? (
                   <>
-                    پیشرو در تولید
-                    <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                      {" "}ژنراتورهای صنعتی
-                    </span>
+                    پیشرو در تولید {" "}ژنراتورهای صنعتی
                   </>
                 ) : (
                   <>
-                    Leading in
-                    <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                      {" "}Industrial Generators
-                    </span>
+                    Leading in {" "}Industrial Generators
                   </>
                 )}
           </h1>
