@@ -205,9 +205,6 @@ export default function Blog() {
         </div>
       </section>
 
-<<<<<<< HEAD
-      </main>
-=======
       {/* CTA Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 text-center">
@@ -220,7 +217,7 @@ export default function Blog() {
         </div>
       </section>
 
->>>>>>> acbbe293 (feat(cta): admin-editable messages for quote/contact/address; meeting booking)
+      </main>
       <Footer />
       <ChatWidget />
     </div>
