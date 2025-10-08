@@ -542,6 +542,20 @@ export default function AdminContent() {
                             )}
                           </div>
                           <div className="space-y-2">
+                            <Label className="text-sm font-medium">واتس‌اپ</Label>
+                            {isEditing ? (
+                              <Input
+                                value={companyData[lang].whatsapp || ''}
+                                onChange={(e) => handleContentChange(lang, 'whatsapp', e.target.value)}
+                                placeholder={lang === 'fa' ? 'مثال: +98912xxxxxxx' : '+98912xxxxxxx'}
+                              />
+                            ) : (
+                              <p className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                {companyData[lang].whatsapp || (lang === 'fa' ? '—' : '—')}
+                              </p>
+                            )}
+                          </div>
+                          <div className="space-y-2">
                             <Label className="text-sm font-medium">ایمیل</Label>
                             {isEditing ? (
                               <Input
@@ -580,6 +594,38 @@ export default function AdminContent() {
                             ) : (
                               <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                                 {companyData[lang].quoteMessage || (lang === 'fa' ? '—' : '—')}
+                              </div>
+                            )}
+                          </div>
+                          <div className="space-y-2 md:col-span-3">
+                            <Label className="text-sm font-medium">پیام تماس با ما</Label>
+                            {isEditing ? (
+                              <Textarea
+                                value={companyData[lang].contactMessage || ''}
+                                onChange={(e) => handleContentChange(lang, 'contactMessage', e.target.value)}
+                                rows={3}
+                                className="resize-none"
+                                placeholder={lang === 'fa' ? 'پیام قابل نمایش هنگام کلیک روی تماس/تماس فوری' : 'Message shown when clicking Contact/Call'}
+                              />
+                            ) : (
+                              <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                {companyData[lang].contactMessage || (lang === 'fa' ? '—' : '—')}
+                              </div>
+                            )}
+                          </div>
+                          <div className="space-y-2 md:col-span-3">
+                            <Label className="text-sm font-medium">پیام آدرس شرکت</Label>
+                            {isEditing ? (
+                              <Textarea
+                                value={companyData[lang].addressMessage || ''}
+                                onChange={(e) => handleContentChange(lang, 'addressMessage', e.target.value)}
+                                rows={2}
+                                className="resize-none"
+                                placeholder={lang === 'fa' ? 'پیام قابل نمایش هنگام کلیک روی آدرس' : 'Message shown when clicking Address'}
+                              />
+                            ) : (
+                              <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                {companyData[lang].addressMessage || (lang === 'fa' ? '—' : '—')}
                               </div>
                             )}
                           </div>

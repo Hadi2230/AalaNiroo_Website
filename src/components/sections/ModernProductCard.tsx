@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Zap, Settings, Phone, Download, Eye, ArrowRight } from 'lucide-react';
+import { useCTA } from '@/hooks/useCTA';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Product {
@@ -26,6 +27,7 @@ interface ModernProductCardProps {
 
 const ModernProductCard = ({ product }: ModernProductCardProps) => {
   const { language, t, dir } = useLanguage();
+  const { showQuoteMessage, showContactMessage } = useCTA();
 
   return (
     <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 bg-white border-gray-200 overflow-hidden">
@@ -132,12 +134,12 @@ const ModernProductCard = ({ product }: ModernProductCardProps) => {
 
       <CardFooter className="p-6 pt-0 flex flex-col gap-3">
         <div className="flex gap-2 w-full">
-          <Button className="bg-blue-600 hover:bg-blue-700 flex-1 group/btn">
+          <Button className="bg-blue-600 hover:bg-blue-700 flex-1 group/btn" onClick={showQuoteMessage}>
             <Phone className="w-4 h-4 mr-1" />
             {t('common.getQuote')}
             <ArrowRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
           </Button>
-          <Button variant="outline" size="sm" className="px-3">
+          <Button variant="outline" size="sm" className="px-3" onClick={showContactMessage}>
             <Download className="w-4 h-4" />
           </Button>
         </div>

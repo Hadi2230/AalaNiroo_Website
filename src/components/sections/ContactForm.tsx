@@ -6,9 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Send, Phone, Mail, MapPin } from 'lucide-react';
+import { useCTA } from '@/hooks/useCTA';
 import { toast } from 'sonner';
 
 const ContactForm = () => {
+  const { showContactMessage, showAddressMessage } = useCTA();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -137,7 +139,7 @@ const ContactForm = () => {
         <div>
           <h3 className="text-2xl font-bold text-gray-900 mb-6">اطلاعات تماس</h3>
           <div className="space-y-6">
-            <div className="flex items-start gap-4">
+            <button type="button" onClick={showContactMessage} className="flex items-start gap-4 text-left">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <Phone className="w-6 h-6 text-blue-600" />
               </div>
@@ -147,7 +149,7 @@ const ContactForm = () => {
                 <p className="text-gray-600">021-88776656</p>
                 <p className="text-sm text-blue-600 mt-1">پشتیبانی 24 ساعته</p>
               </div>
-            </div>
+            </button>
 
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -160,7 +162,7 @@ const ContactForm = () => {
               </div>
             </div>
 
-            <div className="flex items-start gap-4">
+            <button type="button" onClick={showAddressMessage} className="flex items-start gap-4 text-left">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <MapPin className="w-6 h-6 text-blue-600" />
               </div>
@@ -168,7 +170,7 @@ const ContactForm = () => {
                 <h4 className="font-semibold text-gray-900 mb-1">آدرس دفتر مرکزی</h4>
                 <p className="text-gray-600">تهران، خیابان ولیعصر، پلاک 123، طبقه 5</p>
               </div>
-            </div>
+            </button>
           </div>
         </div>
 

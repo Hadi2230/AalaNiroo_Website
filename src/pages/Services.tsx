@@ -6,8 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { services } from '@/data/mockData';
 import { Phone, Clock, Shield, Award, CheckCircle, Wrench } from 'lucide-react';
+import { useCTA } from '@/hooks/useCTA';
+import { useMeetings } from '@/contexts/MeetingsContext';
 
 export default function Services() {
+  const { showContactMessage } = useCTA();
+  const { openModal } = useMeetings();
   const supportFeatures = [
     'پشتیبانی 24 ساعته در 7 روز هفته',
     'تیم فنی مجرب و متخصص',
@@ -73,7 +77,7 @@ export default function Services() {
               </div>
 
               <div className="mt-8">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={showContactMessage}>
                   <Phone className="w-5 h-5 mr-2" />
                   تماس با پشتیبانی
                 </Button>
@@ -133,7 +137,7 @@ export default function Services() {
                     <span>آموزش اولیه</span>
                   </li>
                 </ul>
-                <Button className="w-full mt-6 bg-gray-600 hover:bg-gray-700">
+                <Button className="w-full mt-6 bg-gray-600 hover:bg-gray-700" onClick={showContactMessage}>
                   شامل خرید
                 </Button>
               </CardContent>
@@ -174,7 +178,7 @@ export default function Services() {
                     <span>قطعات یدکی رایگان</span>
                   </li>
                 </ul>
-                <Button className="w-full mt-6 bg-blue-600 hover:bg-blue-700">
+                <Button className="w-full mt-6 bg-blue-600 hover:bg-blue-700" onClick={showContactMessage}>
                   انتخاب بسته
                 </Button>
               </CardContent>
@@ -210,7 +214,7 @@ export default function Services() {
                     <span>گزارش‌دهی دوره‌ای</span>
                   </li>
                 </ul>
-                <Button className="w-full mt-6 bg-gray-600 hover:bg-gray-700">
+                <Button className="w-full mt-6 bg-gray-600 hover:bg-gray-700" onClick={showContactMessage}>
                   تماس با فروش
                 </Button>
               </CardContent>
@@ -316,11 +320,11 @@ export default function Services() {
             تیم پشتیبانی ما آماده کمک به شما در هر زمان از شبانه‌روز است
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-blue-900 hover:bg-gray-100">
+            <Button size="lg" className="bg-white text-blue-900 hover:bg-gray-100" onClick={showContactMessage}>
               <Phone className="w-5 h-5 mr-2" />
               تماس با پشتیبانی
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-900">
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-900" onClick={() => openModal()}>
               درخواست سرویس
             </Button>
           </div>

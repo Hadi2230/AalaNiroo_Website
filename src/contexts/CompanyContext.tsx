@@ -13,20 +13,26 @@ interface CompanyData {
     tagline: string;
     description: string;
     phone: string;
+    whatsapp?: string;
     address: string;
     email: string;
     logoUrl?: string;
     quoteMessage?: string;
+    contactMessage?: string;
+    addressMessage?: string;
   };
   en: {
     name: string;
     tagline: string;
     description: string;
     phone: string;
+    whatsapp?: string;
     address: string;
     email: string;
     logoUrl?: string;
     quoteMessage?: string;
+    contactMessage?: string;
+    addressMessage?: string;
   };
 }
 
