@@ -70,8 +70,27 @@ const ModernHeader = () => {
               </div>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-8">
+            {/* CTA Buttons (left side, not at the edge) */}
+            <div className="hidden lg:flex items-center gap-3 ml-6">
+              <Button
+                variant="outline"
+                className="border-white/40 text-white hover:bg-white/10 text-sm px-3 py-2"
+                onClick={() => openModal()}
+              >
+                <Calendar className="w-3 h-3 mr-1 text-white" />
+                {language === 'fa' ? 'درخواست رزرو جلسه' : 'Book Meeting Request'}
+              </Button>
+              <Button
+                className="bg-cyan-500 hover:bg-cyan-600 text-white text-sm px-3 py-2"
+                onClick={showContactMessage}
+              >
+                <Phone className="w-3 h-3 mr-1 text-white" />
+                {t('hero.cta.call')}
+              </Button>
+            </div>
+
+            {/* Desktop Navigation (pushed slightly right to create visual balance) */}
+            <nav className="hidden lg:flex items-center gap-8 mr-auto pl-8">
               {navigation.map((item) => (
                 <Link
                   key={item.key}
@@ -88,21 +107,7 @@ const ModernHeader = () => {
               ))}
             </nav>
 
-            {/* CTA Buttons */}
-            <div className="hidden lg:flex items-center gap-4 ml-8 pl-6 border-l border-white/20">
-              <Button
-                variant="outline"
-                className="border-white/40 text-white hover:bg-white/10"
-                onClick={() => openModal()}
-              >
-                <Calendar className="w-3 h-3 mr-2 text-white" />
-                {language === 'fa' ? 'درخواست رزرو جلسه' : 'Book Meeting Request'}
-              </Button>
-              <Button className="bg-cyan-500 hover:bg-cyan-600 text-white" onClick={showContactMessage}>
-                <Phone className="w-3 h-3 mr-2 text-white" />
-                {t('hero.cta.call')}
-              </Button>
-            </div>
+            {/* CTA Buttons moved to left with logo */}
 
             {/* Mobile Menu Button */}
             <button
