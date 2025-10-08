@@ -54,7 +54,7 @@ const ModernHeader = () => {
         isScrolled ? 'bg-black/40 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}>
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center py-4" style={{ direction: 'ltr' }}>
             {/* Logo */}
             <Link to="/" className="flex items-center gap-4">
               {company.logoUrl ? (
