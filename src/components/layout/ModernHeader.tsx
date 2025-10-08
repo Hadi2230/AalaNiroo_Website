@@ -70,24 +70,7 @@ const ModernHeader = () => {
               </div>
             </Link>
 
-            {/* CTA Buttons (left cluster, not at extreme edge) */}
-            <div className="hidden lg:flex items-center gap-3 ml-6">
-              <Button
-                variant="outline"
-                className="border-white/40 text-white hover:bg-white/10 text-sm px-3 py-2"
-                onClick={() => openModal()}
-              >
-                <Calendar className="w-3 h-3 mr-1 text-cyan-300" />
-                {language === 'fa' ? 'درخواست رزرو جلسه' : 'Book Meeting Request'}
-              </Button>
-              <Button
-                className="bg-cyan-500 hover:bg-cyan-600 text-white text-sm px-3 py-2"
-                onClick={showContactMessage}
-              >
-                <Phone className="w-3 h-3 mr-1 text-cyan-300" />
-                {t('hero.cta.call')}
-              </Button>
-            </div>
+            {/* CTAs moved out of header into floating buttons (see FloatingCTAs) */}
 
             {/* Desktop Navigation (pushed to right; CTAs stay left) */}
             <nav className="hidden lg:flex items-center gap-8 ml-auto pr-8">
