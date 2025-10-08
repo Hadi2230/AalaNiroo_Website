@@ -6,15 +6,16 @@
   :root {
     /* New brand palette */
     /* Base backgrounds */
-    --background: 208 52% 23%; /* #1c3d5a */
-    --foreground: 205 14% 54%; /* #7a8d9b */
+    /* Page background set to #7a8d9b */
+    --background: 205 14% 54%; /* #7a8d9b */
+    /* Default text set to near-white for contrast on background */
+    --foreground: 210 40% 98%; /* near white */
 
-    /* Modern surfaces */
-    --card: 0 0% 100%;       /* white */
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 210 24% 48%; /* #5e7b99 */
+    --card-foreground: 205 14% 54%; /* #7a8d9b */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 210 24% 48%;
+    --popover-foreground: 205 14% 54%;
 
     /* Accents */
     --primary: 186 100% 37%; /* #00a7bb */
@@ -37,7 +38,7 @@
     --input: 210 24% 40%;
     --ring: 186 100% 37%;
 
-    --radius: 0.75rem; /* slightly rounder like modern SaaS */
+    --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -58,8 +59,9 @@
 
   .dark {
     /* Slightly lighter foreground on dark */
-    --background: 208 52% 18%;
-    --foreground: 210 40% 94%;
+    /* Keep the same content background in dark mode to match request */
+    --background: 205 14% 54%; /* #7a8d9b */
+    --foreground: 210 40% 98%;
 
     --card: 208 52% 23%;
     --card-foreground: 210 40% 94%;
@@ -102,18 +104,8 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground;
   }
 }
 
-/* Utilities */
-@layer utilities {
-  /* Dedicated content background (excludes header/footer) */
-  .page-bg { background-color: #7a8d9b; color: #0f172a; }
-  .page-bg .bg-white { background-color: rgba(255, 255, 255, 0.88) !important; }
-  .page-bg .bg-gray-50 { background-color: rgba(255, 255, 255, 0.78) !important; }
-  .container { @apply max-w-[1200px]; }
-  .section { @apply py-16 md:py-20; }
-  .section-title { @apply text-3xl md:text-4xl font-extrabold tracking-tight mb-6; }
-  .section-subtitle { @apply text-base md:text-lg text-slate-700; }
-}
+/* Removed unsafe global overrides for Tailwind utilities to respect component styles */
