@@ -1,13 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useMediaUrl } from '@/hooks/useMediaUrl';
-<<<<<<< HEAD
-// Buttons removed per design change
-=======
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Phone, FileText } from 'lucide-react';
 import { useCTA } from '@/hooks/useCTA';
 import { useMeetings } from '@/contexts/MeetingsContext';
->>>>>>> acbbe293 (feat(cta): admin-editable messages for quote/contact/address; meeting booking)
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useHomeContent } from '@/contexts/HomeContentContext';
@@ -24,17 +20,13 @@ const ModernHero = () => {
   const heroVideoUrl = useMediaUrl(home.hero.type === 'video' ? home.hero.videoUrl : undefined);
 
   useEffect(() => {
-    // Ensure autoplay tries to start when allowed (muted inline)
     if (home.hero.type === 'video' && heroVideoUrl && (home.hero.autoplay ?? true)) {
       const el = bgVideoRef.current;
       if (el) {
-        // Force muted for autoplay compliance if not explicitly false
         if (home.hero.muted !== false) {
           el.muted = true;
         }
-        el.play().catch(() => {
-          // Autoplay might be blocked; we'll try again on canplay
-        });
+        el.play().catch(() => {});
       }
     }
   }, [home.hero.type, heroVideoUrl, home.hero.autoplay, home.hero.muted]);
@@ -106,33 +98,27 @@ const ModernHero = () => {
                 )}
           </h1>
 
-<<<<<<< HEAD
           <p className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-2xl mx-auto">
             {home.hero.subtitle || company.description}
           </p>
-=======
-            
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4 group" onClick={showQuoteMessage}>
-                <FileText className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-                {home.hero.ctaText || t('hero.cta.quote')}
-                <ArrowRight className={`w-5 h-5 ${dir === 'rtl' ? 'mr-2' : 'ml-2'} group-hover:translate-x-1 transition-transform`} />
-              </Button>
-              
-              <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-gray-400 text-white hover:bg-white hover:text-gray-900" onClick={showContactMessage}>
-                <Phone className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-                {t('hero.cta.call')}
-              </Button>
-              <Button size="lg" variant="ghost" className="text-lg px-8 py-4" onClick={() => openModal()}>
-                {language === 'fa' ? 'رزرو جلسه' : 'Book Meeting'}
-              </Button>
-            </div>
-
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4 group" onClick={showQuoteMessage}>
+              <FileText className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
+              {home.hero.ctaText || t('hero.cta.quote')}
+              <ArrowRight className={`w-5 h-5 ${dir === 'rtl' ? 'mr-2' : 'ml-2'} group-hover:translate-x-1 transition-transform`} />
+            </Button>
             
+            <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-gray-400 text-white hover:bg-white hover:text-gray-900" onClick={showContactMessage}>
+              <Phone className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
+              {t('hero.cta.call')}
+            </Button>
+            <Button size="lg" variant="ghost" className="text-lg px-8 py-4" onClick={() => openModal()}>
+              {language === 'fa' ? 'رزرو جلسه' : 'Book Meeting'}
+            </Button>
           </div>
->>>>>>> acbbe293 (feat(cta): admin-editable messages for quote/contact/address; meeting booking)
+
         </div>
       </div>
       
