@@ -12,6 +12,7 @@ import {
   X,
   Bell,
   Search,
+  Calendar,
   MessageCircle,
   Zap,
   Shield,
