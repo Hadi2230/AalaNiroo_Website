@@ -70,6 +70,11 @@ const ModernHero = () => {
           />
         </video>
       )}
+      {home.hero.type === 'video' && !heroVideoUrl && (
+        <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-black/40 text-white z-10">
+          <div className="text-center text-sm opacity-80">ویدیو آماده پخش نیست</div>
+        </div>
+      )}
       {home.hero.type === 'video' && videoError && (home.hero.posterUrl || home.hero.imageUrl) && (
         <img src={home.hero.posterUrl || home.hero.imageUrl!} alt={home.hero.title || ''} className="absolute inset-0 w-full h-full object-cover opacity-60" />
       )}

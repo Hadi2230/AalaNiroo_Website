@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { idbGetBlob } from '@/utils/idb';
 
 export function useMediaUrl(inputUrl?: string) {
-  const [resolvedUrl, setResolvedUrl] = useState<string | undefined>(inputUrl);
+  // Start undefined to avoid trying to load unsupported schemes like idb: before resolution
+  const [resolvedUrl, setResolvedUrl] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     let revoked: string | null = null;
@@ -21,6 +22,8 @@ export function useMediaUrl(inputUrl?: string) {
             const obj = URL.createObjectURL(blob);
             revoked = obj;
             setResolvedUrl(obj);
+          } else if (!cancelled) {
+            setResolvedUrl(undefined);
           }
         } catch {
           if (!cancelled) setResolvedUrl(undefined);
