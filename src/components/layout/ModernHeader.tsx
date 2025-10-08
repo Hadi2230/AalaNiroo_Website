@@ -90,11 +90,6 @@ const ModernHeader = () => {
 
             {/* CTA Buttons */}
             <div className="hidden lg:flex items-center gap-4">
-              <Link to="/admin/login">
-                <Button variant="outline" className="border-white/40 text-white hover:bg-white/10">
-                  پنل فروش
-                </Button>
-              </Link>
               <Button variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => openModal()}>
                 {t('hero.cta.quote')}
               </Button>
@@ -132,11 +127,6 @@ const ModernHeader = () => {
                   </Link>
                 ))}
                 <div className="flex flex-col gap-2 mt-4">
-                  <Link to="/admin/login">
-                    <Button variant="outline" className="border-white/40 text-white w-full hover:bg-white/10">
-                      پنل فروش
-                    </Button>
-                  </Link>
                   <Button variant="outline" className="border-white/40 text-white w-full hover:bg-white/10" onClick={() => openModal()}>
                     {t('hero.cta.quote')}
                   </Button>
