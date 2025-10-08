@@ -9,6 +9,8 @@ import { ChatProvider } from '@/contexts/ChatContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CompanyProvider } from '@/contexts/CompanyContext';
 import { MediaProvider } from '@/contexts/MediaContext';
+import { CTAModalProvider } from '@/contexts/CTAModalContext';
+import ContactCenterModal from '@/components/cta/ContactCenterModal';
 import { MeetingsProvider } from '@/contexts/MeetingsContext';
 import MeetingModal from '@/components/meetings/MeetingModal';
 import { AboutContentProvider } from '@/contexts/AboutContentContext';
@@ -107,12 +109,14 @@ const App = () => (
         <LanguageProvider>
           <CompanyProvider>
             <MediaProvider>
+              <CTAModalProvider>
               <MeetingsProvider>
               <HomeContentProvider>
               <ProductsProvider>
               <AboutContentProvider>
                 <TooltipProvider>
             <Toaster position="top-right" richColors expand={true} />
+            <ContactCenterModal />
             <MeetingModal />
 
             <ErrorBoundary>
@@ -245,6 +249,7 @@ const App = () => (
               </ProductsProvider>
               </HomeContentProvider>
               </MeetingsProvider>
+              </CTAModalProvider>
             </MediaProvider>
           </CompanyProvider>
         </LanguageProvider>
