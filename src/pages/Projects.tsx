@@ -7,8 +7,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { projects } from '@/data/mockData';
 import { MapPin, Calendar, Zap, Building, Users, Award, TrendingUp } from 'lucide-react';
+import { useMeetings } from '@/contexts/MeetingsContext';
 
 export default function Projects() {
+  const { openModal } = useMeetings();
   const stats = [
     { icon: Building, label: 'پروژه تکمیل شده', value: '500+' },
     { icon: Users, label: 'مشتری راضی', value: '300+' },
@@ -225,7 +227,7 @@ export default function Projects() {
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             آماده‌ایم تا بهترین راهکار انرژی را برای پروژه شما طراحی و اجرا کنیم
           </p>
-          <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+          <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={() => openModal()}>
             شروع پروژه جدید
           </Button>
         </div>

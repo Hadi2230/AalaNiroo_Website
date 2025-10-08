@@ -5,18 +5,24 @@ export const companyInfo = {
     tagline: "پیشرو در تولید و تامین ژنراتورهای صنعتی",
     description: "با بیش از 33 سال تجربه در صنعت ژنراتور، نماینده رسمی برندهای معتبر جهانی",
     phone: "021-58635",
+    whatsapp: "+989121234567",
     address: "تهران، بزرگراه مدرس، نرسیده به میدان هفت تیر، مقابل خیابان زهره",
     email: "info@aalaniroo.com",
-    quoteMessage: "درخواست پیش‌فاکتور شما ثبت شد. همکاران ما به‌زودی با شما تماس می‌گیرند."
+    quoteMessage: "درخواست پیش‌فاکتور شما ثبت شد. همکاران ما به‌زودی با شما تماس می‌گیرند.",
+    contactMessage: "برای ارتباط سریع با ما، با شماره 021-58635 تماس بگیرید یا در واتس‌اپ پیام دهید.",
+    addressMessage: "آدرس شرکت: تهران، بزرگراه مدرس، نرسیده به میدان هفت تیر، مقابل خیابان زهره"
   },
   en: {
     name: "Aalaniroo Power Company",
     tagline: "Leading Industrial Generator Manufacturer & Supplier",
     description: "Over 33 years of experience in generator industry, official representative of global trusted brands",
     phone: "+98-21-58635",
+    whatsapp: "+989121234567",
     address: "Tehran, Modarres Highway, Before Haft Tir Square, Opposite Zohreh Street",
     email: "info@aalaniroo.com",
-    quoteMessage: "Your quote request has been received. We will contact you shortly."
+    quoteMessage: "Your quote request has been received. We will contact you shortly.",
+    contactMessage: "Contact us at +98-21-58635 or send a WhatsApp message.",
+    addressMessage: "Company Address: Tehran, Modarres Hwy, Before Haft Tir Sq., Opposite Zohreh St."
   }
 };
 

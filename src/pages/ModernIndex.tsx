@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import ModernHero from '@/components/sections/ModernHero';
+import MeetingModal from '@/components/meetings/MeetingModal';
+import { useCTA } from '@/hooks/useCTA';
+import { useMeetings } from '@/contexts/MeetingsContext';
 import ModernProductCard from '@/components/sections/ModernProductCard';
 import ModernHeader from '@/components/layout/ModernHeader';
 import Footer from '@/components/layout/Footer';
@@ -35,6 +38,8 @@ import {
 } from 'lucide-react';
 
 export default function ModernIndex() {
+  const { showContactMessage, showAddressMessage } = useCTA();
+  const { openModal } = useMeetings();
   const { language, t, dir } = useLanguage();
   const { companyData, isLoading } = useCompany();
   const { listGalleries, mediaFiles } = useMedia();
@@ -162,11 +167,11 @@ export default function ModernIndex() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={() => showContactMessage()}>
                     <Phone className="w-5 h-5 mr-2" />
                     {t('common.contactUs')}
                   </Button>
-                  <Button size="lg" variant="outline">
+                  <Button size="lg" variant="outline" onClick={() => openModal() }>
                     {t('common.learnMore')}
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
@@ -204,7 +209,7 @@ export default function ModernIndex() {
                 )}
                 
                 {/* Experience Badge */}
-                <div className="absolute -top-4 -right-4 bg-blue-600 text-white p-6 rounded-lg shadow-lg">
+              <div className="absolute -top-4 -right-4 bg-blue-600 text-white p-6 rounded-lg shadow-lg cursor-pointer" onClick={() => showAddressMessage()}>
                   <div className="text-3xl font-bold">33+</div>
                   <div className="text-sm">
                     {language === 'fa' ? 'سال تجربه' : 'Years'}
@@ -406,11 +411,11 @@ export default function ModernIndex() {
             }
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
+            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100" onClick={() => showContactMessage()}>
               <Phone className="w-5 h-5 mr-2" />
               {t('hero.cta.call')}
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600">
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600" onClick={() => openModal()}>
               <Mail className="w-5 h-5 mr-2" />
               {t('hero.cta.quote')}
             </Button>
@@ -420,6 +425,7 @@ export default function ModernIndex() {
 
       <Footer />
       <ChatWidget />
+      <MeetingModal />
     </div>
   );
 }

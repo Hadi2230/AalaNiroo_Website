@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
+import { useCTA } from '@/hooks/useCTA';
+import { useMeetings } from '@/contexts/MeetingsContext';
 import { Menu, X, Phone, Mail, Globe, ChevronDown } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,6 +13,8 @@ const ModernHeader = () => {
   const location = useLocation();
   const { language, setLanguage, t, dir } = useLanguage();
   const { companyData } = useCompany();
+  const { showContactMessage } = useCTA();
+  const { openModal } = useMeetings();
 
   const NAV_ITEMS = useMemo(() => (
     [
@@ -91,10 +95,10 @@ const ModernHeader = () => {
                   پنل فروش
                 </Button>
               </Link>
-              <Button variant="outline" className="border-white/40 text-white hover:bg-white/10">
+              <Button variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => openModal()}>
                 {t('hero.cta.quote')}
               </Button>
-              <Button className="bg-cyan-500 hover:bg-cyan-600 text-white">
+              <Button className="bg-cyan-500 hover:bg-cyan-600 text-white" onClick={showContactMessage}>
                 <Phone className="w-4 h-4 mr-2" />
                 {t('hero.cta.call')}
               </Button>
@@ -133,10 +137,10 @@ const ModernHeader = () => {
                       پنل فروش
                     </Button>
                   </Link>
-                  <Button variant="outline" className="border-white/40 text-white w-full hover:bg-white/10">
+                  <Button variant="outline" className="border-white/40 text-white w-full hover:bg-white/10" onClick={() => openModal()}>
                     {t('hero.cta.quote')}
                   </Button>
-                  <Button className="bg-cyan-500 hover:bg-cyan-600 text-white w-full">
+                  <Button className="bg-cyan-500 hover:bg-cyan-600 text-white w-full" onClick={showContactMessage}>
                     <Phone className="w-4 h-4 mr-2" />
                     {t('hero.cta.call')}
                   </Button>

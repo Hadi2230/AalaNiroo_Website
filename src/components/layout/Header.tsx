@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useCTA } from '@/hooks/useCTA';
+import { useMeetings } from '@/contexts/MeetingsContext';
 import { Menu, X, Phone, Mail } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,6 +13,8 @@ const Header = () => {
   const { language } = useLanguage();
   const { companyData } = useCompany();
   const company = companyData[language];
+  const { showContactMessage } = useCTA();
+  const { openModal } = useMeetings();
 
   const navigation = [
     { name: 'خانه', href: '/' },
@@ -77,7 +81,7 @@ const Header = () => {
 
             {/* CTA Button */}
             <div className="hidden lg:flex items-center gap-4">
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => openModal()}>
                 درخواست مشاوره
               </Button>
             </div>
@@ -109,7 +113,7 @@ const Header = () => {
                     {item.name}
                   </Link>
                 ))}
-                <Button className="bg-blue-600 hover:bg-blue-700 mt-4">
+                <Button className="bg-blue-600 hover:bg-blue-700 mt-4" onClick={showContactMessage}>
                   درخواست مشاوره
                 </Button>
               </nav>

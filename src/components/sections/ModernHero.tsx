@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { useMediaUrl } from '@/hooks/useMediaUrl';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Phone, FileText } from 'lucide-react';
+import { useCTA } from '@/hooks/useCTA';
+import { useMeetings } from '@/contexts/MeetingsContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useHomeContent } from '@/contexts/HomeContentContext';
@@ -10,6 +12,8 @@ const ModernHero = () => {
   const { language, t, dir } = useLanguage();
   const { companyData } = useCompany();
   const { content: home } = useHomeContent();
+  const { showQuoteMessage, showContactMessage } = useCTA();
+  const { openModal } = useMeetings();
   const company = companyData[language];
   const bgVideoRef = useRef<HTMLVideoElement | null>(null);
   const heroVideoUrl = useMediaUrl(home.hero.type === 'video' ? home.hero.videoUrl : undefined);
@@ -74,29 +78,18 @@ const ModernHero = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4 group" onClick={() => {
-                const msg = company.quoteMessage || (language === 'fa' ? 'درخواست پیش‌فاکتور ثبت شد.' : 'Quote request submitted.');
-                // inline toast fallback if toast not globally available
-                try {
-                  // @ts-ignore
-                  if (window?.sonner?.toast) {
-                    // @ts-ignore
-                    window.sonner.toast.success(msg);
-                  } else {
-                    alert(msg);
-                  }
-                } catch {
-                  alert(msg);
-                }
-              }}>
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4 group" onClick={showQuoteMessage}>
                 <FileText className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
                 {home.hero.ctaText || t('hero.cta.quote')}
                 <ArrowRight className={`w-5 h-5 ${dir === 'rtl' ? 'mr-2' : 'ml-2'} group-hover:translate-x-1 transition-transform`} />
               </Button>
               
-              <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-gray-400 text-white hover:bg-white hover:text-gray-900" onClick={() => { if (company.phone) window.open(`tel:${company.phone}`, '_self'); }}>
+              <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-gray-400 text-white hover:bg-white hover:text-gray-900" onClick={showContactMessage}>
                 <Phone className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
                 {t('hero.cta.call')}
+              </Button>
+              <Button size="lg" variant="ghost" className="text-lg px-8 py-4" onClick={() => openModal()}>
+                {language === 'fa' ? 'رزرو جلسه' : 'Book Meeting'}
               </Button>
             </div>
 

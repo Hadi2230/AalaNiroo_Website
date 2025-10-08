@@ -9,6 +9,8 @@ import { ChatProvider } from '@/contexts/ChatContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CompanyProvider } from '@/contexts/CompanyContext';
 import { MediaProvider } from '@/contexts/MediaContext';
+import { MeetingsProvider } from '@/contexts/MeetingsContext';
+import MeetingModal from '@/components/meetings/MeetingModal';
 import { AboutContentProvider } from '@/contexts/AboutContentContext';
 import { HomeContentProvider } from '@/contexts/HomeContentContext';
 import { ProductsProvider } from '@/contexts/ProductsContext';
@@ -92,6 +94,7 @@ import AdminContent from './pages/AdminContent';
 import AdminMedia from './pages/AdminMedia';
 import AdminAbout from './pages/AdminAbout';
 import AdminPages from './pages/AdminPages';
+import AdminMeetings from './pages/AdminMeetings';
 
 // ---------- React Query Client ----------
 const queryClient = new QueryClient();
@@ -104,11 +107,13 @@ const App = () => (
         <LanguageProvider>
           <CompanyProvider>
             <MediaProvider>
+              <MeetingsProvider>
               <HomeContentProvider>
               <ProductsProvider>
               <AboutContentProvider>
                 <TooltipProvider>
             <Toaster position="top-right" richColors expand={true} />
+            <MeetingModal />
 
             <ErrorBoundary>
               <BrowserRouter
@@ -221,6 +226,14 @@ const App = () => (
                       </RequireAuth>
                     }
                   />
+                  <Route
+                    path="/admin/meetings"
+                    element={
+                      <RequireAuth roles={['admin', 'manager', 'sales']}>
+                        <AdminMeetings />
+                      </RequireAuth>
+                    }
+                  />
 
                   {/* 🛑 404 */}
                   <Route path="*" element={<NotFound />} />
@@ -231,6 +244,7 @@ const App = () => (
               </AboutContentProvider>
               </ProductsProvider>
               </HomeContentProvider>
+              </MeetingsProvider>
             </MediaProvider>
           </CompanyProvider>
         </LanguageProvider>

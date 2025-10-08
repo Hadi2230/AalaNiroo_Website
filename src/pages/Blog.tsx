@@ -6,8 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { blogPosts } from '@/data/mockData';
 import { Calendar, User, ArrowRight, TrendingUp, Lightbulb, Zap } from 'lucide-react';
+import { useCTA } from '@/hooks/useCTA';
+import { useMeetings } from '@/contexts/MeetingsContext';
 
 export default function Blog() {
+  const { showContactMessage } = useCTA();
+  const { openModal } = useMeetings();
   const categories = [
     { name: 'همه مقالات', count: 12, active: true },
     { name: 'انرژی تجدیدپذیر', count: 5 },
@@ -196,6 +200,18 @@ export default function Blog() {
                 </CardContent>
               </Card>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">همین حالا با ما در ارتباط باشید</h2>
+          <p className="text-xl text-gray-600 mb-8">برای دریافت مشاوره و رزرو جلسه با کارشناسان ما در ارتباط باشید</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button className="h-12 px-6 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onClick={showContactMessage}>تماس</button>
+            <button className="h-12 px-6 rounded-lg border border-gray-300 hover:bg-gray-100" onClick={() => openModal()}>رزرو جلسه</button>
           </div>
         </div>
       </section>
