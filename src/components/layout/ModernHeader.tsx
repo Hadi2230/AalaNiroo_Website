@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { useCTA } from '@/hooks/useCTA';
 import { useMeetings } from '@/contexts/MeetingsContext';
-import { Menu, X, Phone, Mail, Globe, ChevronDown } from 'lucide-react';
+import { Menu, X, Phone, Mail, Globe, ChevronDown, Calendar } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -89,12 +89,17 @@ const ModernHeader = () => {
             </nav>
 
             {/* CTA Buttons */}
-            <div className="hidden lg:flex items-center gap-4">
-              <Button variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => openModal()}>
-                {t('hero.cta.quote')}
+            <div className="hidden lg:flex items-center gap-4 ml-8 pl-6 border-l border-white/20">
+              <Button
+                variant="outline"
+                className="border-white/40 text-white hover:bg-white/10"
+                onClick={() => openModal()}
+              >
+                <Calendar className="w-3 h-3 mr-2 text-white" />
+                {language === 'fa' ? 'درخواست رزرو جلسه' : 'Book Meeting Request'}
               </Button>
               <Button className="bg-cyan-500 hover:bg-cyan-600 text-white" onClick={showContactMessage}>
-                <Phone className="w-4 h-4 mr-2" />
+                <Phone className="w-3 h-3 mr-2 text-white" />
                 {t('hero.cta.call')}
               </Button>
             </div>
@@ -126,12 +131,13 @@ const ModernHeader = () => {
                     {item.name}
                   </Link>
                 ))}
-                <div className="flex flex-col gap-2 mt-4">
+                <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-white/10">
                   <Button variant="outline" className="border-white/40 text-white w-full hover:bg-white/10" onClick={() => openModal()}>
-                    {t('hero.cta.quote')}
+                    <Calendar className="w-4 h-4 mr-2 text-white" />
+                    {language === 'fa' ? 'درخواست رزرو جلسه' : 'Book Meeting Request'}
                   </Button>
                   <Button className="bg-cyan-500 hover:bg-cyan-600 text-white w-full" onClick={showContactMessage}>
-                    <Phone className="w-4 h-4 mr-2" />
+                    <Phone className="w-4 h-4 mr-2 text-white" />
                     {t('hero.cta.call')}
                   </Button>
                 </div>
