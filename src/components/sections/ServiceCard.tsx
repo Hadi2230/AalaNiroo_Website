@@ -1,6 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { useCTA } from '@/hooks/useCTA';
 
 interface Service {
   id: number;
@@ -15,6 +16,7 @@ interface ServiceCardProps {
 }
 
 const ServiceCard = ({ service }: ServiceCardProps) => {
+  const { showContactMessage } = useCTA();
   return (
     <Card className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-white border-gray-200 h-full">
       <CardContent className="p-8 flex flex-col h-full">
@@ -46,6 +48,7 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
           <Button 
             className="w-full bg-blue-600 hover:bg-blue-700 group-hover:bg-blue-700 transition-colors"
             size="lg"
+            onClick={showContactMessage}
           >
             درخواست خدمت
             <ArrowRight className="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform" />
