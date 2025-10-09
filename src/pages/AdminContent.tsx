@@ -859,6 +859,30 @@ export default function AdminContent() {
                 </div>
               </div>
 
+              {/* Services Media (image/video beside support section on /services) */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">مدیای بخش خدمات</h3>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => { setServicesFileInput({ type: 'image' }); (document.getElementById('services-hidden-file') as HTMLInputElement)?.click(); }}>آپلود تصویر</Button>
+                    <Button variant="outline" onClick={() => { setServicesFileInput({ type: 'video' }); (document.getElementById('services-hidden-file') as HTMLInputElement)?.click(); }}>آپلود ویدیو</Button>
+                    <Button variant="outline" onClick={() => { setServicesFileInput({ type: 'poster' }); (document.getElementById('services-hidden-file') as HTMLInputElement)?.click(); }}>آپلود پوستر</Button>
+                    <Button variant="outline" className="text-red-600" onClick={clearServicesMedia}>حذف</Button>
+                  </div>
+                </div>
+                <div className="rounded-lg overflow-hidden border">
+                  {homeContent.servicesMedia.type === 'video' && homeContent.servicesMedia.videoUrl ? (
+                    <video className="w-full" controls poster={homeContent.servicesMedia.posterUrl || undefined} autoPlay={homeContent.servicesMedia.autoplay} muted={homeContent.servicesMedia.muted} loop={homeContent.servicesMedia.loop} playsInline preload="metadata">
+                      <source src={homeContent.servicesMedia.videoUrl.startsWith('idb:') ? '' : homeContent.servicesMedia.videoUrl} type={homeContent.servicesMedia.videoUrl?.startsWith('data:') ? homeContent.servicesMedia.videoUrl.substring(5, homeContent.servicesMedia.videoUrl.indexOf(';')) : (homeContent.servicesMedia.videoUrl?.endsWith('.webm') ? 'video/webm' : (homeContent.servicesMedia.videoUrl?.endsWith('.ogv') || homeContent.servicesMedia.videoUrl?.endsWith('.ogg') ? 'video/ogg' : 'video/mp4'))} />
+                    </video>
+                  ) : homeContent.servicesMedia.type === 'image' && homeContent.servicesMedia.imageUrl ? (
+                    <img src={homeContent.servicesMedia.imageUrl} alt="services" className="w-full" />
+                  ) : (
+                    <div className="p-8 text-center text-gray-500">مدیایی انتخاب نشده است</div>
+                  )}
+                </div>
+              </div>
+
               {/* Gallery Manager */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -989,6 +1013,20 @@ export default function AdminContent() {
             if (heroFileInput.type === 'video') setHero({ type: 'video', videoUrl: uploaded.url, autoplay: true, muted: true, loop: true });
           } catch {}
           finally { setHeroFileInput(null); (e.target as HTMLInputElement).value = ''; }
+        }} />
+
+        {/* Hidden file input for services uploads */}
+        <input id="services-hidden-file" type="file" accept="image/*,video/*" className="hidden" onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (!file || !servicesFileInput) return;
+          try {
+            const folder = 'homepage';
+            const uploaded = await uploadFile(file, folder);
+            if (servicesFileInput.type === 'image') setServicesMedia({ type: 'image', imageUrl: uploaded.url, posterUrl: uploaded.url });
+            if (servicesFileInput.type === 'poster') setServicesMedia({ posterUrl: uploaded.url });
+            if (servicesFileInput.type === 'video') setServicesMedia({ type: 'video', videoUrl: uploaded.url, autoplay: true, muted: true, loop: true });
+          } catch {}
+          finally { setServicesFileInput(null); (e.target as HTMLInputElement).value = ''; }
         }} />
 
         {/* Hidden file input for intro uploads */}
