@@ -109,17 +109,18 @@ const ModernHero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4 group" onClick={showQuoteMessage}>
+            <Button variant="ghost" className="text-white text-base px-0 group" onClick={showQuoteMessage}>
               <FileText className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
               {home.hero.ctaText || t('hero.cta.quote')}
               <ArrowRight className={`w-5 h-5 ${dir === 'rtl' ? 'mr-2' : 'ml-2'} group-hover:translate-x-1 transition-transform`} />
             </Button>
-            
-            <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-gray-400 text-white hover:bg-white hover:text-gray-900" onClick={showContactMessage}>
+
+            <Button variant="ghost" className="text-white text-base px-0" onClick={showContactMessage}>
               <Phone className={`w-5 h-5 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
               {t('hero.cta.call')}
             </Button>
-            <Button size="lg" variant="ghost" className="text-lg px-8 py-4" onClick={() => openModal()}>
+
+            <Button variant="ghost" className="text-white text-base px-0" onClick={() => openModal()}>
               {language === 'fa' ? 'رزرو جلسه' : 'Book Meeting'}
             </Button>
           </div>
