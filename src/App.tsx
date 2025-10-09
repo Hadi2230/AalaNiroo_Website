@@ -13,7 +13,6 @@ import { CTAModalProvider } from '@/contexts/CTAModalContext';
 import ContactCenterModal from '@/components/cta/ContactCenterModal';
 import { MeetingsProvider } from '@/contexts/MeetingsContext';
 import MeetingModal from '@/components/meetings/MeetingModal';
-import FloatingCTAs from '@/components/layout/FloatingCTAs';
 import { AboutContentProvider } from '@/contexts/AboutContentContext';
 import { HomeContentProvider } from '@/contexts/HomeContentContext';
 import { ProductsProvider } from '@/contexts/ProductsContext';
@@ -118,7 +117,6 @@ const App = () => (
                 <TooltipProvider>
             <Toaster position="top-right" richColors expand={true} />
             <ContactCenterModal />
-            <FloatingCTAs />
             <MeetingModal />
 
             <ErrorBoundary>

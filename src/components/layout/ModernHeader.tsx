@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useCTA } from '@/hooks/useCTA';
 import { useMeetings } from '@/contexts/MeetingsContext';
 import { Menu, X, Phone, Mail, Globe, ChevronDown, Calendar } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -54,7 +55,7 @@ const ModernHeader = () => {
         isScrolled ? 'bg-black/40 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}>
         <div className="container mx-auto px-4">
-          <div className="relative grid grid-cols-3 items-center py-4">
+          <div className="flex justify-between items-center py-4" style={{ direction: dir }}>
             {/* Logo */}
             <Link
               to="/"
@@ -73,10 +74,8 @@ const ModernHeader = () => {
               </div>
             </Link>
 
-            {/* Desktop Navigation (centered; RTL shows Home at right) */}
-            <nav
-              className={`hidden lg:flex items-center gap-8 col-start-2 justify-self-center ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
-            >
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-8">
               {navigation.map((item) => (
                 <Link
                   key={item.key}
@@ -93,26 +92,41 @@ const ModernHeader = () => {
               ))}
             </nav>
 
-            {/* CTA Icons (corner opposite to logo; small, unified color) */}
-            <div className={`hidden lg:flex items-center gap-2 ${dir === 'rtl' ? 'col-start-1 justify-self-start' : 'col-start-3 justify-self-end'}`}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-7 h-7 hover:bg-white/10"
-                onClick={() => openModal()}
-                aria-label={language === 'fa' ? 'درخواست رزرو جلسه' : 'Book Meeting'}
-              >
-                <Calendar className="w-3 h-3 text-cyan-300" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-7 h-7 hover:bg-white/10"
-                onClick={showContactMessage}
-                aria-label={language === 'fa' ? 'تماس فوری' : 'Quick Call'}
-              >
-                <Phone className="w-3 h-3 text-cyan-300" />
-              </Button>
+            {/* CTA Icons (small with tooltips) */}
+            <div className="hidden lg:flex items-center gap-3">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-7 h-7 hover:bg-white/10"
+                    onClick={() => openModal()}
+                    aria-label={language === 'fa' ? 'درخواست رزرو جلسه' : 'Book Meeting'}
+                  >
+                    <Calendar className="w-3 h-3 text-cyan-300" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <span>{language === 'fa' ? 'درخواست رزرو جلسه' : 'Book Meeting'}</span>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-7 h-7 hover:bg-white/10"
+                    onClick={showContactMessage}
+                    aria-label={language === 'fa' ? 'تماس فوری' : 'Quick Call'}
+                  >
+                    <Phone className="w-3 h-3 text-cyan-300" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <span>{language === 'fa' ? 'تماس فوری' : 'Quick Call'}</span>
+                </TooltipContent>
+              </Tooltip>
             </div>
 
             {/* CTA Buttons moved to left with logo */}
