@@ -127,6 +127,12 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       badge: null
     },
     { 
+      path: '/admin/projects', 
+      icon: Shield, 
+      label: 'پروژه‌ها', 
+      badge: null
+    },
+    { 
       path: '/admin/meetings', 
       icon: Calendar, 
       label: 'جلسات', 

@@ -17,6 +17,7 @@ import { AboutContentProvider } from '@/contexts/AboutContentContext';
 import { HomeContentProvider } from '@/contexts/HomeContentContext';
 import { ProductsProvider } from '@/contexts/ProductsContext';
 import { ProjectsProvider } from '@/contexts/ProjectsContext';
+import { ProjectsProvider } from '@/contexts/ProjectsContext';
 
 // ---------- ProtectedRoute ----------
 const RequireAuth = ({
@@ -91,6 +92,7 @@ import AdminProducts from './pages/AdminProducts';
 import AdminOrders from './pages/AdminOrders';
 import AdminCustomers from './pages/AdminCustomers';
 import AdminReports from './pages/AdminReports';
+import AdminProjects from './pages/AdminProjects';
 import AdminIntegrations from './pages/AdminIntegrations';
 import AdminChat from './pages/AdminChat';
 import AdminContent from './pages/AdminContent';
@@ -158,6 +160,14 @@ const App = () => (
                     element={
                       <RequireAuth roles={['admin', 'manager']}>
                         <AdminProducts />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/admin/projects"
+                    element={
+                      <RequireAuth roles={['admin', 'manager']}>
+                        <AdminProjects />
                       </RequireAuth>
                     }
                   />
