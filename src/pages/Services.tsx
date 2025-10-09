@@ -6,12 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { services } from '@/data/mockData';
 import { Phone, Clock, Shield, Award, CheckCircle, Wrench } from 'lucide-react';
+import { useHomeContent } from '@/contexts/HomeContentContext';
+import { useMediaUrl } from '@/hooks/useMediaUrl';
 import { useCTA } from '@/hooks/useCTA';
 import { useMeetings } from '@/contexts/MeetingsContext';
 
 export default function Services() {
   const { showContactMessage } = useCTA();
   const { openModal } = useMeetings();
+  const { content } = useHomeContent();
+  const servicesImageUrl = useMediaUrl(content.servicesMedia.type === 'image' ? content.servicesMedia.imageUrl : undefined);
+  const servicesVideoUrl = useMediaUrl(content.servicesMedia.type === 'video' ? content.servicesMedia.videoUrl : undefined);
   const supportFeatures = [
     'پشتیبانی 24 ساعته در 7 روز هفته',
     'تیم فنی مجرب و متخصص',
@@ -85,11 +90,17 @@ export default function Services() {
             </div>
 
             <div className="relative">
-              <img 
-                src="/api/placeholder/600/400" 
-                alt="تیم پشتیبانی" 
-                className="rounded-lg shadow-xl"
-              />
+              {content.servicesMedia.type === 'video' && servicesVideoUrl ? (
+                <video className="rounded-lg shadow-xl w-full" controls poster={content.servicesMedia.posterUrl || undefined} autoPlay={content.servicesMedia.autoplay} muted={content.servicesMedia.muted} loop={content.servicesMedia.loop} playsInline preload="metadata">
+                  <source src={servicesVideoUrl} type={servicesVideoUrl.endsWith('.webm') ? 'video/webm' : (servicesVideoUrl.endsWith('.ogv') || servicesVideoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4')} />
+                </video>
+              ) : (
+                <img 
+                  src={servicesImageUrl || '/api/placeholder/600/400'} 
+                  alt="تیم پشتیبانی" 
+                  className="rounded-lg shadow-xl w-full"
+                />
+              )}
               <div className="absolute -bottom-6 -left-6 bg-blue-600 text-white p-6 rounded-lg shadow-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Clock className="w-5 h-5" />

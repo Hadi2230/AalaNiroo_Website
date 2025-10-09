@@ -41,6 +41,7 @@ export interface HomeContentState {
   hero: HomeHero;
   gallery: HomeGalleryItem[];
   introMedia: IntroMedia;
+  servicesMedia: IntroMedia;
   featuredProductIds: string[];
   updatedAt: string;
   updatedBy?: string;
@@ -52,6 +53,8 @@ interface HomeContentContextType {
   clearHero: () => void;
   setIntroMedia: (media: Partial<IntroMedia>) => void;
   clearIntroMedia: () => void;
+  setServicesMedia: (media: Partial<IntroMedia>) => void;
+  clearServicesMedia: () => void;
   addGalleryItem: (item: Omit<HomeGalleryItem, 'id' | 'order'>) => void;
   removeGalleryItem: (id: string) => void;
   updateGalleryItem: (id: string, updates: Partial<HomeGalleryItem>) => void;
@@ -75,6 +78,12 @@ const initialState: HomeContentState = {
   },
   gallery: [],
   introMedia: {
+    type: 'none',
+    autoplay: false,
+    muted: true,
+    loop: false,
+  },
+  servicesMedia: {
     type: 'none',
     autoplay: false,
     muted: true,
@@ -110,10 +119,15 @@ export const HomeContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (!parsed.introMedia) {
           (parsed as HomeContentState).introMedia = { type: 'none', autoplay: false, muted: true, loop: false } as IntroMedia;
         }
+        // migrate to ensure servicesMedia exists
+        if (!(parsed as HomeContentState).servicesMedia) {
+          (parsed as HomeContentState).servicesMedia = { type: 'none', autoplay: false, muted: true, loop: false } as IntroMedia;
+        }
         setContent({
           hero: parsed.hero ?? initialState.hero,
           gallery: parsed.gallery ?? initialState.gallery,
           introMedia: (parsed as HomeContentState).introMedia,
+          servicesMedia: (parsed as HomeContentState).servicesMedia,
           updatedAt: parsed.updatedAt ?? new Date().toISOString(),
           updatedBy: parsed.updatedBy,
         });
@@ -191,6 +205,18 @@ export const HomeContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setContent(prev => ({ ...prev, introMedia: { type: 'none', autoplay: false, muted: true, loop: false }, updatedAt: new Date().toISOString() }));
   }, []);
 
+  const setServicesMedia = useCallback((media: Partial<IntroMedia>) => {
+    setContent(prev => ({
+      ...prev,
+      servicesMedia: { ...prev.servicesMedia, ...media },
+      updatedAt: new Date().toISOString(),
+    }));
+  }, []);
+
+  const clearServicesMedia = useCallback(() => {
+    setContent(prev => ({ ...prev, servicesMedia: { type: 'none', autoplay: false, muted: true, loop: false }, updatedAt: new Date().toISOString() }));
+  }, []);
+
   const addGalleryItem = useCallback((item: Omit<HomeGalleryItem, 'id' | 'order'>) => {
     const id = `hg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     setContent(prev => ({
@@ -246,6 +272,8 @@ export const HomeContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     clearHero,
     setIntroMedia,
     clearIntroMedia,
+    setServicesMedia,
+    clearServicesMedia,
     addGalleryItem,
     removeGalleryItem,
     updateGalleryItem,
