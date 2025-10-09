@@ -1,6 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Calendar, Zap, Building } from 'lucide-react';
+import { useMediaUrl } from '@/hooks/useMediaUrl';
 
 interface Project {
   id: number;
@@ -13,19 +14,26 @@ interface Project {
   client: string;
 }
 
-interface ProjectCardProps {
-  project: Project;
-}
+interface ProjectCardProps { project: Project | any; }
 
 const ProjectCard = ({ project }: ProjectCardProps) => {
+  const coverUrl = useMediaUrl(
+    project.mediaType === 'video' ? project.videoUrl : (project.imageUrl || project.image)
+  );
   return (
     <Card className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-white overflow-hidden">
       <div className="relative overflow-hidden">
-        <img 
-          src={project.image} 
-          alt={project.title}
-          className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
-        />
+        {project.mediaType === 'video' && coverUrl ? (
+          <video className="w-full h-64 object-cover" controls poster={project.posterUrl || undefined} playsInline preload="metadata">
+            <source src={coverUrl} />
+          </video>
+        ) : (
+          <img 
+            src={coverUrl || project.image || project.imageUrl} 
+            alt={project.title}
+            className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         <div className="absolute bottom-4 left-4 right-4">
           <Badge className="bg-blue-600 text-white mb-2">

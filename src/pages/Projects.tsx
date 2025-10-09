@@ -5,12 +5,14 @@ import ProjectCard from '@/components/sections/ProjectCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { projects } from '@/data/mockData';
+import { projects as mockProjects } from '@/data/mockData';
+import { useProjects } from '@/contexts/ProjectsContext';
 import { MapPin, Calendar, Zap, Building, Users, Award, TrendingUp } from 'lucide-react';
 import { useMeetings } from '@/contexts/MeetingsContext';
 
 export default function Projects() {
   const { openModal } = useMeetings();
+  const { projects, importMockIfEmpty } = useProjects();
   const stats = [
     { icon: Building, label: 'پروژه تکمیل شده', value: '500+' },
     { icon: Users, label: 'مشتری راضی', value: '300+' },
@@ -63,7 +65,7 @@ export default function Projects() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project) => (
+            {(projects.length ? projects : mockProjects).map((project: any) => (
               <ProjectCard key={project.id} project={project} />
             ))}
           </div>

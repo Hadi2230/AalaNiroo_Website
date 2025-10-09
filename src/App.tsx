@@ -16,6 +16,7 @@ import MeetingModal from '@/components/meetings/MeetingModal';
 import { AboutContentProvider } from '@/contexts/AboutContentContext';
 import { HomeContentProvider } from '@/contexts/HomeContentContext';
 import { ProductsProvider } from '@/contexts/ProductsContext';
+import { ProjectsProvider } from '@/contexts/ProjectsContext';
 
 // ---------- ProtectedRoute ----------
 const RequireAuth = ({
@@ -97,6 +98,7 @@ import AdminMedia from './pages/AdminMedia';
 import AdminAbout from './pages/AdminAbout';
 import AdminPages from './pages/AdminPages';
 import AdminMeetings from './pages/AdminMeetings';
+import AdminProjects from './pages/AdminProjects';
 
 // ---------- React Query Client ----------
 const queryClient = new QueryClient();
@@ -113,6 +115,7 @@ const App = () => (
               <MeetingsProvider>
               <HomeContentProvider>
               <ProductsProvider>
+              <ProjectsProvider>
               <AboutContentProvider>
                 <TooltipProvider>
             <Toaster position="top-right" richColors expand={true} />
@@ -223,6 +226,14 @@ const App = () => (
                     }
                   />
                   <Route
+                    path="/admin/projects"
+                    element={
+                      <RequireAuth roles={['admin', 'manager']}>
+                        <AdminProjects />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
                     path="/admin/pages"
                     element={
                       <RequireAuth roles={['admin', 'manager']}>
@@ -246,6 +257,7 @@ const App = () => (
             </ErrorBoundary>
                 </TooltipProvider>
               </AboutContentProvider>
+              </ProjectsProvider>
               </ProductsProvider>
               </HomeContentProvider>
               </MeetingsProvider>
