@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toPersianDate } from '@/utils/date';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -137,6 +138,37 @@ export default function AdminPages() {
   const [seo, setSeo] = useState({ title: '', description: '' });
   const [featuredImage, setFeaturedImage] = useState<string>('');
   const [showMediaPicker, setShowMediaPicker] = useState(false);
+
+  // Edit existing page
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editDraft, setEditDraft] = useState<Page | null>(null);
+
+  const openEdit = (pageId: string) => {
+    const p = pages.find(pg => pg.id === pageId) || null;
+    if (p) setEditDraft({ ...p });
+    setIsEditOpen(!!p);
+  };
+
+  const handleUpdatePage = () => {
+    if (!editDraft) return;
+    const updated: Page = {
+      ...editDraft,
+      lastModified: new Date().toISOString(),
+      versions: [
+        ...(editDraft.versions || []),
+        {
+          id: `v${Date.now()}`,
+          content: editDraft.content,
+          timestamp: new Date().toISOString(),
+          user: user?.name || 'Unknown',
+          comment: 'ویرایش محتوا'
+        }
+      ]
+    };
+    setPages(prev => prev.map(p => p.id === updated.id ? updated : p));
+    setIsEditOpen(false);
+    setEditDraft(null);
+  };
 
   // Advanced mock data
   const [templates] = useState<PageTemplate[]>([
@@ -768,14 +800,14 @@ export default function AdminPages() {
                          page.status === 'review' ? 'در حال بررسی' :
                          'پیش‌نویس'}
                       </Badge>
-                      <span className="text-xs text-gray-500">/{page.slug}</span>
+                        <span className="text-xs text-gray-500">/{page.slug}</span>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
                         <span>نویسنده: {page.author}</span>
-                        <span>{new Date(page.lastModified).toLocaleDateString('fa-IR')}</span>
+                        <span>{toPersianDate(page.lastModified)}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="flex items-center gap-1">
@@ -803,6 +835,15 @@ export default function AdminPages() {
                         >
                           <Eye className="w-3 h-3 mr-1" />
                           نمایش
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => openEdit(page.id)}
+                          className="flex-1"
+                        >
+                          <Edit className="w-3 h-3 mr-1" />
+                          ویرایش
                         </Button>
                         <Button
                           size="sm"
@@ -859,14 +900,15 @@ export default function AdminPages() {
                           </Badge>
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-600">{page.author}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {new Date(page.lastModified).toLocaleDateString('fa-IR')}
-                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">{toPersianDate(page.lastModified)}</td>
                         <td className="px-6 py-4 text-sm text-gray-600">{page.views}</td>
                         <td className="px-6 py-4">
                           <div className="flex gap-2">
                             <Button size="sm" variant="outline" onClick={() => handlePreview(page.slug)}>
                               <Eye className="w-3 h-3" />
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => openEdit(page.id)}>
+                              <Edit className="w-3 h-3" />
                             </Button>
                             <Button size="sm" variant="outline" onClick={() => handleDuplicatePage(page.id)}>
                               <Copy className="w-3 h-3" />
@@ -1199,6 +1241,64 @@ export default function AdminPages() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Edit Page Modal */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle>ویرایش صفحه</DialogTitle>
+            <DialogDescription>محتوای صفحه را ویرایش و ذخیره کنید</DialogDescription>
+          </DialogHeader>
+          {editDraft && (
+            <div className="space-y-6 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label>عنوان</Label>
+                  <Input value={editDraft.title} onChange={(e) => setEditDraft({ ...editDraft, title: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Slug</Label>
+                  <Input value={editDraft.slug} onChange={(e) => setEditDraft({ ...editDraft, slug: e.target.value })} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>محتوا</Label>
+                <Textarea rows={12} value={editDraft.content} onChange={(e) => setEditDraft({ ...editDraft, content: e.target.value })} className="font-mono text-sm" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <Label>وضعیت</Label>
+                  <Select value={editDraft.status} onValueChange={(v: Page['status']) => setEditDraft({ ...editDraft, status: v })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">پیش‌نویس</SelectItem>
+                      <SelectItem value="review">در حال بررسی</SelectItem>
+                      <SelectItem value="published">منتشر شده</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>SEO Title</Label>
+                  <Input value={editDraft.seoTitle || ''} onChange={(e) => setEditDraft({ ...editDraft, seoTitle: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>SEO Description</Label>
+                  <Input value={editDraft.seoDescription || ''} onChange={(e) => setEditDraft({ ...editDraft, seoDescription: e.target.value })} />
+                </div>
+              </div>
+              <div className="flex justify-between items-center pt-4 border-t">
+                <Button variant="outline" onClick={() => setIsEditOpen(false)}>انصراف</Button>
+                <Button onClick={handleUpdatePage}>
+                  <Save className="w-4 h-4 mr-2" />
+                  ذخیره تغییرات
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }
