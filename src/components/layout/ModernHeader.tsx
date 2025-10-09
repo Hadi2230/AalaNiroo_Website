@@ -54,7 +54,7 @@ const ModernHeader = () => {
         isScrolled ? 'bg-black/40 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}>
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center py-4" style={{ direction: dir }}>
+          <div className="relative flex justify-between items-center py-4" style={{ direction: dir }}>
             {/* Logo */}
             <Link to="/" className="flex items-center gap-4">
               {company.logoUrl ? (
@@ -70,8 +70,8 @@ const ModernHeader = () => {
               </div>
             </Link>
 
-            {/* Desktop Navigation (center, between logo/text and CTAs) */}
-            <nav className="hidden lg:flex items-center gap-8">
+            {/* Desktop Navigation (centered) */}
+            <nav className={`hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
               {navigation.map((item) => (
                 <Link
                   key={item.key}
@@ -88,25 +88,25 @@ const ModernHeader = () => {
               ))}
             </nav>
 
-            {/* CTA Icons (at far left in RTL; small, unified color) */}
+            {/* CTA Icons (top-left in RTL; small, unified color) */}
             <div className="hidden lg:flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="icon"
-                className="w-8 h-8 hover:bg-white/10"
+                className="w-7 h-7 hover:bg-white/10"
                 onClick={() => openModal()}
                 aria-label={language === 'fa' ? 'درخواست رزرو جلسه' : 'Book Meeting'}
               >
-                <Calendar className="w-4 h-4 text-cyan-300" />
+                <Calendar className="w-3 h-3 text-cyan-300" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                className="w-8 h-8 hover:bg-white/10"
+                className="w-7 h-7 hover:bg-white/10"
                 onClick={showContactMessage}
                 aria-label={language === 'fa' ? 'تماس فوری' : 'Quick Call'}
               >
-                <Phone className="w-4 h-4 text-cyan-300" />
+                <Phone className="w-3 h-3 text-cyan-300" />
               </Button>
             </div>
 
