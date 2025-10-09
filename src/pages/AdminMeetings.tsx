@@ -1,4 +1,5 @@
 import React from 'react';
+import { toPersianDate } from '@/utils/date';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { useMeetings } from '@/contexts/MeetingsContext';
 import { Button } from '@/components/ui/button';
@@ -52,7 +53,7 @@ export default function AdminMeetings() {
                     <div className="flex-1">
                       <div className="font-medium">{b.name}</div>
                       <div className="text-sm text-gray-600">{b.phone} {b.email ? `| ${b.email}` : ''}</div>
-                      <div className="text-sm">{b.date} - {b.time}</div>
+                      <div className="text-sm">{toPersianDate(b.date)} - {b.time}</div>
                       {b.notes && <div className="text-xs text-gray-500 mt-1">{b.notes}</div>}
                     </div>
                     <div className="flex items-center gap-2">

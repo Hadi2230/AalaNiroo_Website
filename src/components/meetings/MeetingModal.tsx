@@ -3,6 +3,7 @@ import { useMeetings } from '@/contexts/MeetingsContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { toPersianDate } from '@/utils/date';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -68,7 +69,17 @@ export default function MeetingModal() {
             </div>
             <div>
               <Label>{language === 'fa' ? 'تاریخ' : 'Date'}</Label>
-              <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+              <Input
+                type="date"
+                value={form.date}
+                onChange={(e) => setForm({ ...form, date: e.target.value })}
+                dir="ltr"
+              />
+              {form.date && (
+                <div className="mt-1 text-xs text-gray-500">
+                  {toPersianDate(form.date)}
+                </div>
+              )}
             </div>
           </div>
           <div>
