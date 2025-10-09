@@ -54,7 +54,7 @@ const ModernHeader = () => {
         isScrolled ? 'bg-black/40 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}>
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center py-4" style={{ direction: 'ltr' }}>
+          <div className="flex justify-between items-center py-4" style={{ direction: dir }}>
             {/* Logo */}
             <Link to="/" className="flex items-center gap-4">
               {company.logoUrl ? (
@@ -70,10 +70,8 @@ const ModernHeader = () => {
               </div>
             </Link>
 
-            {/* CTAs moved out of header into floating buttons (see FloatingCTAs) */}
-
-            {/* Desktop Navigation (pushed to right; CTAs stay left) */}
-            <nav className="hidden lg:flex items-center gap-8 ml-auto pr-8">
+            {/* Desktop Navigation (center, between logo/text and CTAs) */}
+            <nav className="hidden lg:flex items-center gap-8">
               {navigation.map((item) => (
                 <Link
                   key={item.key}
@@ -89,6 +87,28 @@ const ModernHeader = () => {
                 </Link>
               ))}
             </nav>
+
+            {/* CTA Icons (at far left in RTL; small, unified color) */}
+            <div className="hidden lg:flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-8 h-8 hover:bg-white/10"
+                onClick={() => openModal()}
+                aria-label={language === 'fa' ? 'درخواست رزرو جلسه' : 'Book Meeting'}
+              >
+                <Calendar className="w-4 h-4 text-cyan-300" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-8 h-8 hover:bg-white/10"
+                onClick={showContactMessage}
+                aria-label={language === 'fa' ? 'تماس فوری' : 'Quick Call'}
+              >
+                <Phone className="w-4 h-4 text-cyan-300" />
+              </Button>
+            </div>
 
             {/* CTA Buttons moved to left with logo */}
 
