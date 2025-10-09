@@ -92,7 +92,7 @@ export default function AdminContent() {
   const [editorMode, setEditorMode] = useState<'wysiwyg' | 'html' | 'text'>('wysiwyg');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const { content: homeContent, setHero, clearHero, setIntroMedia, clearIntroMedia, setServicesMedia, clearServicesMedia, addGalleryItem, removeGalleryItem, updateGalleryItem, setFeaturedProducts, toggleFeaturedProduct } = useHomeContent();
+  const { content: homeContent, setHero, clearHero, setIntroMedia, clearIntroMedia, setServicesMedia, clearServicesMedia, setEmergencyMedia, clearEmergencyMedia, addGalleryItem, removeGalleryItem, updateGalleryItem, setFeaturedProducts, toggleFeaturedProduct } = useHomeContent();
   const hero = (homeContent && homeContent.hero) ? homeContent.hero : { type: 'none', title: '', subtitle: '', ctaText: '', ctaUrl: '', overlay: true, autoplay: true, muted: true, loop: true, posterUrl: '', imageUrl: '', videoUrl: '' };
   const gallery = Array.isArray(homeContent?.gallery) ? homeContent!.gallery : [];
   const { uploadFile } = useMedia();
@@ -101,6 +101,7 @@ export default function AdminContent() {
   const [heroFileInput, setHeroFileInput] = useState<{ type: 'image' | 'video' | 'poster' } | null>(null);
   const [introFileInput, setIntroFileInput] = useState<{ type: 'image' | 'video' | 'poster' } | null>(null);
   const [servicesFileInput, setServicesFileInput] = useState<{ type: 'image' | 'video' | 'poster' } | null>(null);
+  const [emergencyFileInput, setEmergencyFileInput] = useState<{ type: 'image' | 'video' | 'poster' } | null>(null);
   const [logoFileInput, setLogoFileInput] = useState(false);
   const [showLogoPicker, setShowLogoPicker] = useState(false);
 
@@ -883,6 +884,30 @@ export default function AdminContent() {
                 </div>
               </div>
 
+            {/* Emergency Support Media (image/video in Emergency section on /services) */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">مدیای بخش پشتیبانی اضطراری</h3>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => { setEmergencyFileInput({ type: 'image' }); (document.getElementById('emergency-hidden-file') as HTMLInputElement)?.click(); }}>آپلود تصویر</Button>
+                  <Button variant="outline" onClick={() => { setEmergencyFileInput({ type: 'video' }); (document.getElementById('emergency-hidden-file') as HTMLInputElement)?.click(); }}>آپلود ویدیو</Button>
+                  <Button variant="outline" onClick={() => { setEmergencyFileInput({ type: 'poster' }); (document.getElementById('emergency-hidden-file') as HTMLInputElement)?.click(); }}>آپلود پوستر</Button>
+                  <Button variant="outline" className="text-red-600" onClick={clearEmergencyMedia}>حذف</Button>
+                </div>
+              </div>
+              <div className="rounded-lg overflow-hidden border">
+                {homeContent.emergencyMedia?.type === 'video' && homeContent.emergencyMedia.videoUrl ? (
+                  <video className="w-full" controls poster={homeContent.emergencyMedia.posterUrl || undefined} autoPlay={homeContent.emergencyMedia.autoplay} muted={homeContent.emergencyMedia.muted} loop={homeContent.emergencyMedia.loop} playsInline preload="metadata">
+                    <source src={homeContent.emergencyMedia.videoUrl.startsWith('idb:') ? '' : homeContent.emergencyMedia.videoUrl} type={homeContent.emergencyMedia.videoUrl?.startsWith('data:') ? homeContent.emergencyMedia.videoUrl.substring(5, homeContent.emergencyMedia.videoUrl.indexOf(';')) : (homeContent.emergencyMedia.videoUrl?.endsWith('.webm') ? 'video/webm' : (homeContent.emergencyMedia.videoUrl?.endsWith('.ogv') || homeContent.emergencyMedia.videoUrl?.endsWith('.ogg') ? 'video/ogg' : 'video/mp4'))} />
+                  </video>
+                ) : homeContent.emergencyMedia?.type === 'image' && homeContent.emergencyMedia.imageUrl ? (
+                  <img src={homeContent.emergencyMedia.imageUrl} alt="emergency" className="w-full" />
+                ) : (
+                  <div className="p-8 text-center text-gray-500">مدیایی انتخاب نشده است</div>
+                )}
+              </div>
+            </div>
+
               {/* Gallery Manager */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -1027,6 +1052,20 @@ export default function AdminContent() {
             if (servicesFileInput.type === 'video') setServicesMedia({ type: 'video', videoUrl: uploaded.url, autoplay: true, muted: true, loop: true });
           } catch {}
           finally { setServicesFileInput(null); (e.target as HTMLInputElement).value = ''; }
+        }} />
+
+        {/* Hidden file input for emergency uploads */}
+        <input id="emergency-hidden-file" type="file" accept="image/*,video/*" className="hidden" onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (!file || !emergencyFileInput) return;
+          try {
+            const folder = 'homepage';
+            const uploaded = await uploadFile(file, folder);
+            if (emergencyFileInput.type === 'image') setEmergencyMedia({ type: 'image', imageUrl: uploaded.url, posterUrl: uploaded.url });
+            if (emergencyFileInput.type === 'poster') setEmergencyMedia({ posterUrl: uploaded.url });
+            if (emergencyFileInput.type === 'video') setEmergencyMedia({ type: 'video', videoUrl: uploaded.url, autoplay: true, muted: true, loop: true });
+          } catch {}
+          finally { setEmergencyFileInput(null); (e.target as HTMLInputElement).value = ''; }
         }} />
 
         {/* Hidden file input for intro uploads */}

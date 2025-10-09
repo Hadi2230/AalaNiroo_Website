@@ -42,6 +42,7 @@ export interface HomeContentState {
   gallery: HomeGalleryItem[];
   introMedia: IntroMedia;
   servicesMedia: IntroMedia;
+  emergencyMedia: IntroMedia;
   featuredProductIds: string[];
   updatedAt: string;
   updatedBy?: string;
@@ -55,6 +56,8 @@ interface HomeContentContextType {
   clearIntroMedia: () => void;
   setServicesMedia: (media: Partial<IntroMedia>) => void;
   clearServicesMedia: () => void;
+  setEmergencyMedia: (media: Partial<IntroMedia>) => void;
+  clearEmergencyMedia: () => void;
   addGalleryItem: (item: Omit<HomeGalleryItem, 'id' | 'order'>) => void;
   removeGalleryItem: (id: string) => void;
   updateGalleryItem: (id: string, updates: Partial<HomeGalleryItem>) => void;
@@ -84,6 +87,12 @@ const initialState: HomeContentState = {
     loop: false,
   },
   servicesMedia: {
+    type: 'none',
+    autoplay: false,
+    muted: true,
+    loop: false,
+  },
+  emergencyMedia: {
     type: 'none',
     autoplay: false,
     muted: true,
@@ -123,11 +132,16 @@ export const HomeContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (!(parsed as HomeContentState).servicesMedia) {
           (parsed as HomeContentState).servicesMedia = { type: 'none', autoplay: false, muted: true, loop: false } as IntroMedia;
         }
+        // migrate to ensure emergencyMedia exists
+        if (!(parsed as HomeContentState).emergencyMedia) {
+          (parsed as HomeContentState).emergencyMedia = { type: 'none', autoplay: false, muted: true, loop: false } as IntroMedia;
+        }
         setContent({
           hero: parsed.hero ?? initialState.hero,
           gallery: parsed.gallery ?? initialState.gallery,
           introMedia: (parsed as HomeContentState).introMedia,
           servicesMedia: (parsed as HomeContentState).servicesMedia,
+          emergencyMedia: (parsed as HomeContentState).emergencyMedia,
           updatedAt: parsed.updatedAt ?? new Date().toISOString(),
           updatedBy: parsed.updatedBy,
         });
@@ -217,6 +231,18 @@ export const HomeContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setContent(prev => ({ ...prev, servicesMedia: { type: 'none', autoplay: false, muted: true, loop: false }, updatedAt: new Date().toISOString() }));
   }, []);
 
+  const setEmergencyMedia = useCallback((media: Partial<IntroMedia>) => {
+    setContent(prev => ({
+      ...prev,
+      emergencyMedia: { ...prev.emergencyMedia, ...media },
+      updatedAt: new Date().toISOString(),
+    }));
+  }, []);
+
+  const clearEmergencyMedia = useCallback(() => {
+    setContent(prev => ({ ...prev, emergencyMedia: { type: 'none', autoplay: false, muted: true, loop: false }, updatedAt: new Date().toISOString() }));
+  }, []);
+
   const addGalleryItem = useCallback((item: Omit<HomeGalleryItem, 'id' | 'order'>) => {
     const id = `hg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     setContent(prev => ({
@@ -274,6 +300,8 @@ export const HomeContentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     clearIntroMedia,
     setServicesMedia,
     clearServicesMedia,
+    setEmergencyMedia,
+    clearEmergencyMedia,
     addGalleryItem,
     removeGalleryItem,
     updateGalleryItem,

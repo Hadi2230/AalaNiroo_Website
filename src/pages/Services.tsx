@@ -17,6 +17,8 @@ export default function Services() {
   const { content } = useHomeContent();
   const servicesImageUrl = useMediaUrl(content.servicesMedia.type === 'image' ? content.servicesMedia.imageUrl : undefined);
   const servicesVideoUrl = useMediaUrl(content.servicesMedia.type === 'video' ? content.servicesMedia.videoUrl : undefined);
+  const emergencyImageUrl = useMediaUrl(content.emergencyMedia?.type === 'image' ? content.emergencyMedia.imageUrl : undefined);
+  const emergencyVideoUrl = useMediaUrl(content.emergencyMedia?.type === 'video' ? content.emergencyMedia.videoUrl : undefined);
   const supportFeatures = [
     'پشتیبانی 24 ساعته در 7 روز هفته',
     'تیم فنی مجرب و متخصص',
@@ -245,7 +247,17 @@ export default function Services() {
             <p className="text-xl text-gray-600 mb-8">
               در شرایط اضطراری، تیم فنی ما آماده ارائه خدمات فوری است
             </p>
-            
+            {/* Media (admin managed) */}
+            <div className="max-w-4xl mx-auto mb-8">
+              {content.emergencyMedia?.type === 'video' && emergencyVideoUrl ? (
+                <video className="w-full rounded-lg shadow" controls poster={content.emergencyMedia.posterUrl || undefined} autoPlay={content.emergencyMedia.autoplay} muted={content.emergencyMedia.muted} loop={content.emergencyMedia.loop} playsInline preload="metadata">
+                  <source src={emergencyVideoUrl} type={emergencyVideoUrl.endsWith('.webm') ? 'video/webm' : (emergencyVideoUrl.endsWith('.ogv') || emergencyVideoUrl.endsWith('.ogg') ? 'video/ogg' : 'video/mp4')} />
+                </video>
+              ) : content.emergencyMedia?.type === 'image' && (emergencyImageUrl || content.emergencyMedia.imageUrl) ? (
+                <img src={emergencyImageUrl || content.emergencyMedia.imageUrl!} alt="emergency" className="w-full rounded-lg shadow" />
+              ) : null}
+            </div>
+
             <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               <div className="text-center">
                 <div className="text-3xl font-bold text-red-600 mb-2">24/7</div>
@@ -262,7 +274,7 @@ export default function Services() {
             </div>
 
             <div className="mt-8">
-              <Button size="lg" className="bg-red-600 hover:bg-red-700 text-lg px-8">
+              <Button size="lg" className="bg-red-600 hover:bg-red-700 text-lg px-8" onClick={showContactMessage}>
                 <Phone className="w-5 h-5 mr-2" />
                 تماس اضطراری: 021-88776655
               </Button>
