@@ -17,7 +17,6 @@ import { AboutContentProvider } from '@/contexts/AboutContentContext';
 import { HomeContentProvider } from '@/contexts/HomeContentContext';
 import { ProductsProvider } from '@/contexts/ProductsContext';
 import { ProjectsProvider } from '@/contexts/ProjectsContext';
-import { ProjectsProvider } from '@/contexts/ProjectsContext';
 
 // ---------- ProtectedRoute ----------
 const RequireAuth = ({
@@ -160,14 +159,6 @@ const App = () => (
                     element={
                       <RequireAuth roles={['admin', 'manager']}>
                         <AdminProducts />
-                      </RequireAuth>
-                    }
-                  />
-                  <Route
-                    path="/admin/projects"
-                    element={
-                      <RequireAuth roles={['admin', 'manager']}>
-                        <AdminProjects />
                       </RequireAuth>
                     }
                   />
