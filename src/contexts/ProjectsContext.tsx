@@ -204,6 +204,7 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   return <ProjectsContext.Provider value={value}>{children}</ProjectsContext.Provider>;
 };
 
+
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { projects as mockProjects } from '@/data/mockData';
 
