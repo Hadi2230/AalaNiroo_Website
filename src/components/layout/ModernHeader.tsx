@@ -54,7 +54,7 @@ const ModernHeader = () => {
         isScrolled ? 'bg-black/40 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}>
         <div className="container mx-auto px-4">
-          <div className="relative flex justify-between items-center py-4" style={{ direction: dir }}>
+          <div className="relative flex justify-between items-center py-4" style={{ direction: 'ltr' }}>
             {/* Logo */}
             <Link to="/" className="flex items-center gap-4">
               {company.logoUrl ? (
@@ -70,8 +70,11 @@ const ModernHeader = () => {
               </div>
             </Link>
 
-            {/* Desktop Navigation (centered) */}
-            <nav className={`hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+            {/* Desktop Navigation (centered; RTL shows Home at right) */}
+            <nav
+              className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2"
+              style={{ direction: language === 'fa' ? 'rtl' : 'ltr' }}
+            >
               {navigation.map((item) => (
                 <Link
                   key={item.key}
@@ -88,7 +91,7 @@ const ModernHeader = () => {
               ))}
             </nav>
 
-            {/* CTA Icons (top-left in RTL; small, unified color) */}
+            {/* CTA Icons (top-right now; small, unified color) */}
             <div className="hidden lg:flex items-center gap-2">
               <Button
                 variant="ghost"
