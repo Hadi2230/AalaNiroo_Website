@@ -92,7 +92,7 @@ export default function AdminContent() {
   const [editorMode, setEditorMode] = useState<'wysiwyg' | 'html' | 'text'>('wysiwyg');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const { content: homeContent, setHero, clearHero, setIntroMedia, clearIntroMedia, addGalleryItem, removeGalleryItem, updateGalleryItem, setFeaturedProducts, toggleFeaturedProduct } = useHomeContent();
+  const { content: homeContent, setHero, clearHero, setIntroMedia, clearIntroMedia, setServicesMedia, clearServicesMedia, addGalleryItem, removeGalleryItem, updateGalleryItem, setFeaturedProducts, toggleFeaturedProduct } = useHomeContent();
   const hero = (homeContent && homeContent.hero) ? homeContent.hero : { type: 'none', title: '', subtitle: '', ctaText: '', ctaUrl: '', overlay: true, autoplay: true, muted: true, loop: true, posterUrl: '', imageUrl: '', videoUrl: '' };
   const gallery = Array.isArray(homeContent?.gallery) ? homeContent!.gallery : [];
   const { uploadFile } = useMedia();
@@ -100,6 +100,7 @@ export default function AdminContent() {
   const [showGalleryPicker, setShowGalleryPicker] = useState(false);
   const [heroFileInput, setHeroFileInput] = useState<{ type: 'image' | 'video' | 'poster' } | null>(null);
   const [introFileInput, setIntroFileInput] = useState<{ type: 'image' | 'video' | 'poster' } | null>(null);
+  const [servicesFileInput, setServicesFileInput] = useState<{ type: 'image' | 'video' | 'poster' } | null>(null);
   const [logoFileInput, setLogoFileInput] = useState(false);
   const [showLogoPicker, setShowLogoPicker] = useState(false);
 
