@@ -8,26 +8,33 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { useProjects } from '@/contexts/ProjectsContext';
-import { useMedia } from '@/contexts/MediaContext';
 import MediaPicker from '@/components/media/MediaPicker';
-import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Upload, Image as ImageIcon, Filter, Search, RefreshCw } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, RefreshCw, Image as ImageIcon } from 'lucide-react';
 
 export default function AdminProjects() {
   const { projects, createProject, updateProject, deleteProject } = useProjects();
-  const { uploadFile } = useMedia();
+
   const [showAdd, setShowAdd] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
   const [search, setSearch] = useState('');
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [draft, setDraft] = useState({ title: '', location: '', capacity: '', year: '', image: '', description: '', client: '', status: 'published' as const });
+  const [draft, setDraft] = useState({
+    title: '',
+    location: '',
+    capacity: '',
+    year: '',
+    image: '',
+    description: '',
+    client: '',
+    status: 'published' as const,
+  });
 
   const filtered = useMemo(() => {
     if (!search.trim()) return projects;
     const q = search.toLowerCase();
-    return projects.filter(p =>
+    return projects.filter((p) =>
       p.title.toLowerCase().includes(q) ||
       p.location.toLowerCase().includes(q) ||
       p.client.toLowerCase().includes(q) ||
@@ -46,7 +53,12 @@ export default function AdminProjects() {
               <div className="flex gap-2">
                 <div className="relative">
                   <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="جستجو..." className="pr-9 w-64" />
+                  <Input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="جستجو..."
+                    className="pr-9 w-64"
+                  />
                 </div>
                 <Button onClick={() => setShowAdd(true)} className="bg-blue-600 hover:bg-blue-700">
                   <Plus className="w-4 h-4 mr-2" /> پروژه جدید
@@ -62,7 +74,11 @@ export default function AdminProjects() {
                 {filtered.map((p) => (
                   <Card key={p.id} className="overflow-hidden group">
                     <div className="relative">
-                      <img src={p.image || '/api/placeholder/600/400'} alt={p.title} className="w-full h-48 object-cover" />
+                      <img
+                        src={p.image || '/api/placeholder/600/400'}
+                        alt={p.title}
+                        className="w-full h-48 object-cover"
+                      />
                       <Badge className="absolute top-2 right-2 bg-blue-600">{p.capacity}</Badge>
                     </div>
                     <CardContent className="p-4 space-y-2">
@@ -73,10 +89,32 @@ export default function AdminProjects() {
                         <span>{p.year}</span>
                       </div>
                       <div className="flex gap-2 pt-2">
-                        <Button size="sm" variant="outline" onClick={() => { setEditingId(p.id); setDraft({ title: p.title, location: p.location, capacity: p.capacity, year: p.year, image: p.image, description: p.description, client: p.client, status: p.status }); setShowEdit(true); }}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setEditingId(p.id);
+                            setDraft({
+                              title: p.title,
+                              location: p.location,
+                              capacity: p.capacity,
+                              year: p.year,
+                              image: p.image,
+                              description: p.description,
+                              client: p.client,
+                              status: p.status as 'published' | 'draft',
+                            });
+                            setShowEdit(true);
+                          }}
+                        >
                           <Edit className="w-4 h-4 mr-1" /> ویرایش
                         </Button>
-                        <Button size="sm" variant="outline" className="text-red-600" onClick={() => deleteProject(p.id)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-red-600"
+                          onClick={() => deleteProject(p.id)}
+                        >
                           <Trash2 className="w-4 h-4 mr-1" /> حذف
                         </Button>
                       </div>
@@ -98,32 +136,55 @@ export default function AdminProjects() {
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 space-y-2">
                 <Label>عنوان</Label>
-                <Input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
+                <Input
+                  value={draft.title}
+                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                />
               </div>
               <div className="space-y-2">
                 <Label>موقعیت</Label>
-                <Input value={draft.location} onChange={(e) => setDraft({ ...draft, location: e.target.value })} />
+                <Input
+                  value={draft.location}
+                  onChange={(e) => setDraft({ ...draft, location: e.target.value })}
+                />
               </div>
               <div className="space-y-2">
                 <Label>ظرفیت</Label>
-                <Input value={draft.capacity} onChange={(e) => setDraft({ ...draft, capacity: e.target.value })} />
+                <Input
+                  value={draft.capacity}
+                  onChange={(e) => setDraft({ ...draft, capacity: e.target.value })}
+                />
               </div>
               <div className="space-y-2">
                 <Label>سال اجرا</Label>
-                <Input value={draft.year} onChange={(e) => setDraft({ ...draft, year: e.target.value })} />
+                <Input
+                  value={draft.year}
+                  onChange={(e) => setDraft({ ...draft, year: e.target.value })}
+                />
               </div>
               <div className="col-span-2 space-y-2">
                 <Label>توضیحات</Label>
-                <Textarea rows={3} value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
+                <Textarea
+                  rows={3}
+                  value={draft.description}
+                  onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+                />
               </div>
               <div className="space-y-2">
                 <Label>کارفرما</Label>
-                <Input value={draft.client} onChange={(e) => setDraft({ ...draft, client: e.target.value })} />
+                <Input
+                  value={draft.client}
+                  onChange={(e) => setDraft({ ...draft, client: e.target.value })}
+                />
               </div>
               <div className="space-y-2">
                 <Label>تصویر کاور</Label>
                 <div className="flex gap-2">
-                  <Input value={draft.image} onChange={(e) => setDraft({ ...draft, image: e.target.value })} placeholder="URL" />
+                  <Input
+                    value={draft.image}
+                    onChange={(e) => setDraft({ ...draft, image: e.target.value })}
+                    placeholder="URL"
+                  />
                   <Button variant="outline" onClick={() => setShowPicker(true)}>
                     <ImageIcon className="w-4 h-4 mr-1" /> انتخاب
                   </Button>
@@ -131,17 +192,41 @@ export default function AdminProjects() {
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setShowAdd(false)}>انصراف</Button>
-              <Button disabled={adding || !draft.title.trim()} onClick={async () => {
-                setAdding(true);
-                try {
-                  await createProject(draft);
-                  setShowAdd(false);
-                  setDraft({ title: '', location: '', capacity: '', year: '', image: '', description: '', client: '', status: 'published' });
-                } catch {}
-                finally { setAdding(false); }
-              }}>
-                {adding ? (<><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> در حال افزودن...</>) : (<><Plus className="w-4 h-4 mr-2" /> افزودن</>)}
+              <Button variant="outline" onClick={() => setShowAdd(false)}>
+                انصراف
+              </Button>
+              <Button
+                disabled={adding || !draft.title.trim()}
+                onClick={async () => {
+                  setAdding(true);
+                  try {
+                    await createProject(draft);
+                    setShowAdd(false);
+                    setDraft({
+                      title: '',
+                      location: '',
+                      capacity: '',
+                      year: '',
+                      image: '',
+                      description: '',
+                      client: '',
+                      status: 'published',
+                    });
+                  } catch {}
+                  finally {
+                    setAdding(false);
+                  }
+                }}
+              >
+                {adding ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> در حال افزودن...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 mr-2" /> افزودن
+                  </>
+                )}
               </Button>
             </div>
           </DialogContent>
@@ -156,32 +241,55 @@ export default function AdminProjects() {
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 space-y-2">
                 <Label>عنوان</Label>
-                <Input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
+                <Input
+                  value={draft.title}
+                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                />
               </div>
               <div className="space-y-2">
                 <Label>موقعیت</Label>
-                <Input value={draft.location} onChange={(e) => setDraft({ ...draft, location: e.target.value })} />
+                <Input
+                  value={draft.location}
+                  onChange={(e) => setDraft({ ...draft, location: e.target.value })}
+                />
               </div>
               <div className="space-y-2">
                 <Label>ظرفیت</Label>
-                <Input value={draft.capacity} onChange={(e) => setDraft({ ...draft, capacity: e.target.value })} />
+                <Input
+                  value={draft.capacity}
+                  onChange={(e) => setDraft({ ...draft, capacity: e.target.value })}
+                />
               </div>
               <div className="space-y-2">
                 <Label>سال اجرا</Label>
-                <Input value={draft.year} onChange={(e) => setDraft({ ...draft, year: e.target.value })} />
+                <Input
+                  value={draft.year}
+                  onChange={(e) => setDraft({ ...draft, year: e.target.value })}
+                />
               </div>
               <div className="col-span-2 space-y-2">
                 <Label>توضیحات</Label>
-                <Textarea rows={3} value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
+                <Textarea
+                  rows={3}
+                  value={draft.description}
+                  onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+                />
               </div>
               <div className="space-y-2">
                 <Label>کارفرما</Label>
-                <Input value={draft.client} onChange={(e) => setDraft({ ...draft, client: e.target.value })} />
+                <Input
+                  value={draft.client}
+                  onChange={(e) => setDraft({ ...draft, client: e.target.value })}
+                />
               </div>
               <div className="space-y-2">
                 <Label>تصویر کاور</Label>
                 <div className="flex gap-2">
-                  <Input value={draft.image} onChange={(e) => setDraft({ ...draft, image: e.target.value })} placeholder="URL" />
+                  <Input
+                    value={draft.image}
+                    onChange={(e) => setDraft({ ...draft, image: e.target.value })}
+                    placeholder="URL"
+                  />
                   <Button variant="outline" onClick={() => setShowPicker(true)}>
                     <ImageIcon className="w-4 h-4 mr-1" /> انتخاب
                   </Button>
@@ -189,12 +297,18 @@ export default function AdminProjects() {
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setShowEdit(false)}>انصراف</Button>
-              <Button onClick={async () => {
-                if (!editingId) return;
-                await updateProject(editingId, draft);
-                setShowEdit(false);
-              }}>ذخیره</Button>
+              <Button variant="outline" onClick={() => setShowEdit(false)}>
+                انصراف
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (!editingId) return;
+                  await updateProject(editingId, draft);
+                  setShowEdit(false);
+                }}
+              >
+                ذخیره
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -203,7 +317,7 @@ export default function AdminProjects() {
         <MediaPicker
           open={showPicker}
           onOpenChange={setShowPicker}
-          onSelect={(file) => setDraft(prev => ({ ...prev, image: file.url }))}
+          onSelect={(file) => setDraft((prev) => ({ ...prev, image: file.url }))}
           accept={['image']}
         />
       </div>
