@@ -91,7 +91,6 @@ import AdminProducts from './pages/AdminProducts';
 import AdminOrders from './pages/AdminOrders';
 import AdminCustomers from './pages/AdminCustomers';
 import AdminReports from './pages/AdminReports';
-import AdminProjects from './pages/AdminProjects';
 import AdminIntegrations from './pages/AdminIntegrations';
 import AdminChat from './pages/AdminChat';
 import AdminContent from './pages/AdminContent';
