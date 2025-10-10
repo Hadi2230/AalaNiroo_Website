@@ -48,7 +48,7 @@ export default function ModernIndex() {
   const introImageUrl = useMediaUrl(home.introMedia?.type === 'image' ? home.introMedia?.imageUrl : undefined);
   const heroVideoUrl = useMediaUrl(home.hero.type === 'video' ? home.hero.videoUrl : undefined);
   const playableVideoUrl = introVideoUrl || heroVideoUrl;
-  const posterUrl = home.introMedia?.posterUrl || home.hero.posterUrl || introImageUrl || '/api/placeholder/600/400';
+  const posterUrl = home.introMedia?.posterUrl || home.hero.posterUrl || introImageUrl || 'https://picsum.photos/600/400';
   const [isPlaying, setIsPlaying] = useState(false);
   const currentProducts = products[language];
   const currentServices = services[language];
@@ -189,7 +189,7 @@ export default function ModernIndex() {
                   ) : (
                     <div className="relative">
                       <img 
-                        src={typeof posterUrl === 'string' ? posterUrl : '/api/placeholder/600/400'} 
+                        src={typeof posterUrl === 'string' ? posterUrl : 'https://picsum.photos/600/400'} 
                         alt="Aalaniroo Company" 
                         className="w-full h-auto rounded-lg"
                       />
@@ -202,7 +202,7 @@ export default function ModernIndex() {
                   )
                 ) : (
                   <img 
-                    src={introImageUrl || '/api/placeholder/600/400'} 
+                    src={introImageUrl || 'https://picsum.photos/600/400'} 
                     alt="Aalaniroo Company" 
                     className="w-full h-auto rounded-lg"
                   />

@@ -25,7 +25,7 @@ const mockUsers = [
     email: 'admin@aalaniroo.com',
     password: 'admin123',
     role: 'admin' as const,
-    avatar: '/api/placeholder/40/40'
+    avatar: 'https://picsum.photos/40/40'
   },
   {
     id: '2',
@@ -33,7 +33,7 @@ const mockUsers = [
     email: 'sales@aalaniroo.com',
     password: 'sales123',
     role: 'sales' as const,
-    avatar: '/api/placeholder/40/40'
+    avatar: 'https://picsum.photos/40/40'
   },
   {
     id: '3',
@@ -41,7 +41,7 @@ const mockUsers = [
     email: 'manager@aalaniroo.com',
     password: 'manager123',
     role: 'manager' as const,
-    avatar: '/api/placeholder/40/40'
+    avatar: 'https://picsum.photos/40/40'
   }
 ];
 

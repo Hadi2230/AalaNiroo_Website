@@ -98,7 +98,7 @@ export default function Services() {
                 </video>
               ) : (
                 <img 
-                  src={servicesImageUrl || '/api/placeholder/600/400'} 
+                  src={servicesImageUrl || 'https://picsum.photos/600/400'} 
                   alt="تیم پشتیبانی" 
                   className="rounded-lg shadow-xl w-full"
                 />

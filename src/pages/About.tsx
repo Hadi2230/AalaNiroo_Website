@@ -405,7 +405,7 @@ export default function About() {
                 <CardContent className="p-6">
                   <div className="relative mb-6">
                     <img
-                      src={member.photoId ? (getGalleryImages().find(f => f.id === member.photoId)?.url || '/api/placeholder/200/200') : '/api/placeholder/200/200'}
+                      src={member.photoId ? (getGalleryImages().find(f => f.id === member.photoId)?.url || 'https://picsum.photos/200/200') : 'https://picsum.photos/200/200'}
                       alt={member.name}
                       className="w-32 h-32 rounded-full mx-auto object-cover shadow-lg group-hover:shadow-xl transition-shadow"
                     />

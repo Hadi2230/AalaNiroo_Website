@@ -75,7 +75,7 @@ export default function AdminProjects() {
                   <Card key={p.id} className="overflow-hidden group">
                     <div className="relative">
                       <img
-                        src={p.image || '/api/placeholder/600/400'}
+                        src={p.image || 'https://picsum.photos/600/400'}
                         alt={p.title}
                         className="w-full h-48 object-cover"
                       />

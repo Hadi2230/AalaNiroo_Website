@@ -36,7 +36,7 @@ export const products = {
       cylinders: "3-16 سیلندر",
       fuel: "دیزل",
       brand: "FG Wilson",
-      image: "/api/placeholder/600/400",
+      image: "https://picsum.photos/600/400",
       description: "ژنراتورهای دیزلی FG Wilson با کیفیت برتر و قابلیت اطمینان بالا",
       features: [
         "موتور Perkins اصلی انگلستان",
@@ -57,7 +57,7 @@ export const products = {
       cylinders: "4-12 سیلندر",
       fuel: "گاز طبیعی",
       brand: "Cummins",
-      image: "/api/placeholder/600/400",
+      image: "https://picsum.photos/600/400",
       description: "مولدهای گازسوز Cummins برای تولید برق پایدار و اقتصادی",
       features: [
         "موتور Cummins گازسوز",
@@ -78,7 +78,7 @@ export const products = {
       cylinders: "1-2 سیلندر",
       fuel: "بنزین/دیزل",
       brand: "Honda/Yamaha",
-      image: "/api/placeholder/600/400",
+      image: "https://picsum.photos/600/400",
       description: "موتورهای برق قابل حمل برای مصارف خانگی و کوچک",
       features: [
         "طراحی کامپکت و سبک",
@@ -101,7 +101,7 @@ export const products = {
       cylinders: "3-16 Cylinders",
       fuel: "Diesel",
       brand: "FG Wilson",
-      image: "/api/placeholder/600/400",
+      image: "https://picsum.photos/600/400",
       description: "FG Wilson diesel generators with superior quality and high reliability",
       features: [
         "Original Perkins Engine from UK",
@@ -122,7 +122,7 @@ export const products = {
       cylinders: "4-12 Cylinders",
       fuel: "Natural Gas",
       brand: "Cummins",
-      image: "/api/placeholder/600/400",
+      image: "https://picsum.photos/600/400",
       description: "Cummins gas generators for sustainable and economical power generation",
       features: [
         "Cummins Gas Engine",
@@ -143,7 +143,7 @@ export const products = {
       cylinders: "1-2 Cylinders", 
       fuel: "Gasoline/Diesel",
       brand: "Honda/Yamaha",
-      image: "/api/placeholder/600/400",
+      image: "https://picsum.photos/600/400",
       description: "Portable generators for residential and small applications",
       features: [
         "Compact & Lightweight Design",
@@ -169,8 +169,8 @@ export const projects = {
       year: "2023",
       client: "شرکت پتروشیمی پارس",
       description: "طراحی، تامین و نصب 20 دستگاه ژنراتور گازسوز Cummins",
-      image: "/api/placeholder/800/500",
-      gallery: ["/api/placeholder/400/300", "/api/placeholder/400/300"],
+      image: "https://picsum.photos/800/500",
+      gallery: ["https://picsum.photos/400/300", "https://picsum.photos/400/300"],
       status: "تکمیل شده",
       duration: "18 ماه"
     },
@@ -182,8 +182,8 @@ export const projects = {
       year: "2023",
       client: "دانشگاه علوم پزشکی تهران",
       description: "سیستم برق اضطراری با 4 دستگاه ژنراتور FG Wilson",
-      image: "/api/placeholder/800/500",
-      gallery: ["/api/placeholder/400/300", "/api/placeholder/400/300"],
+      image: "https://picsum.photos/800/500",
+      gallery: ["https://picsum.photos/400/300", "https://picsum.photos/400/300"],
       status: "در حال بهره‌برداری",
       duration: "8 ماه"
     }
@@ -197,8 +197,8 @@ export const projects = {
       year: "2023", 
       client: "Pars Petrochemical Company",
       description: "Design, supply and installation of 20 Cummins gas generators",
-      image: "/api/placeholder/800/500",
-      gallery: ["/api/placeholder/400/300", "/api/placeholder/400/300"],
+      image: "https://picsum.photos/800/500",
+      gallery: ["https://picsum.photos/400/300", "https://picsum.photos/400/300"],
       status: "Completed",
       duration: "18 months"
     },
@@ -210,8 +210,8 @@ export const projects = {
       year: "2023",
       client: "Tehran University of Medical Sciences", 
       description: "Emergency power system with 4 FG Wilson generators",
-      image: "/api/placeholder/800/500",
-      gallery: ["/api/placeholder/400/300", "/api/placeholder/400/300"],
+      image: "https://picsum.photos/800/500",
+      gallery: ["https://picsum.photos/400/300", "https://picsum.photos/400/300"],
       status: "In Operation",
       duration: "8 months"
     }
@@ -323,7 +323,7 @@ export const blogPosts = {
       date: "1403/01/15",
       author: "مهندس احمد محمدی",
       category: "راهنما",
-      image: "/api/placeholder/400/250",
+      image: "https://picsum.photos/400/250",
       readTime: "5 دقیقه"
     },
     {
@@ -333,7 +333,7 @@ export const blogPosts = {
       date: "1403/01/10", 
       author: "مهندس فاطمه کریمی",
       category: "نگهداری",
-      image: "/api/placeholder/400/250",
+      image: "https://picsum.photos/400/250",
       readTime: "7 دقیقه"
     }
   ],
@@ -345,7 +345,7 @@ export const blogPosts = {
       date: "2024-04-04",
       author: "Eng. Ahmad Mohammadi", 
       category: "Guide",
-      image: "/api/placeholder/400/250",
+      image: "https://picsum.photos/400/250",
       readTime: "5 min read"
     },
     {
@@ -355,7 +355,7 @@ export const blogPosts = {
       date: "2024-03-30",
       author: "Eng. Fatemeh Karimi",
       category: "Maintenance", 
-      image: "/api/placeholder/400/250",
+      image: "https://picsum.photos/400/250",
       readTime: "7 min read"
     }
   ]
