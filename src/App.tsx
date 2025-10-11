@@ -11,6 +11,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CompanyProvider } from '@/contexts/CompanyContext';
 import { MediaProvider } from '@/contexts/MediaContext';
 import { CTAModalProvider } from '@/contexts/CTAModalContext';
+import { AuditLogProvider } from '@/contexts/AuditLogContext';
 import ContactCenterModal from '@/components/cta/ContactCenterModal';
 import { MeetingsProvider } from '@/contexts/MeetingsContext';
 import MeetingModal from '@/components/meetings/MeetingModal';
@@ -108,6 +109,7 @@ const queryClient = new QueryClient();
 // ---------- App Component ----------
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <AuditLogProvider>
     <UsersProvider>
     <AuthProvider>
       <ChatProvider>
@@ -279,6 +281,7 @@ const App = () => (
       </ChatProvider>
     </AuthProvider>
     </UsersProvider>
+    </AuditLogProvider>
   </QueryClientProvider>
 );
 

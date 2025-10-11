@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useUsers } from './UsersContext';
+import { useAuditLog } from './AuditLogContext';
 
 interface User {
   id: string;
@@ -46,6 +48,8 @@ const mockUsers = [
 ];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { getUserByEmail } = useUsers();
+  const { addLog } = useAuditLog();
   const initialUser = (() => {
     try {
       const saved = localStorage.getItem('user');
@@ -83,33 +87,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 600));
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+      // Look up user from UsersContext
+      const stored = getUserByEmail(email);
+      if (!stored || stored.status !== 'active') {
+        setIsLoading(false);
+        return false;
+      }
+      // Validate password using same salted-hash function (re-implement quick inline)
+      const enc = new TextEncoder();
+      const saltBytes = new Uint8Array(stored.salt.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+      const pwdBytes = enc.encode(password);
+      const combined = new Uint8Array(saltBytes.length + pwdBytes.length);
+      combined.set(saltBytes);
+      combined.set(pwdBytes, saltBytes.length);
+      const digest = await crypto.subtle.digest('SHA-256', combined);
+      const hash = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
 
-    const foundUser = mockUsers.find(u => u.email === email && u.password === password);
+      if (hash !== stored.passwordHash) {
+        setIsLoading(false);
+        return false;
+      }
 
-    if (foundUser) {
-      const { password: _, ...userWithoutPassword } = foundUser;
-      setUser(userWithoutPassword);
-      try { localStorage.setItem('user', JSON.stringify(userWithoutPassword)); } catch {}
-      try { sessionStorage.setItem('user', JSON.stringify(userWithoutPassword)); } catch {}
+      const userWithoutSecrets = {
+        id: stored.id,
+        name: stored.name,
+        email: stored.email,
+        role: stored.role,
+        avatar: stored.avatar,
+      };
+      setUser(userWithoutSecrets as any);
+      try { localStorage.setItem('user', JSON.stringify(userWithoutSecrets)); } catch {}
+      try { sessionStorage.setItem('user', JSON.stringify(userWithoutSecrets)); } catch {}
       try {
-        const encoded = btoa(JSON.stringify(userWithoutPassword));
+        const encoded = btoa(JSON.stringify(userWithoutSecrets));
         const expDays = 7;
         const d = new Date();
         d.setTime(d.getTime() + (expDays*24*60*60*1000));
         document.cookie = `auth_user=${encoded}; expires=${d.toUTCString()}; path=/`;
       } catch {}
+      addLog({ action: 'login', actorEmail: stored.email, actorName: stored.name });
       setIsLoading(false);
       return true;
+    } catch {
+      setIsLoading(false);
+      return false;
     }
-
-    setIsLoading(false);
-    return false;
   };
 
   const logout = () => {
+    if (user?.email) {
+      try { addLog({ action: 'logout', actorEmail: user.email, actorName: user.name }); } catch {}
+    }
     setUser(null);
     localStorage.removeItem('user');
     try { sessionStorage.removeItem('user'); } catch {}
