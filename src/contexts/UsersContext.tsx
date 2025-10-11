@@ -16,6 +16,9 @@ export interface StoredUser {
   lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;
+  // Fine-grained access control overrides (optional)
+  grants?: string[];
+  denies?: string[];
 }
 
 export interface PublicUser {
@@ -33,8 +36,8 @@ export interface PublicUser {
 interface UsersContextType {
   users: PublicUser[];
   getUserByEmail: (email: string) => StoredUser | undefined;
-  createUser: (data: { name: string; email: string; role: UserRole; password: string; avatar?: string; status?: UserStatus; requirePasswordReset?: boolean; }) => Promise<PublicUser>;
-  updateUser: (id: string, updates: Partial<Pick<StoredUser, 'name' | 'role' | 'status' | 'avatar' | 'requirePasswordReset'>>) => Promise<boolean>;
+  createUser: (data: { name: string; email: string; role: UserRole; password: string; avatar?: string; status?: UserStatus; requirePasswordReset?: boolean; grants?: string[]; denies?: string[]; }) => Promise<PublicUser>;
+  updateUser: (id: string, updates: Partial<Pick<StoredUser, 'name' | 'role' | 'status' | 'avatar' | 'requirePasswordReset' | 'grants' | 'denies'>>) => Promise<boolean>;
   resetPassword: (id: string, newPassword: string) => Promise<boolean>;
   deleteUser: (id: string) => Promise<boolean>;
 }
@@ -125,7 +128,7 @@ export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return users.find(u => u.email.toLowerCase() === email.toLowerCase());
   }, [users]);
 
-  const createUser = useCallback(async (data: { name: string; email: string; role: UserRole; password: string; avatar?: string; status?: UserStatus; requirePasswordReset?: boolean; }): Promise<PublicUser> => {
+  const createUser = useCallback(async (data: { name: string; email: string; role: UserRole; password: string; avatar?: string; status?: UserStatus; requirePasswordReset?: boolean; grants?: string[]; denies?: string[]; }): Promise<PublicUser> => {
     const exists = users.some(u => u.email.toLowerCase() === data.email.toLowerCase());
     if (exists) throw new Error('Email already exists');
     const salt = randomHex(16);
@@ -143,13 +146,15 @@ export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       requirePasswordReset: !!data.requirePasswordReset,
       createdAt: now,
       updatedAt: now,
+      grants: data.grants,
+      denies: data.denies,
     };
     setUsers(prev => [stored, ...prev]);
     const { passwordHash: _p, salt: _s, ...pub } = stored;
     return pub as PublicUser;
   }, [users]);
 
-  const updateUser = useCallback(async (id: string, updates: Partial<Pick<StoredUser, 'name' | 'role' | 'status' | 'avatar' | 'requirePasswordReset'>>): Promise<boolean> => {
+  const updateUser = useCallback(async (id: string, updates: Partial<Pick<StoredUser, 'name' | 'role' | 'status' | 'avatar' | 'requirePasswordReset' | 'grants' | 'denies'>>): Promise<boolean> => {
     setUsers(prev => prev.map(u => u.id === id ? { ...u, ...updates, updatedAt: new Date().toISOString() } : u));
     return true;
   }, []);
@@ -167,7 +172,7 @@ export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   const value: UsersContextType = useMemo(() => ({
-    users: users.map(({ passwordHash: _p, salt: _s, ...u }) => u),
+    users: users.map(({ passwordHash: _p, salt: _s, grants: _g, denies: _d, ...u }) => u),
     getUserByEmail,
     createUser,
     updateUser,
