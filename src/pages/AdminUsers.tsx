@@ -8,10 +8,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useUsers } from '@/contexts/UsersContext';
+import { useAccess } from '@/hooks/useAccess';
 import { Plus, Edit, Trash2, RefreshCw } from 'lucide-react';
 
 export default function AdminUsers() {
   const { users, createUser, updateUser, resetPassword, deleteUser } = useUsers();
+  const { can } = useAccess();
+  if (!can('admin.users.manage')) {
+    return (
+      <AdminLayout>
+        <div className="min-h-[60vh] flex items-center justify-center text-gray-600">دسترسی غیرمجاز</div>
+      </AdminLayout>
+    );
+  }
   const [search, setSearch] = useState('');
   const [showAdd, setShowAdd] = useState(false);
   const [adding, setAdding] = useState(false);
@@ -50,6 +59,9 @@ export default function AdminUsers() {
                       <div className="flex gap-2 mt-2 text-xs">
                         <Badge variant="outline">{u.role}</Badge>
                         <Badge variant={u.status === 'active' ? 'default' : 'outline'}>{u.status}</Badge>
+                        {u.lastLoginAt && (
+                          <Badge variant="outline">آخرین ورود: {new Date(u.lastLoginAt).toLocaleString('fa-IR')}</Badge>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
