@@ -15,6 +15,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
+  updateProfile: (updates: Partial<Pick<User, 'name' | 'avatar'>>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -48,7 +49,7 @@ const mockUsers = [
 ];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { getUserByEmail } = useUsers();
+  const { getUserByEmail, updateUser } = useUsers();
   const { addLog } = useAuditLog();
   const initialUser = (() => {
     try {
@@ -92,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await new Promise(resolve => setTimeout(resolve, 600));
 
       // Look up user from UsersContext
-      const stored = getUserByEmail(email);
+      const stored = getUserByEmail(email.trim());
       if (!stored || stored.status !== 'active') {
         setIsLoading(false);
         return false;
@@ -100,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Validate password using same salted-hash function (re-implement quick inline)
       const enc = new TextEncoder();
       const saltBytes = new Uint8Array(stored.salt.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
-      const pwdBytes = enc.encode(password);
+      const pwdBytes = enc.encode(password.trim());
       const combined = new Uint8Array(saltBytes.length + pwdBytes.length);
       combined.set(saltBytes);
       combined.set(pwdBytes, saltBytes.length);
@@ -129,6 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         d.setTime(d.getTime() + (expDays*24*60*60*1000));
         document.cookie = `auth_user=${encoded}; expires=${d.toUTCString()}; path=/`;
       } catch {}
+      try { await updateUser(stored.id, { lastLoginAt: new Date().toISOString() }); } catch {}
       addLog({ action: 'login', actorEmail: stored.email, actorName: stored.name });
       setIsLoading(false);
       return true;
@@ -148,8 +150,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try { document.cookie = 'auth_user=; Max-Age=0; path=/'; } catch {}
   };
 
+  const updateProfile = (updates: Partial<Pick<User, 'name' | 'avatar'>>) => {
+    if (!user) return;
+    const next = { ...user, ...updates } as User;
+    setUser(next);
+    try { localStorage.setItem('user', JSON.stringify(next)); } catch {}
+    try { sessionStorage.setItem('user', JSON.stringify(next)); } catch {}
+    try {
+      const encoded = btoa(JSON.stringify(next));
+      const expDays = 7;
+      const d = new Date();
+      d.setTime(d.getTime() + (expDays*24*60*60*1000));
+      document.cookie = `auth_user=${encoded}; expires=${d.toUTCString()}; path=/`;
+    } catch {}
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

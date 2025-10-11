@@ -476,11 +476,11 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                     </div>
                     
                     <div className="p-2">
-                      <Button variant="ghost" className="w-full justify-start text-gray-700 dark:text-gray-200">
+                      <Button variant="ghost" className="w-full justify-start text-gray-700 dark:text-gray-200" onClick={() => navigate('/admin/profile')}>
                         <User className="w-4 h-4 ml-2" />
                         پروفایل کاربری
                       </Button>
-                      <Button variant="ghost" className="w-full justify-start text-gray-700 dark:text-gray-200">
+                      <Button variant="ghost" className="w-full justify-start text-gray-700 dark:text-gray-200" onClick={() => navigate('/admin/settings')}>
                         <Settings className="w-4 h-4 ml-2" />
                         تنظیمات حساب
                       </Button>

@@ -102,6 +102,8 @@ import AdminAbout from './pages/AdminAbout';
 import AdminPages from './pages/AdminPages';
 import AdminMeetings from './pages/AdminMeetings';
 import AdminProjects from './pages/AdminProjects';
+import AdminProfile from './pages/AdminProfile';
+import AdminSettings from './pages/AdminSettings';
 
 // ---------- React Query Client ----------
 const queryClient = new QueryClient();
@@ -150,6 +152,23 @@ const App = () => (
                   <Route path="/admin/login" element={<AdminLogin />} />
 
                   {/* 🛠️ Admin Routes */}
+                  <Route
+                    path="/admin/profile"
+                    element={
+                      <RequireAuth roles={['superadmin', 'admin', 'manager', 'sales']}>
+                        <AdminProfile />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/admin/settings"
+                    element={
+                      <RequireAuth roles={['superadmin', 'admin', 'manager', 'sales']}>
+                        <AdminSettings />
+                      </RequireAuth>
+                    }
+                  />
+
                   <Route
                     path="/admin/dashboard"
                     element={

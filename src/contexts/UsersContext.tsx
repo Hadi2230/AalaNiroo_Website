@@ -37,8 +37,9 @@ interface UsersContextType {
   users: PublicUser[];
   getUserByEmail: (email: string) => StoredUser | undefined;
   createUser: (data: { name: string; email: string; role: UserRole; password: string; avatar?: string; status?: UserStatus; requirePasswordReset?: boolean; grants?: string[]; denies?: string[]; }) => Promise<PublicUser>;
-  updateUser: (id: string, updates: Partial<Pick<StoredUser, 'name' | 'role' | 'status' | 'avatar' | 'requirePasswordReset' | 'grants' | 'denies'>>) => Promise<boolean>;
+  updateUser: (id: string, updates: Partial<Pick<StoredUser, 'name' | 'role' | 'status' | 'avatar' | 'requirePasswordReset' | 'grants' | 'denies' | 'lastLoginAt'>>) => Promise<boolean>;
   resetPassword: (id: string, newPassword: string) => Promise<boolean>;
+  changePassword: (id: string, oldPassword: string, newPassword: string) => Promise<boolean>;
   deleteUser: (id: string) => Promise<boolean>;
 }
 
@@ -154,10 +155,30 @@ export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return pub as PublicUser;
   }, [users]);
 
-  const updateUser = useCallback(async (id: string, updates: Partial<Pick<StoredUser, 'name' | 'role' | 'status' | 'avatar' | 'requirePasswordReset' | 'grants' | 'denies'>>): Promise<boolean> => {
+  const updateUser = useCallback(async (id: string, updates: Partial<Pick<StoredUser, 'name' | 'role' | 'status' | 'avatar' | 'requirePasswordReset' | 'grants' | 'denies' | 'lastLoginAt'>>): Promise<boolean> => {
     setUsers(prev => prev.map(u => u.id === id ? { ...u, ...updates, updatedAt: new Date().toISOString() } : u));
     return true;
   }, []);
+
+  const changePassword = useCallback(async (id: string, oldPassword: string, newPassword: string): Promise<boolean> => {
+    const user = users.find(u => u.id === id);
+    if (!user) return false;
+    // verify old password
+    const enc = new TextEncoder();
+    const saltBytes = new Uint8Array(user.salt.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+    const pwdBytes = enc.encode(oldPassword);
+    const combined = new Uint8Array(saltBytes.length + pwdBytes.length);
+    combined.set(saltBytes);
+    combined.set(pwdBytes, saltBytes.length);
+    const digest = await crypto.subtle.digest('SHA-256', combined);
+    const oldHash = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+    if (oldHash !== user.passwordHash) return false;
+    // set new password
+    const newSalt = randomHex(16);
+    const newHash = await hashPassword(newPassword, newSalt);
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, salt: newSalt, passwordHash: newHash, requirePasswordReset: false, updatedAt: new Date().toISOString() } : u));
+    return true;
+  }, [users]);
 
   const resetPassword = useCallback(async (id: string, newPassword: string): Promise<boolean> => {
     const salt = randomHex(16);
@@ -176,6 +197,7 @@ export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     getUserByEmail,
     createUser,
     updateUser,
+    changePassword,
     resetPassword,
     deleteUser,
   }), [users, getUserByEmail, createUser, updateUser, resetPassword, deleteUser]);
