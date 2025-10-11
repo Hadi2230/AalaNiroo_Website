@@ -172,7 +172,7 @@ const App = () => (
                   <Route
                     path="/admin/dashboard"
                     element={
-                      <RequireAuth roles={['admin', 'manager', 'sales']}>
+                      <RequireAuth roles={['superadmin', 'admin', 'manager', 'sales']}>
                         <AdminDashboard />
                       </RequireAuth>
                     }
@@ -180,7 +180,7 @@ const App = () => (
                   <Route
                     path="/admin/products"
                     element={
-                      <RequireAuth roles={['admin', 'manager']}>
+                      <RequireAuth roles={['superadmin', 'admin', 'manager']}>
                         <AdminProducts />
                       </RequireAuth>
                     }
@@ -188,7 +188,7 @@ const App = () => (
                   <Route
                     path="/admin/orders"
                     element={
-                      <RequireAuth roles={['admin', 'manager', 'sales']}>
+                      <RequireAuth roles={['superadmin', 'admin', 'manager', 'sales']}>
                         <AdminOrders />
                       </RequireAuth>
                     }
@@ -196,7 +196,7 @@ const App = () => (
                   <Route
                     path="/admin/customers"
                     element={
-                      <RequireAuth roles={['admin', 'manager', 'sales']}>
+                      <RequireAuth roles={['superadmin', 'admin', 'manager', 'sales']}>
                         <AdminCustomers />
                       </RequireAuth>
                     }
@@ -212,7 +212,7 @@ const App = () => (
                   <Route
                     path="/admin/reports"
                     element={
-                      <RequireAuth roles={['admin', 'manager']}>
+                      <RequireAuth roles={['superadmin', 'admin', 'manager']}>
                         <AdminReports />
                       </RequireAuth>
                     }
@@ -220,7 +220,7 @@ const App = () => (
                   <Route
                     path="/admin/integrations"
                     element={
-                      <RequireAuth roles={['admin', 'manager']}>
+                      <RequireAuth roles={['superadmin', 'admin', 'manager']}>
                         <AdminIntegrations />
                       </RequireAuth>
                     }
@@ -228,7 +228,7 @@ const App = () => (
                   <Route
                     path="/admin/chat"
                     element={
-                      <RequireAuth roles={['admin', 'manager', 'sales']}>
+                      <RequireAuth roles={['superadmin', 'admin', 'manager', 'sales']}>
                         <AdminChat />
                       </RequireAuth>
                     }
@@ -236,7 +236,7 @@ const App = () => (
                   <Route
                     path="/admin/content"
                     element={
-                      <RequireAuth roles={['admin', 'manager']}>
+                      <RequireAuth roles={['superadmin', 'admin', 'manager']}>
                         <AdminContent />
                       </RequireAuth>
                     }
@@ -244,7 +244,7 @@ const App = () => (
                   <Route
                     path="/admin/about"
                     element={
-                      <RequireAuth roles={['admin', 'manager']}>
+                      <RequireAuth roles={['superadmin', 'admin', 'manager']}>
                         <AdminAbout />
                       </RequireAuth>
                     }
@@ -252,7 +252,7 @@ const App = () => (
                   <Route
                     path="/admin/media"
                     element={
-                      <RequireAuth roles={['admin', 'manager']}>
+                      <RequireAuth roles={['superadmin', 'admin', 'manager']}>
                         <AdminMedia />
                       </RequireAuth>
                     }
@@ -260,7 +260,7 @@ const App = () => (
                   <Route
                     path="/admin/projects"
                     element={
-                      <RequireAuth roles={['admin', 'manager']}>
+                      <RequireAuth roles={['superadmin', 'admin', 'manager']}>
                         <AdminProjects />
                       </RequireAuth>
                     }
@@ -268,7 +268,7 @@ const App = () => (
                   <Route
                     path="/admin/pages"
                     element={
-                      <RequireAuth roles={['admin', 'manager']}>
+                      <RequireAuth roles={['superadmin', 'admin', 'manager']}>
                         <AdminPages />
                       </RequireAuth>
                     }
@@ -276,7 +276,7 @@ const App = () => (
                   <Route
                     path="/admin/meetings"
                     element={
-                      <RequireAuth roles={['admin', 'manager', 'sales']}>
+                      <RequireAuth roles={['superadmin', 'admin', 'manager', 'sales']}>
                         <AdminMeetings />
                       </RequireAuth>
                     }
