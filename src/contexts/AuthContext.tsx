@@ -6,7 +6,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'manager' | 'sales';
+  role: 'superadmin' | 'admin' | 'manager' | 'sales';
   avatar?: string;
 }
 

@@ -18,7 +18,7 @@ export default function AdminLogin() {
     e.preventDefault();
     setError('');
 
-    const success = await login(email, password);
+    const success = await login(email.trim(), password.trim());
     if (success) {
       navigate('/admin/dashboard');
     } else {
@@ -100,6 +100,11 @@ export default function AdminLogin() {
               <div>مدیر: admin@aalaniroo.com / admin123</div>
               <div>کارشناس فروش: sales@aalaniroo.com / sales123</div>
               <div>مدیر ارشد: manager@aalaniroo.com / manager123</div>
+              <div>سوپرادمین: root@aalaniroo.com / ChangeMe!234</div>
+            </div>
+            <div className="mt-3 text-xs text-gray-500">
+              اگر ورود نمی‌شود، یک‌بار ریست محلی:
+              <pre className="mt-2 p-2 bg-white border rounded">{`localStorage.removeItem('users');\nlocalStorage.removeItem('user');\nsessionStorage.removeItem('user');\ndocument.cookie = 'auth_user=; Max-Age=0; path=/';`}</pre>
             </div>
           </div>
         </CardContent>
