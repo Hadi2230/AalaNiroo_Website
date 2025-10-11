@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useAuditLog } from './AuditLogContext';
 
 export type UserRole = 'superadmin' | 'admin' | 'manager' | 'sales';
 export type UserStatus = 'active' | 'disabled';
@@ -79,6 +80,7 @@ function randomHex(bytes = 16): string {
 const STORAGE_KEY = 'users';
 
 export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { addLog } = useAuditLog();
   const [users, setUsers] = useState<StoredUser[]>(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -151,12 +153,14 @@ export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       denies: data.denies,
     };
     setUsers(prev => [stored, ...prev]);
+    try { addLog({ action: 'user.create', actorEmail: data.email, actorName: data.name, target: stored.id, metadata: { role: data.role } }); } catch {}
     const { passwordHash: _p, salt: _s, ...pub } = stored;
     return pub as PublicUser;
   }, [users]);
 
   const updateUser = useCallback(async (id: string, updates: Partial<Pick<StoredUser, 'name' | 'role' | 'status' | 'avatar' | 'requirePasswordReset' | 'grants' | 'denies' | 'lastLoginAt'>>): Promise<boolean> => {
     setUsers(prev => prev.map(u => u.id === id ? { ...u, ...updates, updatedAt: new Date().toISOString() } : u));
+    try { addLog({ action: 'user.update', target: id, metadata: updates }); } catch {}
     return true;
   }, []);
 
@@ -177,6 +181,7 @@ export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const newSalt = randomHex(16);
     const newHash = await hashPassword(newPassword, newSalt);
     setUsers(prev => prev.map(u => u.id === id ? { ...u, salt: newSalt, passwordHash: newHash, requirePasswordReset: false, updatedAt: new Date().toISOString() } : u));
+    try { addLog({ action: 'user.password.change', target: id }); } catch {}
     return true;
   }, [users]);
 
@@ -184,11 +189,13 @@ export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const salt = randomHex(16);
     const passwordHash = await hashPassword(newPassword, salt);
     setUsers(prev => prev.map(u => u.id === id ? { ...u, salt, passwordHash, updatedAt: new Date().toISOString(), requirePasswordReset: false } : u));
+    try { addLog({ action: 'user.password.reset', target: id }); } catch {}
     return true;
   }, []);
 
   const deleteUser = useCallback(async (id: string): Promise<boolean> => {
     setUsers(prev => prev.filter(u => u.id !== id));
+    try { addLog({ action: 'user.delete', target: id }); } catch {}
     return true;
   }, []);
 

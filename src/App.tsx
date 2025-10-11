@@ -104,6 +104,7 @@ import AdminMeetings from './pages/AdminMeetings';
 import AdminProjects from './pages/AdminProjects';
 import AdminProfile from './pages/AdminProfile';
 import AdminSettings from './pages/AdminSettings';
+import AdminAuditLogs from './pages/AdminAuditLogs';
 
 // ---------- React Query Client ----------
 const queryClient = new QueryClient();
@@ -214,6 +215,14 @@ const App = () => (
                     element={
                       <RequireAuth roles={['superadmin', 'admin', 'manager']}>
                         <AdminReports />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/admin/audit-logs"
+                    element={
+                      <RequireAuth roles={['superadmin']}>
+                        <AdminAuditLogs />
                       </RequireAuth>
                     }
                   />

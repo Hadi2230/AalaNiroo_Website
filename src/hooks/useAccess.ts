@@ -14,7 +14,7 @@ export type AppPermission =
   | 'admin.integrations.manage'
   | 'admin.users.manage';
 
-const allPermissions: AppPermission[] = [
+export const ALL_PERMISSIONS: AppPermission[] = [
   'admin.dashboard.view',
   'admin.products.manage',
   'admin.orders.manage',
@@ -27,8 +27,8 @@ const allPermissions: AppPermission[] = [
   'admin.users.manage',
 ];
 
-const rolePermissions: Record<string, AppPermission[]> = {
-  superadmin: allPermissions,
+export const ROLE_PERMISSIONS: Record<string, AppPermission[]> = {
+  superadmin: ALL_PERMISSIONS,
   admin: [
     'admin.dashboard.view',
     'admin.products.manage',
@@ -58,19 +58,28 @@ const rolePermissions: Record<string, AppPermission[]> = {
   ],
 };
 
+export function computeEffectivePermissions(
+  role: string,
+  grants: AppPermission[] = [],
+  denies: AppPermission[] = []
+) {
+  const base = ROLE_PERMISSIONS[role] || [];
+  const set = new Set<AppPermission>([...base, ...grants]);
+  denies.forEach(d => set.delete(d));
+  return set;
+}
+
 export function useAccess() {
   const { user } = useAuth();
   const { getUserByEmail } = useUsers();
 
   const effective = useMemo(() => {
     if (!user) return new Set<AppPermission>();
-    const rolePerms = rolePermissions[user.role] || [];
+    const rolePerms = ROLE_PERMISSIONS[user.role] || [];
     const stored = getUserByEmail(user.email);
     const grants = (stored?.grants || []) as AppPermission[];
     const denies = (stored?.denies || []) as AppPermission[];
-    const set = new Set<AppPermission>([...rolePerms, ...grants]);
-    denies.forEach(d => set.delete(d));
-    return set;
+    return computeEffectivePermissions(user.role, grants, denies);
   }, [user, getUserByEmail]);
 
   const can = (perm: AppPermission) => effective.has(perm);

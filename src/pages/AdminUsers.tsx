@@ -9,7 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useUsers } from '@/contexts/UsersContext';
 import { useAccess } from '@/hooks/useAccess';
-import { Plus, Edit, Trash2, RefreshCw } from 'lucide-react';
+import { Plus, Edit, Trash2, RefreshCw, ShieldCheck, ShieldMinus } from 'lucide-react';
+import { computeEffectivePermissions, ALL_PERMISSIONS } from '@/hooks/useAccess';
 
 export default function AdminUsers() {
   const { users, createUser, updateUser, resetPassword, deleteUser } = useUsers();
@@ -30,6 +31,8 @@ export default function AdminUsers() {
     const q = search.toLowerCase();
     return users.filter(u => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || u.role.toLowerCase().includes(q));
   }, [users, search]);
+
+  const [permDialog, setPermDialog] = useState<{ open: boolean; userId?: string; grants: string[]; denies: string[] }>({ open: false, grants: [], denies: [] });
 
   return (
     <AdminLayout>
@@ -67,6 +70,11 @@ export default function AdminUsers() {
                     <div className="flex items-center gap-2">
                       <Button size="sm" variant="outline" onClick={() => resetPassword(u.id, 'ChangeMe!234')}>
                         <RefreshCw className="w-4 h-4 ml-2" /> ریست پسورد
+                      </Button>
+                      <Button size="sm" variant="secondary" onClick={() => {
+                        setPermDialog({ open: true, userId: u.id, grants: (u as any).grants || [], denies: (u as any).denies || [] });
+                      }}>
+                        <ShieldCheck className="w-4 h-4 ml-2" /> دسترسی‌ها
                       </Button>
                       <Button size="sm" variant="destructive" onClick={() => deleteUser(u.id)}>
                         <Trash2 className="w-4 h-4 ml-2" /> حذف
@@ -124,6 +132,69 @@ export default function AdminUsers() {
                   setAdding(false);
                 }
               }}>{adding ? 'در حال افزودن...' : 'افزودن'}</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Permissions Dialog */}
+        <Dialog open={permDialog.open} onOpenChange={(v) => setPermDialog(p => ({ ...p, open: v }))}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>مدیریت دسترسی‌ها</DialogTitle>
+            </DialogHeader>
+            <div className="grid md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto">
+              <div>
+                <div className="font-semibold mb-2">اجازه‌ها (Grants)</div>
+                <div className="space-y-2">
+                  {ALL_PERMISSIONS.map(p => (
+                    <label key={`g-${p}`} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={permDialog.grants.includes(p)}
+                        onChange={(e) => setPermDialog(prev => ({
+                          ...prev,
+                          grants: e.target.checked ? [...prev.grants, p] : prev.grants.filter(x => x !== p)
+                        }))}
+                      />
+                      <span className="text-sm">{p}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="font-semibold mb-2">محرومیت‌ها (Denies)</div>
+                <div className="space-y-2">
+                  {ALL_PERMISSIONS.map(p => (
+                    <label key={`d-${p}`} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={permDialog.denies.includes(p)}
+                        onChange={(e) => setPermDialog(prev => ({
+                          ...prev,
+                          denies: e.target.checked ? [...prev.denies, p] : prev.denies.filter(x => x !== p)
+                        }))}
+                      />
+                      <span className="text-sm">{p}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-between items-center mt-4">
+              <div className="text-xs text-gray-500">
+                مؤثر: {(() => {
+                  const eff = computeEffectivePermissions('admin', permDialog.grants as any, permDialog.denies as any);
+                  return Array.from(eff).length;
+                })()} مورد
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setPermDialog({ open: false, grants: [], denies: [] })}>انصراف</Button>
+                <Button onClick={async () => {
+                  if (!permDialog.userId) return;
+                  await updateUser(permDialog.userId, { grants: permDialog.grants as any, denies: permDialog.denies as any });
+                  setPermDialog({ open: false, grants: [], denies: [] });
+                }}>ذخیره</Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>

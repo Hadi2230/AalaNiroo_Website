@@ -157,6 +157,12 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       badge: null
     },
     { 
+      path: '/admin/audit-logs', 
+      icon: Shield, 
+      label: 'گزارش فعالیت‌ها',
+      badge: null
+    },
+    { 
       path: '/admin/integrations', 
       icon: Database, 
       label: 'ادغام‌ها',
