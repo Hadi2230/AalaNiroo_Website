@@ -9,12 +9,14 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useUsers } from '@/contexts/UsersContext';
 import { useAccess } from '@/hooks/useAccess';
-import { Plus, Edit, Trash2, RefreshCw, ShieldCheck, ShieldMinus } from 'lucide-react';
+import { Plus, Edit, Trash2, RefreshCw, ShieldCheck, ShieldMinus, ClipboardList } from 'lucide-react';
 import { computeEffectivePermissions, ALL_PERMISSIONS } from '@/hooks/useAccess';
+import { useAuditLog } from '@/contexts/AuditLogContext';
 
 export default function AdminUsers() {
   const { users, createUser, updateUser, resetPassword, deleteUser } = useUsers();
   const { can } = useAccess();
+  const { logs } = useAuditLog();
   if (!can('admin.users.manage')) {
     return (
       <AdminLayout>
@@ -33,6 +35,7 @@ export default function AdminUsers() {
   }, [users, search]);
 
   const [permDialog, setPermDialog] = useState<{ open: boolean; userId?: string; grants: string[]; denies: string[] }>({ open: false, grants: [], denies: [] });
+  const [logsDialog, setLogsDialog] = useState<{ open: boolean; userId?: string }>({ open: false });
 
   return (
     <AdminLayout>
@@ -53,7 +56,9 @@ export default function AdminUsers() {
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filtered.map(u => (
+              {filtered.map(u => {
+                const userLogsCount = logs.filter(l => l.actorEmail === u.email || l.target === u.id).length;
+                return (
                 <Card key={u.id} className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -65,6 +70,7 @@ export default function AdminUsers() {
                         {u.lastLoginAt && (
                           <Badge variant="outline">آخرین ورود: {new Date(u.lastLoginAt).toLocaleString('fa-IR')}</Badge>
                         )}
+                        <Badge variant="outline">لاگ‌ها: {userLogsCount}</Badge>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -76,13 +82,16 @@ export default function AdminUsers() {
                       }}>
                         <ShieldCheck className="w-4 h-4 ml-2" /> دسترسی‌ها
                       </Button>
+                      <Button size="sm" variant="outline" onClick={() => setLogsDialog({ open: true, userId: u.id })}>
+                        <ClipboardList className="w-4 h-4 ml-2" /> گزارش‌ها
+                      </Button>
                       <Button size="sm" variant="destructive" onClick={() => deleteUser(u.id)}>
                         <Trash2 className="w-4 h-4 ml-2" /> حذف
                       </Button>
                     </div>
                   </div>
                 </Card>
-              ))}
+              );})}
             </div>
           </CardContent>
         </Card>
@@ -183,7 +192,8 @@ export default function AdminUsers() {
             <div className="flex justify-between items-center mt-4">
               <div className="text-xs text-gray-500">
                 مؤثر: {(() => {
-                  const eff = computeEffectivePermissions('admin', permDialog.grants as any, permDialog.denies as any);
+                  const role = (users.find(x => x.id === permDialog.userId)?.role) || 'admin';
+                  const eff = computeEffectivePermissions(role, permDialog.grants as any, permDialog.denies as any);
                   return Array.from(eff).length;
                 })()} مورد
               </div>
@@ -195,6 +205,44 @@ export default function AdminUsers() {
                   setPermDialog({ open: false, grants: [], denies: [] });
                 }}>ذخیره</Button>
               </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* User Logs Dialog */}
+        <Dialog open={logsDialog.open} onOpenChange={(v) => setLogsDialog(p => ({ ...p, open: v }))}>
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>گزارش فعالیت‌های کاربر</DialogTitle>
+            </DialogHeader>
+            <div className="max-h-[60vh] overflow-y-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="text-right text-gray-600">
+                    <th className="p-2">زمان</th>
+                    <th className="p-2">کاربر</th>
+                    <th className="p-2">عملیات</th>
+                    <th className="p-2">هدف</th>
+                    <th className="p-2">جزئیات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {logs
+                    .filter(l => l.actorEmail === (users.find(u => u.id === logsDialog.userId)?.email) || l.target === logsDialog.userId)
+                    .slice(0, 100)
+                    .map(l => (
+                    <tr key={l.id} className="border-t">
+                      <td className="p-2 whitespace-nowrap">{new Date(l.createdAt).toLocaleString('fa-IR')}</td>
+                      <td className="p-2 whitespace-nowrap">{l.actorName || l.actorEmail || '-'}</td>
+                      <td className="p-2 whitespace-nowrap">{l.action}</td>
+                      <td className="p-2 whitespace-nowrap">{l.target || '-'}</td>
+                      <td className="p-2">
+                        <pre className="text-xs bg-gray-50 p-2 rounded overflow-x-auto max-w-[50vw]">{JSON.stringify(l.metadata || {}, null, 2)}</pre>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </DialogContent>
         </Dialog>
