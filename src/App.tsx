@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { UsersProvider } from '@/contexts/UsersContext';
 import { ChatProvider } from '@/contexts/ChatContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CompanyProvider } from '@/contexts/CompanyContext';
@@ -90,6 +91,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminProducts from './pages/AdminProducts';
 import AdminOrders from './pages/AdminOrders';
 import AdminCustomers from './pages/AdminCustomers';
+import AdminUsers from './pages/AdminUsers';
 import AdminReports from './pages/AdminReports';
 import AdminIntegrations from './pages/AdminIntegrations';
 import AdminChat from './pages/AdminChat';
@@ -106,6 +108,7 @@ const queryClient = new QueryClient();
 // ---------- App Component ----------
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <UsersProvider>
     <AuthProvider>
       <ChatProvider>
         <LanguageProvider>
@@ -174,6 +177,14 @@ const App = () => (
                     element={
                       <RequireAuth roles={['admin', 'manager', 'sales']}>
                         <AdminCustomers />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/admin/users"
+                    element={
+                      <RequireAuth roles={['superadmin', 'admin']}>
+                        <AdminUsers />
                       </RequireAuth>
                     }
                   />
@@ -267,6 +278,7 @@ const App = () => (
         </LanguageProvider>
       </ChatProvider>
     </AuthProvider>
+    </UsersProvider>
   </QueryClientProvider>
 );
 

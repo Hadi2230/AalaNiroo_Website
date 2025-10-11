@@ -103,6 +103,12 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       badge: '23'
     },
     { 
+      path: '/admin/users', 
+      icon: User, 
+      label: 'کاربران',
+      badge: null
+    },
+    { 
       path: '/admin/chat', 
       icon: MessageCircle, 
       label: 'مدیریت چت',
