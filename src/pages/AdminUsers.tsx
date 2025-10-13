@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useUsers } from '@/contexts/UsersContext';
+import { API_BASE, apiRequest } from '@/lib/api';
 import { useAccess } from '@/hooks/useAccess';
 import { Plus, Edit, Trash2, RefreshCw, ShieldCheck, ShieldMinus, ClipboardList } from 'lucide-react';
 import { computeEffectivePermissions, ALL_PERMISSIONS } from '@/hooks/useAccess';
@@ -85,7 +86,14 @@ export default function AdminUsers() {
                       <Button size="sm" variant="outline" onClick={() => setLogsDialog({ open: true, userId: u.id })}>
                         <ClipboardList className="w-4 h-4 ml-2" /> گزارش‌ها
                       </Button>
-                      <Button size="sm" variant="destructive" onClick={() => deleteUser(u.id)}>
+                      <Button size="sm" variant="destructive" onClick={async () => {
+                        if (API_BASE) {
+                          await apiRequest(`/api/users/${u.id}`, { method: 'DELETE' });
+                          window.location.reload();
+                        } else {
+                          await deleteUser(u.id);
+                        }
+                      }}>
                         <Trash2 className="w-4 h-4 ml-2" /> حذف
                       </Button>
                     </div>
@@ -134,7 +142,11 @@ export default function AdminUsers() {
               <Button disabled={!draft.name.trim() || !draft.email.trim() || !draft.password.trim()} onClick={async () => {
                 setAdding(true);
                 try {
-                  await createUser({ name: draft.name, email: draft.email, role: draft.role as any, password: draft.password });
+                  if (API_BASE) {
+                    await apiRequest('/api/users', { method: 'POST', body: JSON.stringify({ name: draft.name, email: draft.email, role: draft.role, password: draft.password }) });
+                  } else {
+                    await createUser({ name: draft.name, email: draft.email, role: draft.role as any, password: draft.password });
+                  }
                   setShowAdd(false);
                   setDraft({ name: '', email: '', role: 'manager', password: '' });
                 } finally {
@@ -201,7 +213,11 @@ export default function AdminUsers() {
                 <Button variant="outline" onClick={() => setPermDialog({ open: false, grants: [], denies: [] })}>انصراف</Button>
                 <Button onClick={async () => {
                   if (!permDialog.userId) return;
-                  await updateUser(permDialog.userId, { grants: permDialog.grants as any, denies: permDialog.denies as any });
+                  if (API_BASE) {
+                    await apiRequest(`/api/users/${permDialog.userId}`, { method: 'PATCH', body: JSON.stringify({ grants: permDialog.grants, denies: permDialog.denies }) });
+                  } else {
+                    await updateUser(permDialog.userId, { grants: permDialog.grants as any, denies: permDialog.denies as any });
+                  }
                   setPermDialog({ open: false, grants: [], denies: [] });
                 }}>ذخیره</Button>
               </div>

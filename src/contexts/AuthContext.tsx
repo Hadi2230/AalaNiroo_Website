@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useUsers } from './UsersContext';
+import { apiRequest, setAuthToken, API_BASE } from '@/lib/api';
 import { useAuditLog } from './AuditLogContext';
 
 interface User {
@@ -89,16 +90,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 600));
-
-      // Look up user from UsersContext
-      const stored = getUserByEmail(email.trim());
-      if (!stored || stored.status !== 'active') {
+      if (API_BASE) {
+        // Remote login
+        const resp = await apiRequest<{ token: string; user: any }>(`/api/auth/login`, {
+          method: 'POST',
+          body: JSON.stringify({ email: email.trim(), password: password.trim() }),
+        });
+        setAuthToken(resp.token);
+        setUser(resp.user);
+        try { localStorage.setItem('user', JSON.stringify(resp.user)); } catch {}
+        try { sessionStorage.setItem('user', JSON.stringify(resp.user)); } catch {}
+        try {
+          const encoded = btoa(JSON.stringify(resp.user));
+          const expDays = 7;
+          const d = new Date();
+          d.setTime(d.getTime() + (expDays*24*60*60*1000));
+          document.cookie = `auth_user=${encoded}; expires=${d.toUTCString()}; path=/`;
+        } catch {}
+        addLog({ action: 'login', actorEmail: resp.user.email, actorName: resp.user.name });
         setIsLoading(false);
-        return false;
+        return true;
       }
-      // Validate password using same salted-hash function (re-implement quick inline)
+
+      // Local fallback
+      await new Promise(resolve => setTimeout(resolve, 300));
+      const stored = getUserByEmail(email.trim());
+      if (!stored || stored.status !== 'active') { setIsLoading(false); return false; }
       const enc = new TextEncoder();
       const saltBytes = new Uint8Array(stored.salt.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
       const pwdBytes = enc.encode(password.trim());
@@ -107,29 +124,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       combined.set(pwdBytes, saltBytes.length);
       const digest = await crypto.subtle.digest('SHA-256', combined);
       const hash = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
-
-      if (hash !== stored.passwordHash) {
-        setIsLoading(false);
-        return false;
-      }
-
-      const userWithoutSecrets = {
-        id: stored.id,
-        name: stored.name,
-        email: stored.email,
-        role: stored.role,
-        avatar: stored.avatar,
-      };
+      if (hash !== stored.passwordHash) { setIsLoading(false); return false; }
+      const userWithoutSecrets = { id: stored.id, name: stored.name, email: stored.email, role: stored.role, avatar: stored.avatar };
       setUser(userWithoutSecrets as any);
       try { localStorage.setItem('user', JSON.stringify(userWithoutSecrets)); } catch {}
       try { sessionStorage.setItem('user', JSON.stringify(userWithoutSecrets)); } catch {}
-      try {
-        const encoded = btoa(JSON.stringify(userWithoutSecrets));
-        const expDays = 7;
-        const d = new Date();
-        d.setTime(d.getTime() + (expDays*24*60*60*1000));
-        document.cookie = `auth_user=${encoded}; expires=${d.toUTCString()}; path=/`;
-      } catch {}
+      try { const encoded = btoa(JSON.stringify(userWithoutSecrets)); const d = new Date(); d.setTime(d.getTime() + (7*24*60*60*1000)); document.cookie = `auth_user=${encoded}; expires=${d.toUTCString()}; path=/`; } catch {}
       try { await updateUser(stored.id, { lastLoginAt: new Date().toISOString() }); } catch {}
       addLog({ action: 'login', actorEmail: stored.email, actorName: stored.name });
       setIsLoading(false);
@@ -146,6 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setUser(null);
     localStorage.removeItem('user');
+    setAuthToken(null);
     try { sessionStorage.removeItem('user'); } catch {}
     try { document.cookie = 'auth_user=; Max-Age=0; path=/'; } catch {}
   };
