@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      String   @default("manager") // superadmin | admin | manager | sales
+  status    String   @default("active")   // active | disabled
+  avatar    String? 
+  password  String   // salted hash
+  salt      String
+  grants    String[] @default([])
+  denies    String[] @default([])
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  AuditLogs AuditLog[]
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id])
+  action    String
+  target    String?
+  metadata  Json?
+  userAgent String?
+  createdAt DateTime @default(now())
+}
