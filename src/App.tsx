@@ -95,7 +95,8 @@ import AdminCustomers from './pages/AdminCustomers';
 import AdminUsers from './pages/AdminUsers';
 import AdminReports from './pages/AdminReports';
 import AdminIntegrations from './pages/AdminIntegrations';
-import AdminChat from './pages/AdminChat';
+// Lazy-load heavy admin pages to avoid initial bundle issues
+const AdminChat = React.lazy(() => import('./pages/AdminChat'));
 import AdminContent from './pages/AdminContent';
 import AdminMedia from './pages/AdminMedia';
 import AdminAbout from './pages/AdminAbout';
@@ -137,6 +138,7 @@ const App = () => (
                   v7_relativeSplatPath: true,
                 }}
               >
+                <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-600">در حال بارگذاری...</div>}>
                 <Routes>
                   {/* 🌍 Public Routes */}
                   <Route path="/" element={<ModernIndex />} />
@@ -294,6 +296,7 @@ const App = () => (
                   {/* 🛑 404 */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
+                </React.Suspense>
               </BrowserRouter>
             </ErrorBoundary>
                 </TooltipProvider>
