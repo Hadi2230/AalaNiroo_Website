@@ -4,5 +4,6 @@
     void Application_Start(object sender, EventArgs e)
     {
         GlobalConfiguration.Configure(WebApiConfig.Register);
+        ServerNetFx.Seed.Ensure();
     }
 </script>
