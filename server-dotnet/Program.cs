@@ -52,6 +52,13 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Authorization Policies
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("superadmin", policy => policy.RequireClaim("role", "superadmin"));
+    options.AddPolicy("superadmin_or_admin", policy => policy.RequireClaim("role", new[] { "superadmin", "admin" }));
+});
+
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -84,11 +91,12 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Migrate and seed
+// Migrate (or ensure) and seed
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync();
+    try { await db.Database.MigrateAsync(); }
+    catch { await db.Database.EnsureCreatedAsync(); }
     await Seed.RunAsync(db, app.Configuration);
 }
 
