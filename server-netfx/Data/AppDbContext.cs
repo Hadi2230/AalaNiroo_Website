@@ -1,7 +1,7 @@
 using System.Data.Entity;
-using ServerNetFx.Models;
+using AalaNiroo.Api.Models;
 
-namespace ServerNetFx.Data
+namespace AalaNiroo.Api.Data
 {
     public class AppDbContext : DbContext
     {
