@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
-using ServerNetFx.Data;
-using ServerNetFx.Models;
-using ServerNetFx.Services;
+using AalaNiroo.Api.Data;
+using AalaNiroo.Api.Models;
+using AalaNiroo.Api.Services;
 
-namespace ServerNetFx
+namespace AalaNiroo.Api
 {
     public static class Seed
     {
