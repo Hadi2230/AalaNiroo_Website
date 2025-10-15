@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
 using System.Web.Http;
-using ServerNetFx.Data;
-using ServerNetFx.Models;
-using ServerNetFx.Services;
+using AalaNiroo.Api.Data;
+using AalaNiroo.Api.Models;
+using AalaNiroo.Api.Services;
 
-namespace ServerNetFx.Controllers
+namespace AalaNiroo.Api.Controllers
 {
     [Authorize]
     [RoutePrefix("api/users")]
