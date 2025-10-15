@@ -1,8 +1,8 @@
 using System.Linq;
 using System.Web.Http;
-using ServerNetFx.Data;
+using AalaNiroo.Api.Data;
 
-namespace ServerNetFx.Controllers
+namespace AalaNiroo.Api.Controllers
 {
     [Authorize]
     [RoutePrefix("api/audit-logs")]

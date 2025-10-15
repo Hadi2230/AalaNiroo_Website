@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ServerNetFx.Services
+namespace AalaNiroo.Api.Services
 {
     public static class PasswordHasher
     {

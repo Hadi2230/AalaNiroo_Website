@@ -5,10 +5,10 @@ using System.Security.Claims;
 using System.Text;
 using System.Web.Http;
 using Microsoft.IdentityModel.Tokens;
-using ServerNetFx.Data;
-using ServerNetFx.Services;
+using AalaNiroo.Api.Data;
+using AalaNiroo.Api.Services;
 
-namespace ServerNetFx.Controllers
+namespace AalaNiroo.Api.Controllers
 {
     [RoutePrefix("api/auth")]
     public class AuthController : ApiController

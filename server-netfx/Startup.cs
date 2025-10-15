@@ -9,8 +9,8 @@ using Microsoft.Owin.Security;
 using Microsoft.IdentityModel.Tokens;
 using Owin;
 
-[assembly: OwinStartup(typeof(ServerNetFx.Startup))]
-namespace ServerNetFx
+[assembly: OwinStartup(typeof(AalaNiroo.Api.Startup))]
+namespace AalaNiroo.Api
 {
     public class Startup
     {
