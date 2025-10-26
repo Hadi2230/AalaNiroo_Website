@@ -355,18 +355,89 @@ export default function AdminContent() {
 
               <Button 
                 onClick={() => {
-                  // Test sync by updating a field
-                  updateCompanyData('fa', 'name', 'شرکت اعلا نیرو - تست ' + Date.now());
-                  toast.success('تست sync انجام شد!', {
-                    description: 'صفحه اصلی را چک کنید'
+                  // Export content for sharing
+                  const allContent = {
+                    companyContent: companyData,
+                    homeContent: homeContent,
+                    seoData: seoData,
+                    menuStructure: menuStructure,
+                    lastUpdated: new Date().toISOString(),
+                    updatedBy: user?.name || 'Admin'
+                  };
+                  
+                  const blob = new Blob([JSON.stringify(allContent, null, 2)], { type: 'application/json' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `content-backup-${new Date().toISOString().split('T')[0]}.json`;
+                  a.click();
+                  
+                  toast.success('فایل محتوا دانلود شد!', {
+                    description: 'این فایل را در سیستم‌های دیگر import کنید'
                   });
                 }} 
                 variant="outline" 
                 size="lg"
-                className="text-purple-600 hover:text-purple-700"
+                className="text-green-600 hover:text-green-700"
               >
-                <Zap className="w-5 h-5 mr-2" />
-                تست فوری
+                <Download className="w-5 h-5 mr-2" />
+                Export محتوا
+              </Button>
+
+              <Button 
+                onClick={() => {
+                  // Import content from file
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = '.json';
+                  input.onchange = (e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                      try {
+                        const content = JSON.parse(e.target?.result as string);
+                        
+                        // Update local storage with imported data
+                        if (content.companyContent) {
+                          localStorage.setItem('companyContent', JSON.stringify(content.companyContent));
+                          window.dispatchEvent(new CustomEvent('companyDataUpdated', {
+                            detail: content.companyContent
+                          }));
+                        }
+                        
+                        if (content.homeContent) {
+                          localStorage.setItem('homeContent', JSON.stringify(content.homeContent));
+                        }
+                        
+                        if (content.seoData) {
+                          localStorage.setItem('seoData', JSON.stringify(content.seoData));
+                        }
+                        
+                        if (content.menuStructure) {
+                          localStorage.setItem('menuStructure', JSON.stringify(content.menuStructure));
+                        }
+                        
+                        toast.success('محتوا با موفقیت import شد!', {
+                          description: 'صفحه را refresh کنید تا تغییرات اعمال شود'
+                        });
+                      } catch (error) {
+                        toast.error('خطا در import فایل', {
+                          description: 'لطفاً فایل معتبر انتخاب کنید'
+                        });
+                      }
+                    };
+                    reader.readAsText(file);
+                  };
+                  input.click();
+                }} 
+                variant="outline" 
+                size="lg"
+                className="text-blue-600 hover:text-blue-700"
+              >
+                <Upload className="w-5 h-5 mr-2" />
+                Import محتوا
               </Button>
 
               <Button
