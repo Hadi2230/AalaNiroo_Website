@@ -114,6 +114,93 @@ app.get('/api/audit-logs', auth, requireRole(['superadmin']), async (req, res) =
   res.json(filtered);
 });
 
+// Content Management API
+// Get all content
+app.get('/api/content', auth, requireRole(['superadmin', 'admin']), async (req, res) => {
+  try {
+    const content = await prisma.content.findMany({
+      orderBy: { updatedAt: 'desc' }
+    });
+    
+    // Convert array to object for easier access
+    const contentMap = {};
+    content.forEach(item => {
+      contentMap[item.key] = item.value;
+    });
+    
+    res.json(contentMap);
+  } catch (error) {
+    console.error('Error fetching content:', error);
+    res.status(500).json({ error: 'Failed to fetch content' });
+  }
+});
+
+// Save content
+app.post('/api/content', auth, requireRole(['superadmin', 'admin']), async (req, res) => {
+  try {
+    const { contentData } = req.body;
+    const userId = req.user.sub;
+    
+    // Save each content item
+    const promises = Object.entries(contentData).map(([key, value]) => 
+      prisma.content.upsert({
+        where: { key },
+        update: { 
+          value: JSON.stringify(value),
+          updatedAt: new Date(),
+          updatedBy: userId
+        },
+        create: {
+          key,
+          value: JSON.stringify(value),
+          updatedBy: userId
+        }
+      })
+    );
+    
+    await Promise.all(promises);
+    
+    // Log the action
+    await prisma.auditLog.create({
+      data: {
+        actorId: userId,
+        action: 'CONTENT_UPDATE',
+        target: 'content',
+        metadata: { keys: Object.keys(contentData) }
+      }
+    });
+    
+    res.json({ success: true, message: 'Content saved successfully' });
+  } catch (error) {
+    console.error('Error saving content:', error);
+    res.status(500).json({ error: 'Failed to save content' });
+  }
+});
+
+// Get specific content by key
+app.get('/api/content/:key', auth, requireRole(['superadmin', 'admin']), async (req, res) => {
+  try {
+    const { key } = req.params;
+    const content = await prisma.content.findUnique({
+      where: { key }
+    });
+    
+    if (!content) {
+      return res.status(404).json({ error: 'Content not found' });
+    }
+    
+    res.json({
+      key: content.key,
+      value: JSON.parse(content.value),
+      updatedAt: content.updatedAt,
+      updatedBy: content.updatedBy
+    });
+  } catch (error) {
+    console.error('Error fetching content:', error);
+    res.status(500).json({ error: 'Failed to fetch content' });
+  }
+});
+
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 app.listen(PORT, () => {
