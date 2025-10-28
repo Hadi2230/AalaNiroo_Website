@@ -1,0 +1,93 @@
+/* PageLayout Custom Styles */
+/* Professional background color implementation for main content areas */
+
+/* Override section backgrounds to work properly with #7a8d9b background */
+.page-content-wrapper section {
+  /* Sections that should have white/light backgrounds will still work */
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure white background sections have proper contrast */
+.page-content-wrapper section.bg-white,
+.page-content-wrapper .bg-white {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Gradient sections should maintain their gradients */
+.page-content-wrapper section[class*="bg-gradient"],
+.page-content-wrapper [class*="bg-gradient"] {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure proper spacing and padding for content sections */
+.page-content-wrapper > section:first-child {
+  padding-top: 0;
+}
+
+/* Cards and content blocks should maintain their backgrounds */
+.page-content-wrapper .card,
+.page-content-wrapper [class*="Card"] {
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure text contrast on the new background */
+.page-content-wrapper {
+  color: #1a1a1a;
+}
+
+/* Transparent sections should show the background color */
+.page-content-wrapper section:not([class*="bg-"]):not([style*="background"]) {
+  background-color: transparent;
+}
+
+/* Gray backgrounds should be slightly adjusted for better contrast */
+.page-content-wrapper .bg-gray-50 {
+  background-color: rgba(243, 244, 246, 0.95) !important;
+}
+
+.page-content-wrapper .bg-gray-100 {
+  background-color: rgba(243, 244, 246, 0.98) !important;
+}
+
+/* Hero sections often have their own backgrounds */
+.page-content-wrapper [class*="hero"],
+.page-content-wrapper [class*="Hero"] {
+  position: relative;
+  z-index: 2;
+}
+
+/* Ensure proper layering for overlapping elements */
+.page-content-wrapper {
+  position: relative;
+  overflow: visible;
+}
+
+/* Smooth transitions for interactive elements */
+.page-content-wrapper * {
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Media queries for responsive behavior */
+@media (max-width: 768px) {
+  .page-content-wrapper section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Dark mode adjustments if needed */
+@media (prefers-color-scheme: dark) {
+  .page-content-wrapper {
+    color: #f9fafb;
+  }
+  
+  .page-content-wrapper .card,
+  .page-content-wrapper [class*="Card"] {
+    background-color: #1f2937;
+    color: #f9fafb;
+  }
+}
